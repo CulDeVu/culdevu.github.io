@@ -2,16 +2,18 @@
 window.onload = function() {
 	var dom = document.getElementsByTagName("body")[0];
 	var originalText = dom.innerHTML;
-	var newText = "<div id='content' style='margin-top:30px;'> \
-			<span id='logo' class='dark'>CulDeVu</span> \
-			<span style='display:inline-block;margin-left:-10px;''> \
-				<span id='quote' class='dark'>the portfolio of Danny Taylor</span><br> \
-				<div id='navbar' class='light'> \
-					<span id='0' class='navbutton' onmousedown='m_down(this)'>HOME</span> \
-					<span id='1' class='navbutton' onmousedown='m_down(this)'>PROJECTS</span> \
-					<span id='2' class='navbutton' onmousedown='m_down(this)'>BLOG</span> \
-					<span id='3' class='navbutton' onmousedown='m_down(this)'>ABOUT</span>  \
-				</div> \
+	var newText = "<div id='content' style='font-size: 0;'> \
+			<span id='header'> \
+				<span id='logo' class='dark'>CulDeVu</span> \
+				<span style='width: 480px; display: inline-block;'> \
+					<span id='quote' class='dark'>the portfolio of Danny Taylor</span> \
+					<div id='navbar' class='light'> \
+						<span id='0' class='navbutton' onmousedown='m_down(this)'>HOME</span> \
+						<span id='1' class='navbutton' onmousedown='m_down(this)'>PROJECTS</span> \
+						<span id='2' class='navbutton' onmousedown='m_down(this)'>DEVLOG</span> \
+						<span id='3' class='navbutton' onmousedown='m_down(this)'>ABOUT</span>  \
+					</div> \
+				</span> \
 			</span> \
 			<span id='body' class='light'>";
 	newText += originalText;
