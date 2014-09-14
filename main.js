@@ -1,3 +1,4 @@
+var disqus_shortname = 'culdevu';
 
 window.onload = function() {
 	var dom = document.getElementsByTagName("body")[0];
@@ -27,6 +28,14 @@ window.onload = function() {
 		att.value = imgDom[i].getAttribute("lazy");
 		imgDom[i].setAttributeNode(att);
 	}
+
+	loadDisqus();
+}
+
+function loadDisqus() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 }
 
 function m_down(button) {
