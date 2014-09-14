@@ -29,7 +29,7 @@ window.onload = function() {
 		imgDom[i].setAttributeNode(att);
 	}
 
-	disqusTags = document.getElementById("discus");
+	disqusTags = document.getElementById("disqus_thread");
 	if (disqusTags != null)
 		loadDisqus();
 }
