@@ -11,7 +11,7 @@ window.onload = function() {
 					<div id='navbar' class='light'> \
 						<span id='0' class='navbutton' onmousedown='m_down(this)'>HOME</span> \
 						<span id='1' class='navbutton' onmousedown='m_down(this)'>PROJECTS</span> \
-						<span id='2' class='navbutton' onmousedown='m_down(this)'>DEVLOG</span> \
+						<span id='2' class='navbutton' onmousedown='m_down(this)'>ARTICLES</span> \
 						<span id='3' class='navbutton' onmousedown='m_down(this)'>ABOUT</span>  \
 					</div> \
 				</span> \
@@ -29,7 +29,9 @@ window.onload = function() {
 		imgDom[i].setAttributeNode(att);
 	}
 
-	loadDisqus();
+	disqusTags = document.getElementById("discus");
+	if (disqusTags != null)
+		loadDisqus();
 }
 
 function loadDisqus() {
@@ -38,8 +40,23 @@ function loadDisqus() {
     (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
 }
 
+/*function loadHomePage()
+{
+	xmlRequest = new XMLHttpRequest();
+	xmlRequest.open("GET", "articles.xml", false);
+	xmlRequest.send();
+	xmlDoc = xmlRequest.responseXML;
+
+	alert(xmlDoc);
+
+	document.getElementById("body").innerHTML = xmlDoc;
+}*/
+
 function m_down(button) {
-	var urls = new Array("index.html", "projects.html", "blog.html", "about.html");
+	var urls = new Array("http://culdevu.github.io/index.html", 
+						 "http://culdevu.github.io/projects.html", 
+						 "http://culdevu.github.io/blog.html", 
+						 "http://culdevu.github.io/about.html");
 
 	var x = parseInt(button.getAttribute("id"));
 	window.location.href = urls[x];
