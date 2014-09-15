@@ -12,10 +12,10 @@
 			You know how, when you're in, say, a math class, and you get a question wrong. It's <i>completely wrong</i>. In traditional mathematics, when you get a problem wrong, it's bad. But why is that?
 		</p>
 		<p>
-			Math is all about predicting reality. It's wierd when you think about it, but manipulating and shuffling little symbols around on a piece of paper gives you an insight into how the world works. If you've ever played with a <a href="http://video.mit.edu/watch/double-pendulum-6392/">double pendulum</a> before, though, you know how finicky reality really is. It's subject to nearly infinite floating point precision, infinite memory, and the computational speed to solve obscenely difficult differential equations in times shorter than a planck time. A single stray digit, a single calculation with slightly less precision, operations that aren't done in precisely the right order, a slight error in intuitive judgement, and <a href="https://www.youtube.com/watch?v=w-I6XTVZXww">bad things can happen</a>.
+			Math is all about predicting reality. It's weird when you think about it, but manipulating and shuffling little symbols around on a piece of paper gives you an insight into how the world works. If you've ever played with a <a href="http://video.mit.edu/watch/double-pendulum-6392/">double pendulum</a> before, though, you know how finicky reality really is. It's subject to nearly infinite floating point precision, infinite memory, and the computational speed to solve obscenely difficult differential equations in times shorter than a planck time. A single stray digit, a single calculation with slightly less precision, operations that aren't done in precisely the right order, a slight error in intuitive judgment, and <a href="https://www.youtube.com/watch?v=w-I6XTVZXww">bad things can happen</a>.
 		</p>
 		<p>
-			But some math isn't like that. Some math, the type they <i>don't</i> teach in schools, are different. Some types of math are so iterative, or so symetric that emergent behaivior is part of their nature. Altering a single step just slightly creates completely different result. And it's not that the results are wrong, per se. They're just... different.
+			But some math isn't like that. Some math, the type they <i>don't</i> teach in schools, are different. Some types of math are so iterative, or so symmetric that emergent behavior is part of their nature. Altering a single step just slightly creates a completely different result. And it's not that the results are wrong, per se. They're just... different.
 		</p>
 		<p>
 			To kind of show what I mean, here are some personal examples of my own, of what happened when I made a mathematical error.
@@ -23,7 +23,7 @@
 		<p class="sectiontitle">Raytracing Mistakes</p>
 		<img lazy="../img/15_9_14/picasso_i_think.bmp" width="50%" />
 		<p>
-			One of the most visually interesting pieces I generated while I was learning ray-tracing and photon mapping was due to a misjudgement. In the mathematic sense, I transformed
+			One of the most visually interesting pieces I generated while I was learning ray-tracing and photon mapping was due to a misjudgment. In the mathematic sense, I transformed
 		</p>
 		<img lazy="../img/15_9_14/eq1.jpg" width="50%" />
 		<p>
@@ -34,7 +34,7 @@
 			, where <i>X</i> is a set of solid angles with <i>k</i> elements.
 		</p>
 		<p>
-			Now, at first glance, they don't seem that different. I mean, it's just Monte Carlo integration, right? Well, not exactly. The rendering equation is iterative, where each <i>Li</i> term feeds into another <i>Lo</i>, iteratively selecting solid angles and bouncing around the scene. But if <i>all</i> the solid angles selected in any of the iterations are taked from a fixed set of predetermined solid angles, it won't work. Patches of color will be splattered everywhere, as you can see in the above image.
+			Now, at first glance, they don't seem that different. I mean, it's just Monte Carlo integration, right? Well, not exactly. The rendering equation is iterative, where each <i>Li</i> term feeds into another <i>Lo</i>, iteratively selecting solid angles and bouncing around the scene. But if <i>all</i> the solid angles selected in any of the iterations are taken from a fixed set of predetermined solid angles, it won't work. Patches of color will be splattered everywhere, as you can see in the above image.
 		</p>
 		<p>
 			The funny thing is, I could never have predicted that that would have happened. In fact, I did it purposefully, with the intention of optimizing out my random angle generator. What I got was unexpected, and technically, wrong. While an equation can universally describe exact outputs to any scenario, it does little to help us visualize it without some prior experience. The equations may be all-telling, but the results are <i>emergent</i>.
@@ -56,10 +56,10 @@
 			First of all, that's not an antibuddhabrot. Antibuddhabrots aren't interesting to look at, ever. But this is.
 		</p>
 		<p>
-			If you open the image in a new tab and zoom in, you can see all sorts of fractal-like patterns that would  probably be visible at a higher resolution. There are also huge divides between an actual antibuddhabrot and the one above, most notably in the huge bulb in the biggest circle, where it doesn't exist when not sampling on a grid.
+			If you open the image in a new tab and zoom in, you can see all sorts of fractal-like patterns that would probably be visible at a higher resolution. There are also huge divides between an actual antibuddhabrot and the one above, most notably in the huge bulb in the biggest circle, where it doesn't exist when not sampling on a grid.
 		</P>
 		<p>
-			Now, to be fair, it <i>is</i> a mandelbrot variant, so you should never know what to expect. It is, by nature, emergent, because little errors have large differences in the end result. But that's not the point.
+			Now, to be fair, it <i>is</i> a Mandelbrot variant, so you should never know what to expect. It is, by nature, emergent, because little errors have large differences in the end result. But that's not the point.
 		</p>
 		<p>
 			The point I'm trying to make with all this is that mathematic mistakes <i>aren't bad</i>. Aside from all the advantages of learning that everybody likes to spout, fiddling around with different approaches to math problems are a good way to get a surprising insight into a set of relationships.
