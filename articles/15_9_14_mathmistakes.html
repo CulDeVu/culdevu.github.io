@@ -1,0 +1,79 @@
+<html>
+	<head>
+		<title>Mathematical Mistakes</title>
+		<link rel="stylesheet" type="text/css" href="../main.css">
+		<script src="../main.js"></script>
+	</head>
+
+	<body>
+		<div class="maintitle">Mathematical Mistakes</div>
+		<img lazy="../img/15_9_14/buddhabrot_wrong.png" width="100%" />
+		<p>
+			You know how, when you're in, say, a math class, and you get a question wrong. It's <i>completely wrong</i>. In traditional mathematics, when you get a problem wrong, it's bad. But why is that?
+		</p>
+		<p>
+			Math is all about predicting reality. It's wierd when you think about it, but manipulating and shuffling little symbols around on a piece of paper gives you an insight into how the world works. If you've ever played with a <a href="http://video.mit.edu/watch/double-pendulum-6392/">double pendulum</a> before, though, you know how finicky reality really is. It's subject to nearly infinite floating point precision, infinite memory, and the computational speed to solve obscenely difficult differential equations in times shorter than a planck time. A single stray digit, a single calculation with slightly less precision, operations that aren't done in precisely the right order, a slight error in intuitive judgement, and <a href="https://www.youtube.com/watch?v=w-I6XTVZXww">bad things can happen</a>.
+		</p>
+		<p>
+			But some math isn't like that. Some math, the type they <i>don't</i> teach in schools, are different. Some types of math are so iterative, or so symetric that emergent behaivior is part of their nature. Altering a single step just slightly creates completely different result. And it's not that the results are wrong, per se. They're just... different.
+		</p>
+		<p>
+			To kind of show what I mean, here are some personal examples of my own, of what happened when I made a mathematical error.
+		</p>
+		<p class="sectiontitle">Raytracing Mistakes</p>
+		<img lazy="../img/15_9_14/picasso_i_think.bmp" width="50%" />
+		<p>
+			One of the most visually interesting pieces I generated while I was learning ray-tracing and photon mapping was due to a misjudgement. In the mathematic sense, I transformed
+		</p>
+		<img lazy="../img/15_9_14/eq1.jpg" width="50%" />
+		<p>
+			into
+		</p>
+		<img lazy="../img/15_9_14/eq3.jpg" width="50%" />
+		<p>
+			, where <i>X</i> is a set of solid angles with <i>k</i> elements.
+		</p>
+		<p>
+			Now, at first glance, they don't seem that different. I mean, it's just Monte Carlo integration, right? Well, not exactly. The rendering equation is iterative, where each <i>Li</i> term feeds into another <i>Lo</i>, iteratively selecting solid angles and bouncing around the scene. But if <i>all</i> the solid angles selected in any of the iterations are taked from a fixed set of predetermined solid angles, it won't work. Patches of color will be splattered everywhere, as you can see in the above image.
+		</p>
+		<p>
+			The funny thing is, I could never have predicted that that would have happened. In fact, I did it purposefully, with the intention of optimizing out my random angle generator. What I got was unexpected, and technically, wrong. While an equation can universally describe exact outputs to any scenario, it does little to help us visualize it without some prior experience. The equations may be all-telling, but the results are <i>emergent</i>.
+		</p>
+		<p>
+			This result is wrong. Completely and unabashedly wrong. Yet it still looks interesting. In fact, I think it's more visually appealing than most cornel boxes I've seen. The splattered painter style gives hints of color bouncing, and shadows are preserved, so it's visually <i>plausable</i>. It may have been a mistake, but I personally think it was a good mistake.
+		<p>
+			If I could, I would have made a game from this art style. It takes to long to render though on my integrated Intel graphics card :(
+		</p>
+		<p class="sectiontitle">Mandelbrot Mistakes</p>
+		<p>
+			When I was creating a <a href="http://en.wikipedia.org/wiki/Buddhabrot">buddhabrot</a> for the first time, I made a few errors. Firstly, I ended up creating an antibuddhabrot (seen <a href="http://en.wikipedia.org/wiki/Buddhabrot#Nuances">here</a> on the right) by accident, and secondly, I did the same sort of thing as I did in the previous example.
+		</p>
+		<p>
+			Buddhabrots are extremely iterative, and based on high-frequency distributions of samples. If you happen to make the "mistake" of sampling on a gid, you get something that looks like this:
+		</p>
+		<img lazy="../img/15_9_14/antibuddhabrot.png" width="50%" />
+		<p>
+			First of all, that's not an antibuddhabrot. Antibuddhabrots aren't interesting to look at, ever. But this is.
+		</p>
+		<p>
+			If you open the image in a new tab and zoom in, you can see all sorts of fractal-like patterns that would  probably be visible at a higher resolution. There are also huge divides between an actual antibuddhabrot and the one above, most notably in the huge bulb in the biggest circle, where it doesn't exist when not sampling on a grid.
+		</P>
+		<p>
+			Now, to be fair, it <i>is</i> a mandelbrot variant, so you should never know what to expect. It is, by nature, emergent, because little errors have large differences in the end result. But that's not the point.
+		</p>
+		<p>
+			The point I'm trying to make with all this is that mathematic mistakes <i>aren't bad</i>. Aside from all the advantages of learning that everybody likes to spout, fiddling around with different approaches to math problems are a good way to get a surprising insight into a set of relationships.
+		</p>
+		<p>
+			Math equations are opaque. You can't look at them and hope to get a good idea of everything that happens without prior experience. When the equations are iterative, you can't hope to figure it out at all. Bret Victor once said in a <a href="http://vimeo.com/36579366">talk that he did</a> that he could comment out almost any line of code in his platformer, and have a new, interesting game mechanic. In rather the same way, fiddling with parameters and making false assumptions can lead to interesting, emergent results of their own (which should make sense, as programming is very math based).
+		</p>
+		<p>
+			I'm not very good at wrapping things up, but just as a closing remark, I think it's important to note that these are personal experiences. Not personal, as in, like, personal secrets, but more like "you can see that" being replaced with "I saw." It may be overly pretentious, but I view all forms of creation an art, and art is always property of the creator. The specific examples above don't mean much to anybody, honestly, it's really only listed there to make a point. :P
+		<p>
+			(Posted on 15/9/14)
+		</p>
+
+		<div id="disqus_thread"></div>
+		
+	</body>
+</html>
