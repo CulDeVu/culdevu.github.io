@@ -7,7 +7,7 @@ window.onload = function() {
 			<span id='header'> \
 				<span id='logo' class='dark'>CulDeVu</span> \
 				<span style='width: 480px; display: inline-block;'> \
-					<span id='quote' class='dark'>the portfolio of Danny Taylor</span> \
+					<span id='quote' class='dark'>99 percent math and code</span> \
 					<div id='navbar' class='light'> \
 						<span id='0' class='navbutton' onmousedown='m_down(this)'>HOME</span> \
 						<span id='1' class='navbutton' onmousedown='m_down(this)'>PROJECTS</span> \
@@ -18,8 +18,9 @@ window.onload = function() {
 			</span> \
 			<span id='body' class='light'>";
 	newText += originalText;
-	newText += "</span> \
-		</div>";
+	newText += "</span>";
+	newText += "<div id='copywrite'>Copywrite &copy; 2014 Daniel Taylor, All Rights Reserved</div>";
+	newText += "</div>";
 	dom.innerHTML = newText;
 
 	var imgDom = document.getElementsByTagName("img");
