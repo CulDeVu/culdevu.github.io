@@ -107,12 +107,15 @@ body
 	border-width: 5px;
 	border-top: 0;
 	border-style: solid;
+
+	font-size: 16px;
 }
 
-.maintitle
+h1
 {
 	font-size: 36px;
 	color: #C53327;
+	font-weight: normal;
 	
 	margin-bottom: 20px;
 	
@@ -123,9 +126,9 @@ body
 		1px 1px 0 #000;
 }
 
-.sectiontitle
+h2
 {
-	font-size: 30px;
+	font-size: 26px;
 	color: #000000;
 	font-weight: bold;
 	
@@ -151,7 +154,7 @@ p
 
 a
 {
-	color: #a0a0a0;
+	color: #C53327;
 }
 
 #copywrite
@@ -162,4 +165,16 @@ a
 	
 	font-size:16px;
 	color:#E2E2E2;
+}
+
+pre 
+{
+	display: block;
+	overflow: scroll;
+
+	padding: 5px;
+
+	border-style: solid;
+	border-color: #000000;
+	border-width: 1px;
 }

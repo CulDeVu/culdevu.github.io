@@ -6,7 +6,13 @@
 	</head>
 
 	<body>
-		<div class="maintitle">Mathematical Mistakes</div>
+		<!-- poly triangulation -->
+		<h1>Polygon Triangulation</h1>
+		<p>Modern GPUs have an annoying habbit of only liking to draw triangles. Often when using 3D modeling programs or vector-based drawing applications to produce game art, you'll get instead a soup of arbitrary polygons. This is an issue if you plan to rasterize these polygons. Fortunately, polygons can be decomposed into triangles relatively easily.</p>
+<p>There are many different ways to decompose polygons into triangles. Typically though you only implement an algorithm that's advanced enough to suit your needs. For example, convex polygons are easier to triangulate than concave ones, and polygons with a hole in the middle of it are a little complicated to get right (and are also beyond the scope of this article: I'll be covering ear clipping at the most in this article. Maybe for another article). If you know that you'll only ever be using convex polygons, then only implement the algorithm for convex polygon triangulation. No need to go overboard :)</p>
+		<p><a href="articles/30_9_14_triangulation.html">Read more...</a></p>
+
+		<h1>Mathematical Mistakes</h1>
 		<p>
 			You know how, when you're in, say, a math class, and you get a question wrong. It's <i>completely wrong</i>. In traditional mathematics, when you get a problem wrong, it's bad. But why is that?
 		</p>
@@ -24,7 +30,7 @@
 		</p>
 
 		<!-- first -->
-		<div class="maintitle">My First Blog Post</div>
+		<h1>My First Blog Post</h1>
 		<p>
 			It's true! My very first blog post EVER!
 		</p>
