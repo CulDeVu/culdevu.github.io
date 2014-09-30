@@ -40,6 +40,8 @@ body
 	border-style: solid;
 
 	vertical-align: top;
+
+	cursor: pointer;
 }
 
 #quote

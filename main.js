@@ -5,7 +5,7 @@ window.onload = function() {
 	var originalText = dom.innerHTML;
 	var newText = "<div id='content' style='font-size: 0;'> \
 			<span id='header'> \
-				<span id='logo' class='dark'>CulDeVu</span> \
+				<span id='logo' class='dark' onclick='onClickLogo()'>CulDeVu</span> \
 				<span style='width: 480px; display: inline-block;'> \
 					<span id='quote' class='dark'>99 percent math and code</span> \
 					<div id='navbar' class='light'> \
@@ -33,6 +33,11 @@ window.onload = function() {
 	disqusTags = document.getElementById("disqus_thread");
 	if (disqusTags != null)
 		loadDisqus();
+}
+
+function onClickLogo()
+{
+	window.location.href = "http://djtaylor.me";
 }
 
 function loadDisqus() {
