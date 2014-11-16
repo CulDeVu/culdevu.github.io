@@ -1,13 +1,24 @@
 var disqus_shortname = 'culdevu';
 
 window.onload = function() {
+	{
+		link = document.createElement( "link" );
+		link.href = "main.css";
+		link.type = "text/css";
+		link.rel = "stylesheet";
+		link.media = "screen,print";
+		document.getElementsByTagName("head")[0].appendChild( link );
+	}
+
+	document.body.style.background = "#262626";
+
 	var dom = document.getElementsByTagName("body")[0];
 	var originalText = dom.innerHTML;
 	var newText = "<div id='content' style='font-size: 0;'> \
 			<span id='header'> \
 				<span id='logo' class='dark' onclick='onClickLogo()'>CulDeVu</span> \
 				<span style='width: 480px; display: inline-block;'> \
-					<span id='quote' class='dark'>99 percent math and code</span> \
+					<span id='quote' class='dark'>99% math and code</span> \
 					<div id='navbar' class='light'> \
 						<span id='0' class='navbutton' onmousedown='m_down(this)'>HOME</span> \
 						<span id='1' class='navbutton' onmousedown='m_down(this)'>PROJECTS</span> \
@@ -19,7 +30,7 @@ window.onload = function() {
 			<span id='body' class='light'>";
 	newText += originalText;
 	newText += "</span>";
-	newText += "<div id='copywrite'>Copywrite &copy; 2014 Daniel Taylor, All Rights Reserved</div>";
+	newText += "<div id='copywrite'>Copyright &copy; 2014 Daniel Taylor, All Rights Reserved</div>";
 	newText += "</div>";
 	dom.innerHTML = newText;
 

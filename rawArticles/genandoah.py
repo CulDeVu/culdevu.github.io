@@ -16,8 +16,8 @@ def build_posts():
     markdown_post_text = markdown_post_file.read()
 
     html_post_file = open(os.path.join(BUILD_DIR, post_name + '.html'), 'w+')
-    html_post_text = "<html><head><title>!!INSERT TITLE HERE!!!</title><link rel='stylesheet' type='text/css' href='../main.css'>" + \
-      "<script src='../main.js'></script></head><body>" + mistune.markdown(markdown_post_text) + "</body></html>"
+    html_post_text = "<html><head><title>!!INSERT TITLE HERE!!!</title>" + \
+      "<script src='../main.js'></script><script src='../latexit.js'></script></head><body>" + mistune.markdown(markdown_post_text) + "</body></html>"
     html_post_file.write(html_post_text)
 
     markdown_post_file.close()
