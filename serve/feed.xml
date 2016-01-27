@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CulDeVu</title>
+    <description>[sort description and key words to shove in meta tags]
+</description>
+    <link>http://yourdomain.com/</link>
+    <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>2015-11-30 14:09:45 -0800</pubDate>
+    <lastBuildDate>2015-11-30 14:09:45 -0800</lastBuildDate>
+    <generator>Jekyll v</generator>
+    
+      <item>
+        <title>Origami and the Associated Maths</title>
+        <description>&lt;p&gt;So this is going to be another one of those write-it-out-so-that-I-can-better-understand-it sort of things. Just a heads up. This IS a journal, after all, and functions as advertisement second.&lt;/p&gt;
+
+&lt;p&gt;So. Origami and mathematics. We know that the two are related because, if you fold a piece of paper the same way twice, you’ll get two of the same shape, so there’s rules governing it. And some smart people have tried figuring out those rules. There’s a bunch of them, but they all fall short for what I’m wanting to do. So here it goes:&lt;/p&gt;
+
+&lt;p&gt;Together with research in 1992, and again in 2002, a total of 7 axioms for flat folding paper were created, detailing exactly which basic operations could be performed with paper. These were laid out in much the same way that Euclid’s axioms of geometry were laid out. This is basically the way that most research that I’ve been able to turn up on the internet is: interesting constructions that, using the axioms, prove something about something else.&lt;/p&gt;
+
+&lt;p&gt;What I’m wanting to do, however, is a lot different. I’m wanting to be able to take a collection of creases and their associated information, and turn it into a model of the finished product. A kind of crease instruction to finished origami model converter if you will. To do this I’ve tried a couple methods, like physics based, relaxation and constraint based, and they’ve failed for one reason or another. I’ve settled on doing something sort of finite-element based: given a point on the original piece of paper and all the folds, where will that point be located in 3D space?&lt;/p&gt;
+
+&lt;p&gt;[attachment=29577:finite_element.jpg]
+(turn up for trackpad art)&lt;/p&gt;
+
+&lt;p&gt;Unfortunately, there doesn’t seem to be any information on the topic, so I guess I’ll have to do it. Which is good, because I really wanted an interesting problem to work on. The rest of the entry will be about the stuff I’ve concluded so far, and the questions I have.&lt;/p&gt;
+
+&lt;h1 id=&quot;types-of-folds&quot;&gt;Types of folds&lt;/h1&gt;
+
+&lt;p&gt;Folds are what what happen when you crease the paper in a straight line, and either fold the other side down or turn it some arbitrary angle around the fold. I’ll be using the term “fold” and “crease” interchangeably.&lt;/p&gt;
+
+&lt;p&gt;Folds can created that do one of two things:
+start at one edge of a piece of paper and end at another
+loop back in on itself
+(a fold can also start and stop on the same point on the edge of a piece of paper, but I’ll ignore that case and say it’s case #1)&lt;/p&gt;
+
+&lt;p&gt;[attachment=29573:fold_segments.jpg]&lt;/p&gt;
+
+&lt;p&gt;As you can see in the above examples, folds can be segmented into multiple parts going different directions, but are still connected end to end. I’ll call these fold segments. They come in 2 flavors:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;mountain&lt;/li&gt;
+  &lt;li&gt;valley&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;These types mean essentially nothing by themselves. They represent a direction to fold relative to your viewing angle. What’s important is that they are opposites, and reversing every single fold segment will result in the exact same origami (this is equivalent to turning the piece of paper over). In this journal, all mountain folds are shown as dotted lines in red, and all valley folds are shown as dashed lines in blue, unless i’m trying to point something out.&lt;/p&gt;
+
+&lt;h1 id=&quot;things-you-can-do-with-folds&quot;&gt;Things you can do with folds&lt;/h1&gt;
+
+&lt;p&gt;Origami is all about layering paper folds, one after another, in order, to create something. The “in order” part is important. You can’t create the head and tail of a paper crane (the last steps) before you make all the other folds. However, folds are not always dependent on all of the previous ones. Sometimes folds are made purely to get a reference point for some other fold later on down the line. Some folds cancel out the symmetry of previous folds (more on that later). Further, some steps can be done in parallel, like the 2 wings of a paper plane, because they are independent of each other.&lt;/p&gt;
+
+&lt;p&gt;When you make a fold, sometimes the mountain fold that you thought you made is actually a bunch of mountain-valley segments. To clear this up, I’ll call the starting fold segment the fold seed.&lt;/p&gt;
+
+&lt;p&gt;[attachment=29571:fold_seed.jpg]
+(the green fold segment is the fold seed. The purple fold segments were calculated from other information about symmetry and dependency)&lt;/p&gt;
+
+&lt;p&gt;There are 4 types of fold seeds that I’ll support for right now. They are:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;mountain&lt;/li&gt;
+  &lt;li&gt;valley&lt;/li&gt;
+  &lt;li&gt;inside-reverse (more on this one later)&lt;/li&gt;
+  &lt;li&gt;outside-reverse (the opposite of inside-reverse)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;[attachment=29572:fold_seed_type.jpg]
+(from left to right: mountain, valley, inside-reverse, outside-reverse. The green is the seed, and this shows what happens when each fold interacts with a single dependent)&lt;/p&gt;
+
+&lt;p&gt;I chose these specifically because these are the types of fold seeds that are needed (with the exception to #4) to create a paper crane. I figured if I can’t create a origami interpreter that can’t interpret the quintessential piece of origami, I’ve failed. The first 2 are really obvious and the latter two I’m saving for a later time. There are certain issues about them that make them more complicated.&lt;/p&gt;
+
+&lt;p&gt;You’ve likely noticed in all of the pictures you’ve seen so far there’s a lot of reflection about lines going on. I’ll call this reflecting about lines “dependency,” because of the its ordering properties. When a fold segment is dependent on another fold segment, it will reflect about the other line and change from mountain to valley or vice versa. Here’s a pic:&lt;/p&gt;
+
+&lt;p&gt;[attachment=29576:angle.jpg]&lt;/p&gt;
+
+&lt;p&gt;An important thing to note about this dependency is that the line that is being reflected about &lt;em&gt;has&lt;/em&gt; to be done first. The only exception to the rule is fold segments at 90 degree angles on the paper, which can be done interchangeably (which I think says something very interesting about these types of folds).&lt;/p&gt;
+
+&lt;p&gt;All of the above info has led me to use a tree to talk about origami folds. the parents of the tree represent dependency, while the nodes represent fold seeds.&lt;/p&gt;
+
+&lt;p&gt;[attachment=29574:tree.jpg]&lt;/p&gt;
+
+&lt;p&gt;For mountain and valley fold seeds, this representation encompasses everything that needs to be said about an origami: from parallelism to dependency to ordering to direction.&lt;/p&gt;
+
+&lt;h1 id=&quot;other-fun-facts&quot;&gt;Other fun facts&lt;/h1&gt;
+
+&lt;p&gt;Here are just some neat things that happen to be true, that are essential to have a complete implementation of a origami interpreter, but aren’t essential to have a complete understanding of what’s happening. In no particular order:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Everything talked about above has to do with planar folds, folds that create something that ends up laying down flat (180 degree folds). Non-planar folds act the exact same way but have an additional constraint: they can have no children in the dependency tree.&lt;/li&gt;
+  &lt;li&gt;For planar folds, every vertex where fold segments intersect, there are always the number of valley folds segments and mountain ones always differ by 2. For vertexes where fold segments and paper edges intersect, all bets are off. For non-planar fold segments, you can treat them like paper edges for the purpose of counting mountain-valley folds. This is an easy way to tell if a fold is valid or not.&lt;/li&gt;
+  &lt;li&gt;For mountain and valley fold seeds only, if a fold seed is dependent on a parent, which is dependent on a grandparent, then the fold seed is also dependent on the grandparent. This is not true for inside-reverse or outside-reverse folds.&lt;/li&gt;
+  &lt;li&gt;Folds that do not touch their parent fold in the dependency tree can be turned into 2 separate folds without any issues. For non-planar folds, it get’s a bit more complicated. This is the only time self-intersection of paper is a problem, and I think I can safely ignore this case as it’s fairly easy to work around. I think Posted Image&lt;/li&gt;
+  &lt;li&gt;Nodes on the same layer of the dependency tree that are not dependent on each other can be done in parallel, or in any order.&lt;/li&gt;
+  &lt;li&gt;Each node on the dependency tree must be unique, otherwise it’d be kind of hard to do anything with it or conclude anything from it.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;yup&quot;&gt;Yup.&lt;/h1&gt;
+
+&lt;p&gt;Well that’s about it. That’s all I’m really semi-confident about at the moment. There are a bunch of things I still have to look into and figure out before all is said and done though.&lt;/p&gt;
+
+&lt;p&gt;Tune in next time to find out what any of this has to do with finite element transformations, what the deal is with inside- and outside-reverse fold seeds and why they throw a kink in everything, and how any of this will help creating a fold to origami interpreter.&lt;/p&gt;
+
+&lt;p&gt;See yah! Posted Image&lt;/p&gt;
+</description>
+        <pubDate>2015-11-09 00:00:00 -0800</pubDate>
+        <link>http://yourdomain.com/blog/2015/origami-01/</link>
+        <guid isPermaLink="true">http://yourdomain.com/blog/2015/origami-01/</guid>
+        
+        
+        <category>math</category>
+        
+        <category>origami</category>
+        
+      </item>
+    
+      <item>
+        <title>Fluid dynamics update</title>
+        <description>&lt;p&gt;I’m not really going to talk about much math-y stuff this time. I’ve covered too much ground since my last entry ( Posted Image ) to be able to remember all the pitfalls I ran into. So this time I’m only really going to be talking about the general algorithm, how I deal with the pitfalls of the marker particle method, and the ongoing translation to CUDA. And probably share some of my Mario Maker levels. I’m addicted to stars Posted Image&lt;/p&gt;
+
+&lt;p&gt;So! Let’s do this!&lt;/p&gt;
+
+&lt;p&gt;[media]https://www.youtube.com/watch?v=0xBAqjxHUkA[/media]&lt;/p&gt;
+
+&lt;p&gt;Sorry for the video being kinda shaky. OBS is having a hard time capturing details and YouTube thinks everything ever is a camcorder, so it looks a little strange. It get’s across the idea, though. Note that there is still no surface tension, which would account for just about everything else strange looking with the simulation.&lt;/p&gt;
+
+&lt;p&gt;The General Algorithm&lt;/p&gt;
+
+&lt;p&gt;So the algorithm for simulating a Eulerian fluid goes as follows:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;init particles
+init velocity field, type field, etc
+
+for each frame:
+    apply external forces to velocity field
+    
+    clear type field
+    update particle positions and apply to type field
+    extrapolate the velocity field
+    
+    find particles to re-position
+    re-position those particles
+    
+    build pressure matrices
+    solve the pressure equation
+    apply the pressure to the velocity field
+    
+    enforce boundary conditions
+    
+    advect the velocity field
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The velocity field is the standard MAC staggered grid, cause why not, and because it’s useful for pressure computation and velocity extrapolation. The extrapolation and pressure step are straight out of academic papers so it’s standard stuff.&lt;/p&gt;
+
+&lt;p&gt;The marker particles are the part I don’t really know about. I just advect the marker particles through the velocity field just like anything else, and wherever the marker particles end up defines where the fluid exists or doesn’t. This is pretty much the simplest method of defining the interior vs exterior of a fluid, so it has a lot of pitfalls, but I’ll get to those in a minute. The issue is, though, that most everyone doesn’t talk about this method (because of the many many issues it has) and so they use something called level sets. I’ve tried implementing level sets several times, and marker particles are just so much simpler in every way.&lt;/p&gt;
+
+&lt;h1 id=&quot;marker-particles&quot;&gt;Marker Particles&lt;/h1&gt;
+
+&lt;p&gt;So the biggest pitfall about marker particles is that, due to numerical inaccuracy and a bunch of other issues, they tend to bunch up a lot in certain places. Namely, places where the divergence of the velocity field is still positive even after the incompressibility pressure solver. You’d think that, since the pressure is positive in some places, it’d be negative in the same area, cancelling each other out, but it’s not. The fact that gravity is always pulling down on the fluid makes it not always true, so what ends up happening is a net loss of volume from full to nearly 0 in a couple minutes.&lt;/p&gt;
+
+&lt;p&gt;So what I tried to do, instead of using level sets like a sane person, I decided to force the fluid to conserve volume. The way I did this is pretty straightforward, and is the “find/re-position particles” part of the above algorithm. Basically,&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;iterate over every particle over a grid and see if there are already more than a certain number of particles (max density, if you will) in that grid cell. If there are, I mark it to be re-positioned&lt;/li&gt;
+  &lt;li&gt;iterate over every grid cell where and see if there are less than some other number of particles (min density), and if there are, start pulling from the re-position pool and fill in those spots&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;This is rather finicky in practice. For example, if I set minDensity to maxDensity, you see a lot of artifacts from there not being enough particles in the re-position pool to accommodate (because of the overall positive divergence I mentioned). A happy median, I found, was setting maxDensity to anywhere between 2 or 3 times the minDensity. Sure, this DOES lead to volume loss by a factor of whatever multiple you choose, but it’s much better than having visually disgusting and simulations.&lt;/p&gt;
+
+&lt;p&gt;[attachment=29248:lolp.jpg]&lt;/p&gt;
+
+&lt;p&gt;To be fair, the simulation without re-position looks a lot more fluid and water-like. However, conserving volume it too important to be avoided. Oh well.&lt;/p&gt;
+
+&lt;h1 id=&quot;cuda&quot;&gt;CUDA&lt;/h1&gt;
+
+&lt;p&gt;I’ve been translating small pieces of the simulation to use the GPGPU via CUDA. I’ve gotten the “update particle” portion completely ported to the GPU, which is just a simple advection and setting type fields. The really neat one is the pressure solver.&lt;/p&gt;
+
+&lt;p&gt;In order to find the pressure in each cell, long story short, you need to construct a matrix something like this:
+[attachment=29249:matrix.jpg]
+, and then solve for pressure. On the cpu I used Gauss-Seidel to solve it, but I have no idea how to do it on the GPU. Luckily, there’s a library called cusp that implemented everything for me!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;struct cuspTriple
+{
+	int row, col;
+	float amount;
+};
+cusp::array1d&amp;lt;float, cusp::host_memory&amp;gt; pressure(mapW * mapH);
+void project()
+{
+	cusp::array1d&amp;lt;float, cusp::host_memory&amp;gt; b(mapW * mapH);
+	{
+		float scale = rho / dt;
+		for (int y = 0; y &amp;lt; mapH; ++y)
+		{
+			for (int x = 0; x &amp;lt; mapW; ++x)
+			{
+				int index = y * mapW + x;
+				b[index] = scale * (u-&amp;gt;at(x + 1, y) - u-&amp;gt;at(x, y) +
+					v-&amp;gt;at(x, y + 1) - v-&amp;gt;at(x, y));
+			}
+		}
+	}
+
+	vector&amp;lt;cuspTriple&amp;gt; data;
+	{
+		for (int y = 0; y &amp;lt; mapH; ++y)
+		{
+			for (int x = 0; x &amp;lt; mapW; ++x)
+			{
+				float scale = 1;
+				int n = 0;
+
+				if (x &amp;gt; 0) 
+				{
+					if (type[y * mapW + x - 1] != SOLID)
+					{
+						if (type[y * mapW + x - 1] == WATER)
+						{
+							cuspTriple t;
+							t.row = y * mapW + x;
+							t.col = y * mapW + x - 1;
+							t.amount = 1;
+							data.push_back(t);
+						}
+						++n;
+					}
+				}
+				if (y &amp;gt; 0) {
+					if (type[(y - 1) * mapW + x] != SOLID)
+					{
+						if (type[(y - 1) * mapW + x] == WATER)
+						{
+							cuspTriple t;
+							t.row = y * mapW + x;
+							t.col = (y - 1) * mapW + x;
+							t.amount = 1;
+							data.push_back(t);
+						}
+						++n;
+					}
+				}
+				if (x &amp;lt; mapW - 1) {
+					if (type[y * mapW + x + 1] != SOLID)
+					{
+						if (type[y * mapW + x + 1] == WATER)
+						{
+							cuspTriple t;
+							t.row = y * mapW + x;
+							t.col = y * mapW + x + 1;
+							t.amount = 1;
+							data.push_back(t);
+						}
+						++n;
+					}
+				}
+				if (y &amp;lt; mapH - 1) {
+					if (type[(y + 1) * mapW + x] != SOLID)
+					{
+						if (type[(y + 1) * mapW + x] == WATER)
+						{
+							cuspTriple t;
+							t.row = y * mapW + x;
+							t.col = (y + 1) * mapW + x;
+							t.amount = 1;
+							data.push_back(t);
+						}
+						++n;
+					}
+				}
+
+				cuspTriple t;
+				t.row = y * mapW + x;
+				t.col = y * mapW + x;
+				t.amount = -n;
+				data.push_back(t);
+			}
+		}
+
+	}
+	cusp::coo_matrix&amp;lt;int, float, cusp::host_memory&amp;gt; A(mapW * mapH, mapW * mapH, data.size());
+	{
+		for (int i = 0; i &amp;lt; data.size(); ++i)
+		{
+			A.row_indices[i] = data[i].row;
+			A.column_indices[i] = data[i].col;
+			A.values[i] = data[i].amount;
+		}
+	}
+
+	cusp::default_monitor&amp;lt;float&amp;gt; monitor(b, 600, 0.01, 0);
+	cusp::precond::diagonal&amp;lt;float, cusp::host_memory&amp;gt; M(A);
+
+	cusp::krylov::cg(A, pressure, b, monitor, M);
+}
+void applyPressure()
+{
+	float scale = dt / (rho);
+
+	for (int y = 0; y &amp;lt; mapH; y++)
+	{
+		for (int x = 0; x &amp;lt; mapW; x++)
+		{
+			if (type[y * mapW + x] != WATER)
+				continue;
+
+			float p = pressure[y * mapW + x];
+
+			u-&amp;gt;at(x, y) -= scale * p;
+			u-&amp;gt;at(x + 1, y) += scale * p;
+			v-&amp;gt;at(x, y) -= scale * p;
+			v-&amp;gt;at(x, y + 1) += scale * p;
+		}
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This is the version of the GPU solver I have right now. It has a ton of theoretical std::vector overhead (idk how well the CUDA compiler does to try to optimize things out), so the next thing I’m going to be testing is whether or not over-approximating the number of non-zero elements in the sparse matrix will still be efficient.&lt;/p&gt;
+
+&lt;p&gt;Also, the GPU version is around 3-4 times faster than the CPU version! Now, on the other hand, it’s only 3 or 4 times faster than the CPU version. That’s with copying data back and forth from the GPU, so I give it a little bit of a break, but not much. I’m extremely confident that I could easily squeeze much more efficiency out of it, so that will have to be something I’ll deal with at a later date, after I port a bit more to the GPU.&lt;/p&gt;
+
+&lt;p&gt;In short, kill me now.&lt;/p&gt;
+
+&lt;p&gt;Conclusion&lt;/p&gt;
+
+&lt;p&gt;Could someone please give me stars in Super Mario Maker? I’m addicted and I need all you have. One of my levels’ ID is 04B7-0000-0069-DB69 and from there you should be able to access the 3 levels I’ve uploaded. They have &amp;lt; 20% clear rate on each of them for some strange reason, even though I think they’re pretty easy (and fun).&lt;/p&gt;
+
+&lt;p&gt;Anyway, thanks for reading!&lt;/p&gt;
+</description>
+        <pubDate>2015-09-29 00:00:00 -0700</pubDate>
+        <link>http://yourdomain.com/blog/2015/fluid-dyanamic-update/</link>
+        <guid isPermaLink="true">http://yourdomain.com/blog/2015/fluid-dyanamic-update/</guid>
+        
+        
+        <category>fluid-dynamics</category>
+        
+        <category>math</category>
+        
+      </item>
+    
+      <item>
+        <title>Failures in GI-land</title>
+        <description>&lt;p&gt;It’s been quite a while.&lt;/p&gt;
+
+&lt;p&gt;So I’ve been working on life/jobs/family/etc the past couple months. A couple weeks ago, however, I decided to implement a type of arbitrary BRDF sampling based on factoring large matrices, found here: http://gfx.cs.princeton.edu/proj/brdf/brdf.pdf&lt;/p&gt;
+
+&lt;p&gt;The idea is to convert the BRDF into a series of matrix representations in such a way that&lt;/p&gt;
+
+&lt;p&gt;[attachment=28227:CodeCogsEqn (1).gif]&lt;/p&gt;
+
+&lt;p&gt;, where Fl, ul, and vl are matrices that depend on outgoing direction, half angle azimuth, and half angle zenith about surface normal, respectively. Now that the functions for half angle azimuth and zenith are separated out, it’s trivial to construct a probability density function based on each. From then on, it’s the whole uniform random number -&amp;gt; CDF -&amp;gt; random ray thing like we’re used to. The PDF is defined by&lt;/p&gt;
+
+&lt;p&gt;[attachment=28229:CodeCogsEqn (2).gif]&lt;/p&gt;
+
+&lt;p&gt;, where that last funky term is the Jacobian between half angle representation and normal paths.&lt;/p&gt;
+
+&lt;p&gt;Pretty Pictures and Opinions&lt;/p&gt;
+
+&lt;p&gt;[attachment=28231:ex2.jpg]
+[Left: factored BRDF representation, Right: Path traced reference, 200 samples each]&lt;/p&gt;
+
+&lt;p&gt;Okay. enough math. On to my personal thoughts. (Just as a warning, I’ve checked and re-checked my math a hundred times, so I don’t think anything is wrong. If it is, though, be sure to sufficiently embarrass me in the comments Posted Image )&lt;/p&gt;
+
+&lt;p&gt;So. The big issue is that, while the representation is extremely good at importance sampling shiny materials, it does so at the expense of accurately representing more lambertian properties. The effect can be seen when only one bounce is traversed:&lt;/p&gt;
+
+&lt;p&gt;[attachment=28230:ex1.jpg]
+[Left: 256 u terms, 128 v terms, Middle: path traced reference, Right: 512 u terms, 256 v terms, all images rendered with 200 samples]
+(btw, the blue ball is the only thing in the picture that new material is applied to here. In case you couldn’t tell.)&lt;/p&gt;
+
+&lt;p&gt;This issue arises because of its discrete nature. In order to get a good enough representation of the BRDF to sample it in this manner, you have to throw more and more samples at the BRDF. In this type of representation, a pure mirror would work very well, and diffuse materials would work less well, because this representation prefers more jagged BRDFs that so that it can sample the correct lobe. Otherwise, it has to make approximations at to what the CDF is, in the same way that a Euler integrator has issues because of regular sampling that doesn’t capture the essence of the function. If that makes sense Posted Image A graph of what this looks like might be something like&lt;/p&gt;
+
+&lt;p&gt;[attachment=28232:lolz.jpg]&lt;/p&gt;
+
+&lt;p&gt;I could show some close-ups like in normal graphics papers, but this journal software is really kicking my ass. I’d like to point out my solution of inserting periods between every paragraph in order to keep them from slamming into each other every time i press the edit button Posted Image&lt;/p&gt;
+
+&lt;p&gt;Welp. Hoped you liked it. The factored representation is still fantastic if you want to store measured BRDF data, but it doesn’t suit my needs for an actual path tracer. Oh well. I’m bound to find some other snazzy graphics paper to try to implement soon Posted Image&lt;/p&gt;
+
+&lt;p&gt;See yah!&lt;/p&gt;
+</description>
+        <pubDate>2015-07-20 00:00:00 -0700</pubDate>
+        <link>http://yourdomain.com/blog/2015/failures-in-gi-land/</link>
+        <guid isPermaLink="true">http://yourdomain.com/blog/2015/failures-in-gi-land/</guid>
+        
+        
+        <category>global-illumination</category>
+        
+        <category>math</category>
+        
+      </item>
+    
+      <item>
+        <title>Planetary Biomes</title>
+        <description>&lt;p&gt;Not many images or videos this time around, unfortunately. It’s mostly about updates about what I’m up to and what I’m working on.&lt;/p&gt;
+
+&lt;p&gt;So, first off, the non-euclidean stretchy game thingy. Turns out that some people in my art class had taken an interest in it when I was working on it in class, and they offered to help offload some of the content generation, like making art, animations, level design, etc. This is actually exactly what I need in order to continue working on it, so you’ll be seeing some gosh-darn pretty images in the future, after finals are over! Look forward to it! Posted Image&lt;/p&gt;
+
+&lt;p&gt;In the meantime though, as I always need something to procrastinate on homework with, I’ve been playing around with a space flying simulation, one where you can get really close to the ground!&lt;/p&gt;
+
+&lt;p&gt;[attachment=26985:Screenshot 2015-04-21 16.15.17.jpg]
+[attachment=26986:Screenshot 2015-04-22 20.00.50.jpg]&lt;/p&gt;
+
+&lt;p&gt;It looks a little rough right now, I know. Atmospheric scattering and physically correct lighting have taken a back seat to getting the game mechanics up and working. As you can see, though, there are biomes on the planet that try to correspond to how an actual planet’s biomes work. With the exception of icecaps and rivers and stuff that have to have a little more processing thrown at them, the biomes are roughly there. I need to work on smoothing them out and getting them to be believable colors, but I’ll work on that when I start doing close-up stuff.&lt;/p&gt;
+
+&lt;p&gt;So, down to the nitty gritty technical details of everything.&lt;/p&gt;
+
+&lt;p&gt;Biomes ‘n Stuff&lt;/p&gt;
+
+&lt;p&gt;The game world is represented in a sort of fixed-point-esque system using doubles in hopes to make it expand to more than just a single solar system. However, everything drawn on the GPU is done using floats, particularly because I don’t want to have to require GLSL version 400. So for the planet and sun that you see right now, everything is done using raytraced impostors.&lt;/p&gt;
+
+&lt;p&gt;So how do the biomes work? Well, back in Freshman year of high school I took biology, and I remember learning about a chart that determines all of the different biomes we see on earth by plotting them on a graph of average rainfall vs average temperature. Here’s a picture of it:&lt;/p&gt;
+
+&lt;p&gt;[attachment=26989:whittaker.jpg]&lt;/p&gt;
+
+&lt;p&gt;So, that’s pretty easy. For the average temperature, I took inspiration from the earth: http://upload.wikimedia.org/wikipedia/commons/a/aa/Annual_Average_Temperature_Map.jpg . I approximate it by a dot product plus offset by some value noise.
+// takes normalized position rel sphere
+// returns a value on [0, 1] representing the range [-15, 30] celcius
+float getTemperature(vec3 p)
+{
+	vec3 randTempSeed = p + vec3(12, 11, 10);&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vec3 upVec = vec3(0, 1, 0);
+float temp = dot(upVec, p);
+if (temp &amp;lt; 0)
+	temp = -temp;
+temp = 1.0 - temp + valueNoise3D(randTempSeed.x, randTempSeed.y, randTempSeed.z, 6) * 0.2;
+temp = clamp(temp, float(0), float(1));
+return temp; } The average rainfall on the earth doesn't look like it has any discernible pattern, so I just thew some value noise on it and called it a day. All together, here's the snippet that determines biomes: // takes normalized position rel sphere // returns a value on [0, 1] representing the range [-15, 30] float getTemperature(vec3 p) {
+vec3 randTempSeed = p + vec3(12, 11, 10);
+
+vec3 upVec = vec3(0, 1, 0);
+float temp = dot(upVec, p);
+if (temp &amp;lt; 0)
+	temp = -temp;
+temp = 1.0 - temp + valueNoise3D(randTempSeed.x, randTempSeed.y, randTempSeed.z, 6) * 0.2;
+temp = clamp(temp, float(0), float(1));
+return temp; }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;// takes normalized position rel sphere
+// returns a value on [0, 1] representing the range [0, max amount of precipitation]
+float getPrecipitation(vec3 p)
+{
+	p = p + vec3(8, 12, 19);
+	float precip = (valueNoise3D(p.x, p.y, p.z, 8) + 1.0) / 2.0;
+	return precip;
+}&lt;/p&gt;
+
+&lt;p&gt;int getBiome(vec3 p)
+{
+	float temp = getTemperature(p);
+	float precip = getPrecipitation(p);&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;if (temp &amp;lt; 0.25)
+	return BIOME_TUNDRA;
+if (precip / temp &amp;lt; 0.15)
+	return BIOME_SUBTROPIC;
+if (temp &amp;lt; 0.75 &amp;amp;&amp;amp; precip / temp &amp;lt; 0.5)
+	return BIOME_GRASSLAND;
+if (temp &amp;lt; 0.3)
+	return BIOME_TIAGA;
+if (temp &amp;lt; 0.75 &amp;amp;&amp;amp; precip &amp;lt; 0.5)
+	return BIOME_DECIDUOUS;
+if (temp &amp;lt; 0.75)
+	return BIOME_TEMERATE_RAINFOREST;
+if (precip &amp;lt; 0.25)
+	return BIOME_SAVANNA;
+if (precip &amp;lt; 0.5)
+	return BIOME_TROPICAL_FOREST;
+return BIOME_TROPICAL_RAINFOREST;
+return 0; } ​Translating it to C++
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So, now with a basic rudimentary system in place for generating biomes for GLSL impostors, I need to translate it over to C++ so that I can build a mesh for when you get up close.&lt;/p&gt;
+
+&lt;p&gt;The issue is that I’ll probably end up changing things, like finding ways to make the biomes more natural (like having more rainfall around ocean edges, etc), and I’ll have to translate every single change I make to C++ as well.&lt;/p&gt;
+
+&lt;p&gt;The solution I came up with is to use the power of GLM plus the power of simple parsing, to get the C++ compiler to compile GLSL.&lt;/p&gt;
+
+&lt;p&gt;Here’s how it works:&lt;/p&gt;
+
+&lt;p&gt;My shaders get run through a very simple parser that looks for #include statements, and then starts revursively copying and pasting those files into the body of the shader (I call these files .glh). This serves a double purpose. Firstly, it makes a large GLSL codebase much cleaner and more plug-and-play, which helps with prototyping. The separate header files can also, if GLM is willing, be parsed by the C++ compiler if there’s just functions and their definitions.&lt;/p&gt;
+
+&lt;p&gt;This way, I can import all of my biome creation code into C++ by saying something like:
+using glm::max;
+using glm::min;
+using glm::clamp;
+using glm::normalize;
+typedef uint32_t uint;
+#include “planetImpostor.glh”
+and BOOM! I’ve got the biome determination code transfered.&lt;/p&gt;
+
+&lt;p&gt;Here are some more boring screens:&lt;/p&gt;
+
+&lt;p&gt;[attachment=26987:Screenshot 2015-04-25 16.34.27.jpg]
+[attachment=26988:Screenshot 2015-04-25 16.34.56.jpg]&lt;/p&gt;
+
+&lt;p&gt;Welp, I hope that interested you guys and everything! I’ll get back to you guys in a week and catch you up with everything if finals don’t get too rough.&lt;/p&gt;
+
+&lt;p&gt;Thanks for reading! Posted Image&lt;/p&gt;
+</description>
+        <pubDate>2015-04-25 00:00:00 -0700</pubDate>
+        <link>http://yourdomain.com/blog/2015/planetary-biomes/</link>
+        <guid isPermaLink="true">http://yourdomain.com/blog/2015/planetary-biomes/</guid>
+        
+        
+        <category>procedural-generation</category>
+        
+        <category>math</category>
+        
+        <category>graphics</category>
+        
+      </item>
+    
+  </channel>
+</rss>

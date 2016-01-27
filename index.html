@@ -1,55 +1,21 @@
-<html>
-	<head>
-		<title>CulDeVu - Home</title>
-		<script src="main.js"></script>
-	</head>
+---
+layout: default
+---
 
-	<body>
-		<!-- poly triangulation -->
-		<h1>Polygon Triangulation</h1>
-		<p>Modern GPUs have an annoying habbit of only liking to draw triangles. Often when using 3D modeling programs or vector-based drawing applications to produce game art, you'll get instead a soup of arbitrary polygons. This is an issue if you plan to rasterize these polygons. Fortunately, polygons can be decomposed into triangles relatively easily.</p>
-<p>There are many different ways to decompose polygons into triangles. Typically though you only implement an algorithm that's advanced enough to suit your needs. For example, convex polygons are easier to triangulate than concave ones, and polygons with a hole in the middle of it are a little complicated to get right (and are also beyond the scope of this article: I'll be covering ear clipping at the most in this article. Maybe for another article). If you know that you'll only ever be using convex polygons, then only implement the algorithm for convex polygon triangulation. No need to go overboard :)</p>
-		<p><a href="articles/30_9_14_triangulation.html">Read more...</a></p>
+{% for post in site.posts %}
+    <br />
+    <div>
 
-		<h1>Mathematical Mistakes</h1>
-		<p>
-			You know how, when you're in, say, a math class, and you get a question wrong. It's <i>completely wrong</i>. In traditional mathematics, when you get a problem wrong, it's bad. But why is that?
-		</p>
-		<p>
-			Math is all about predicting reality. It's wierd when you think about it, but manipulating and shuffling little symbols around on a piece of paper gives you an insight into how the world works. If you've ever played with a <a href="http://video.mit.edu/watch/double-pendulum-6392/">double pendulum</a> before, though, you know how finicky reality really is. It's subject to nearly infinite floating point precision, infinite memory, and the computational speed to solve obscenely difficult differential equations in times shorter than a planck time. A single stray digit, a single calculation with slightly less precision, operations that aren't done in precisely the right order, a slight error in intuitive judgement, and <a href="https://www.youtube.com/watch?v=w-I6XTVZXww">bad things can happen</a>.
-		</p>
-		<p>
-			But some math isn't like that. Some math, the type they <i>don't</i> teach in schools, are different. Some types of math are so iterative, or so symetric that emergent behaivior is part of their nature. Altering a single step just slightly creates completely different result. And it's not that the results are wrong, per se. They're just... different.
-		</p>
-		<p>
-			To kind of show what I mean, here are some personal examples of my own, of what happened when I made a mathematical error.
-		</p>
-		<p>
-			<a href="articles/15_9_14_mathmistakes.html">Read more...</a>
-		</p>
+        <a class="post-title" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        <br />
+        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+        <p>
+            {{ post.content | truncatewords:100 }}
+        </p>
+    </div>
+    <hr />
+{% endfor %}
 
-		<!-- first -->
-		<h1>My First Blog Post</h1>
-		<p>
-			It's true! My very first blog post EVER!
-		</p>
-		<p>
-			I know you didn't think people like that were still around. I think I'm the last.
-		</p>
-		<p>
-			But yeah! The site's under developement, but feel free to check in again soon.
-		</p>
-		<p>
-			I'm going to be starting a tutorial on global illumination. This is mostly because, when I was learning, there was really no information out there about the gritty specifics of how to do things. There were high-level tutorials, and there were heavy math-based tutorials, and there was a random forum post or twelve that pushed me in the right direction. And, while that search and struggle for information was extremely helpful, I kinda wish that a better tutorial was out there. Since then, the excelent tutorial by "The Phantom" Jacco Bikker <a href="http://www.flipcode.com/archives/Raytracing_Topics_Techniques-Part_1_Introduction.shtml">found here</a> and the guides by Zach Waters have been made, but <i>really?</i> <i>Two</i> tutorials on the internet for such an interesting topic? <i>Really?</i>
-		</p>
-		<p>
-			So! Here goes nothing!
-		</p>
-		<p>
-			(Posted on 13/9/14)
-		</p>
-		<p>
-			<a href="articles/13_9_14_first.html">Read more...</a>
-		</p>
-	</body>
-</html>
+<p>
+    Copyright © 2009 Daniel Taylor
+</p>

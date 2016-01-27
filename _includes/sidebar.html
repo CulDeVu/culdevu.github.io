@@ -1,0 +1,46 @@
+<span class="site-title">
+    CulDeVu
+</span>
+
+<a class="nav-button" href="/">
+    Home
+</a>
+{% for page in site.pages %}
+    {% if page.title != nil %}
+        <a class="nav-button" href=" {{ page.url }} ">
+            {{ page.title }}
+        </a>
+    {% endif %}
+{% endfor %}
+
+<p>
+    <a href="https://github.com/culdevu">
+        <span class="social-media-container">{% include icon-github.svg %}</span>
+    </a>
+    <a href="https://twitter.com/culdevu">
+        <span class="social-media-container">{% include icon-twitter.svg %}</span>
+    </a>
+    <a href="{{ "/feed.xml" | prepend: site.baseurl }}">
+        <span class="social-media-container">{% include icon-rss.svg %}</span>
+    </a>
+</p>
+
+<hr />
+<br />
+
+<p>
+    <h2>Hello there!</h2>
+    <p>
+        [insert short description about me and what i do. make sure 
+        that it's conveyed that this is a personal site and i'm available for 
+        hire whenever someone shows even a passing interest]
+    </p>
+</p>
+
+<hr />
+<br />
+
+<p>
+    maybe have a thingy where i'm like "look at all my old posts and shit!"
+    or maybe have one of those "sort posts by catagory" things that are all the rage
+</p>
