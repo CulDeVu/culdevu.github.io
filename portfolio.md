@@ -15,15 +15,17 @@ Computational Origami and Paper Folding
 
 ![Origami Designer window]( {{ site.url }}/assets/portfolio/origami.png)
 
-For those that don't know about mathematic paper folding, it's the study of turning origami and other paper foldings into rules that can be followed, and reaching conclusions from the crease patterns that these folds make. This has (or had, at one point) many uses, including optimal folding of solar sails in space shuttles, or how to rigid-fold sheet metal.
+Years: 2015-2016
 
-I worked on an origami editor that was supposed to be vastly superior to [ORIPA](http://mitani.cs.tsukuba.ac.jp/oripa/), currently the most widely used origami crease pattern editor for academic purposes. My editor was able to show, in real-time wire-frame 3D rendering, every change made to the crease pattern. Also supported was crease suggestions, for being able to auto-complete folds in the paper. At the editor's base was a small, fast, and lightweight  API, with just a handful of classes, that delivered the full functionality of the editor including auto-completion. It is no longer in development anymore, however. You can find the source for the project [here](https://github.com/CulDeVu/OrigamiConverter), (for Windows only).l
+For those that don't know, mathematic paper folding is the study of turning origami and other paper folding crafts into rules that can be followed, and reaching conclusions from the crease patterns that result. This has (or had at one point) many uses, including optimal folding of solar sails in space shuttles, or how to rigid-fold sheet metal.
+
+I worked on an origami editor that was supposed to be vastly superior to [ORIPA](http://mitani.cs.tsukuba.ac.jp/oripa/), currently the most widely used origami crease pattern editor for academic purposes. My editor was able to show, in real-time wire-frame 3D rendering, every change made to the crease pattern. Also supported was crease suggestions, for being able to auto-complete folds in the paper. At the editor's base was a small, fast, and lightweight  API, with just a handful of classes, that delivered the full functionality of the editor including auto-completion. It is no longer in development anymore, however. You can find the source for the project [here](https://github.com/CulDeVu/OrigamiConverter), (for Windows only).
 
 Of the hurdles that were overcome making this, the most significant: 
 
 - Developing a novel and fast folding algorithm that takes advantage of the way that transformation matrices across crease patterns create identities as they circle around certain features
 - Developing a working auto-complete functionality, again taking advantage of these identity matrices and the matrix forms used to construct them
-- Creating a file format that's superior to ORIPA's XML-based file type
+- Creating a file format that's superior to, and much simpler than, ORIPA's XML-based file type
 - Extending all calculations (including auto-complete) into non-flat creases
 
 <br />
@@ -32,6 +34,8 @@ Of the hurdles that were overcome making this, the most significant:
 
 Fluid Mechanics
 ===
+
+Year: 2015
 
 list stuff
 
@@ -42,7 +46,20 @@ list stuff
 Global Illumination
 ===
 
-list stuff
+![Sponza atrium with bust of Lenin]( {{ site.url }}/assets/portfolio/sponza.png)
+
+Years: Off and on for 2013-2016
+
+Global Illumination algorithms are a class of algorithms that simulate the way that light bounces and interacts with real-world materials. It models, mathematically, light exiting from a source, bouncing off of objects, and hitting a camera lens. Light paths, direction, and power are all generated from the properties of the materials they interact with, and accumulate to create a finished image. This is the same method that is used to generate almost all CGI in movies like Disney Pixar films.
+
+This particular project I've been working on a little bit for a couple years now. This is the sort of project I love working on: the type that I can pour hundreds of hours into, and still have barely scratched the surface of what I know that I'm capable of making. There's a low barrier to understanding, but a much higher barrier to implementing everything properly.
+
+Features of the current version:
+
+- Embree raytracing kernel recently replaced my own BVH implementation
+- Imports 3D models and textures
+- Microfacet BRDF, with importance sampling of the Beckmann Distribution of microfacets
+- OpenGL window rendering the current image as it's being created
 
 <br />
 <hr>
@@ -57,16 +74,20 @@ I've made quite a few little video game tech demos showing a video game mechanic
 Contorted
 ---
 
-![Crystal game prototype]( {{ site.url }}/assets/portfolio/contorted.jpg)
+![Contorted game prototype]( {{ site.url }}/assets/portfolio/contorted.jpg)
 
-Contorted is a game where you bend space in order to move around and solve puzzles in the game world. The movement was based around a grappling hook that pulls ledges and objects toward you, instead of the other way around. A video of it in action here:
+Year: 2015
+
+Contorted is a game where you bend space in order to move around and solve puzzles in the game world. The movement was based around a grappling hook that pulls ledges and objects toward you, instead of the other way around. A video (and a sampling of some of my best vector artwork abilities) can be seen of it in action here:
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/h2K6sl1c4fY" frameborder="0" allowfullscreen></iframe>
 
-The main feature of this game, and the part that took the most time, was creating the physics engine. Box2D, Chipmunk2S, and really all other mainstream physics engines, require that you submit static fixtures around even dynamic objects. Even with soft-bodies, these physics engines take huge performance hits when modifying fixture shapes, so a special engine had to be made to support a constantly bending world at a decent framerate. The final engine was modeled off of, with many modifications and improvements, Paul Firth's speculative physics write-up [here](http://www.wildbunny.co.uk/blog/2011/03/25/speculative-contacts-an-continuous-collision-engine-approach-part-1/).
+The main feature of this game, and the part that took the most time, was creating the physics engine. Box2D, Chipmunk2D, and really all other mainstream physics engines, require that you submit static fixtures around even dynamic objects. Even with soft-bodies, these physics engines take huge performance hits when modifying fixture shapes, so a special engine had to be made to support a constantly bending world at a decent framerate. The final engine was modeled off of, with many modifications and improvements, Paul Firth's speculative physics write-up [here](http://www.wildbunny.co.uk/blog/2011/03/25/speculative-contacts-an-continuous-collision-engine-approach-part-1/).
 
-Apart from the physics engine, other barriers that I had to overcome included:
+Including the physics engine, barriers that I had to overcome included:
 
+- Extending Little Big Planet's speculative physics system with friction (not seen in above video)
+- Created a class of distortion functions that prevented discontinuities, even with the existence of 5 or 6 conflicting distortions, but also provided variable "weight" to the distortions
 - Mesh optimization, so that world bending could be done at mesh vertexes and have minimal holes show up
 - Creating an art style that would synergize with the new movement capabilities of the player character
 
@@ -74,6 +95,8 @@ Crystal
 ---
 
 ![Crystal game prototype]( {{ site.url }}/assets/portfolio/crystal_advert_header.png)
+
+Year: 2014
 
 Crystal is a game where you attach gravity wells to various objects in the world. In this game, you manipulate gravity to solve puzzles and to navigate the world.
 
