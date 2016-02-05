@@ -32,17 +32,6 @@ Of the hurdles that were overcome making this, the most significant:
 <hr>
 <br />
 
-Fluid Mechanics
-===
-
-Year: 2015
-
-list stuff
-
-<br />
-<hr>
-<br />
-
 Global Illumination
 ===
 

@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Failures in GI-land"
+title:  "Factored BRDF Representation"
 date:   2015-07-20
 categories: global-illumination math
 ---
@@ -10,22 +10,30 @@ So I've been working on life/jobs/family/etc the past couple months. A couple we
 
 The idea is to convert the BRDF into a series of matrix representations in such a way that
 
-[attachment=28227:CodeCogsEqn (1).gif]
+\\[ f_r(\omega_i, \omega_o)(w_i \cdot \textbf{n}) \approx
+	\sum_{l=1}^{L}{ F_l(\omega_o) u_l(\theta_h) v_l(\phi_h) } \\]
 
-, where Fl, ul, and vl are matrices that depend on outgoing direction, half angle azimuth, and half angle zenith about surface normal, respectively. Now that the functions for half angle azimuth and zenith are separated out, it's trivial to construct a probability density function based on each. From then on, it's the whole uniform random number -> CDF -> random ray thing like we're used to. The PDF is defined by
+, where \\( F_l \\), \\( u_l \\), and \\( vl \\) are massive matrices that depend on outgoing direction, half angle azimuth, and half angle zenith about surface normal, respectively. Now that the functions for half angle azimuth and zenith are separated out, it's trivial to construct a probability density function based on each. From then on, it's the whole uniform random number -> CDF -> random ray thing like we're used to. The PDF is defined by
 
-[attachment=28229:CodeCogsEqn (2).gif]
+\\[
+	pdf(\theta_h, \phi_h \vert \omega_o) =
+	\left( 
+		\sum_{l=1}^{L}{\frac{ F_l(\omega_o) u_l(\theta_h) v_l(\phi_h)}{\sum_{j=1}^{L}{F_j(\omega_o)}}}
+	\right)
+	\frac{1}{4 (\omega_i \cdot \omega_h) }
+\\]
 
-, where that last funky term is the Jacobian between half angle representation and normal paths.
+, where that last term is the Jacobian between half angle representation and normal paths.
 
 Pretty Pictures and Opinions
+===
 
 [attachment=28231:ex2.jpg]
 [Left: factored BRDF representation, Right: Path traced reference, 200 samples each]
 
-Okay. enough math. On to my personal thoughts. (Just as a warning, I've checked and re-checked my math a hundred times, so I don't think anything is wrong. If it is, though, be sure to sufficiently embarrass me in the comments Posted Image )
+On to my personal thoughts. (Just as a warning, I've checked and re-checked my math a hundred times, so I don't think anything is wrong. If it is, though, be sure to sufficiently embarrass me on the Internet)
 
-So. The big issue is that, while the representation is extremely good at importance sampling shiny materials, it does so at the expense of accurately representing more lambertian properties. The effect can be seen when only one bounce is traversed:
+So. The big issue is that, while the representation is extremely good at importance sampling shiny materials, it does so at the expense of accurately representing more Lambertian properties. The effect can be seen when only one bounce is traversed:
 
 [attachment=28230:ex1.jpg]
 [Left: 256 u terms, 128 v terms, Middle: path traced reference, Right: 512 u terms, 256 v terms, all images rendered with 200 samples]
