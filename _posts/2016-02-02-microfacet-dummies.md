@@ -7,7 +7,7 @@ categories: global-illumination math
 
 Despite how important of a topic good importance sampling is in the area of global illumination, it's usually left out of all common-English conversations and tutorials about path tracing (with the exception of the Lambertian case, which is a good introduction to importance sampling). If you want to get into microfacet importance sampling, multiple importance sampling, or even, God forbid, Metropolis light transport, you're on your own. And, probably for a good reason. At some point in a path tracing project, you WILL have to butt heads with the math. And believe me, the head that the math rears is ugly. Beautiful in design, but large and ugly all the same.
 
-I'm going to try to correct that, at least for microfacet importance sampling. Present just enough math to get the point across what *needs* to be understood to implement everything correctly, with minimal pain. 
+I'm going to try to correct that, at least for microfacet importance sampling. I'll present just enough math to get the point across what *needs* to be understood to implement everything correctly, with minimal pain. 
 
 Choosing the Microfacet Terms
 ===
@@ -155,7 +155,7 @@ Now there's an issue, and it's a big one. The density function generated above d
 
 And this is a re-occurring problem. There are papers describing every way to couple this with that. Some of them are about coupling matte diffuse with microfacet specular, some describe how to couple transmissive plus specular, some specular with specular. And at the end of the day, these are all specialized cases of different material properties coexisting on a surface. Until it's taken care of, the problem of mixing and matching BRDFs will never go away. I don't know how other path tracers deal with this issue, but I won't stand for it.
 
-For my path tracer, I chose to go the way that Arnold does, by using the idea of infinitesimal layers of materials. Each layer of the material can, by using the Fresnel function we already have, reflect an amount of light, and then transmit the rest down to the next layer down. This will happen for every layer down until it hits the final layer: either a diffuse or transmission layer, which will use the rest of the remaining energy. Thus, the problem of coupling BRDFs was solved by thinking about the problem a little differently.
+For my path tracer, I chose to go the way that [Arnold](https://www.solidangle.com/arnold/) does, by using the idea of infinitesimal layers of materials. Each layer of the material can, by using the Fresnel function we already have, reflect an amount of light, and then transmit the rest down to the next layer down. This will happen for every layer down until it hits the final layer: either a diffuse or transmission layer, which will use the rest of the remaining energy. Thus, the problem of coupling BRDFs was solved by thinking about the problem a little differently.
 
 If you think about it, the above algorithm can be simplified using Russian Roulette, and so the final algorithm becomes something like this:
 

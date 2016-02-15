@@ -4,15 +4,17 @@ title:  "Fluid dynamics update"
 date:   2015-09-29
 categories: fluid-dynamics math
 ---
-I'm not really going to talk about much math-y stuff this time. I've covered too much ground since my last entry ( Posted Image ) to be able to remember all the pitfalls I ran into. So this time I'm only really going to be talking about the general algorithm, how I deal with the pitfalls of the marker particle method, and the ongoing translation to CUDA. And probably share some of my Mario Maker levels. I'm addicted to stars Posted Image
+
+I'm not really going to talk about much math-y stuff this time. I've covered too much ground since my last entry to be able to remember all the pitfalls I ran into. So this time I'm only really going to be talking about the general algorithm, how I deal with the pitfalls of the marker particle method, and the ongoing translation to CUDA. And probably share some of my Mario Maker levels. I'm addicted to stars :(
 
 So! Let's do this!
 
-[media]https://www.youtube.com/watch?v=0xBAqjxHUkA[/media]
+<iframe width="640" height="390" src="https://www.youtube.com/embed/0xBAqjxHUkA" frameborder="0" allowfullscreen></iframe>
 
-Sorry for the video being kinda shaky. OBS is having a hard time capturing details and YouTube thinks everything ever is a camcorder, so it looks a little strange. It get's across the idea, though. Note that there is still no surface tension, which would account for just about everything else strange looking with the simulation.
+Sorry for the video being kinda shaky. OBS is having a hard time capturing details and YouTube thinks everything ever is a camcorder, so it looks a little strange. It gets across the idea, though. Note that there is still no surface tension, which would account for just about everything else strange looking with the simulation.
 
 The General Algorithm
+===
 
 So the algorithm for simulating a Eulerian fluid goes as follows:
 
@@ -41,9 +43,10 @@ The velocity field is the standard MAC staggered grid, cause why not, and becaus
 
 The marker particles are the part I don't really know about. I just advect the marker particles through the velocity field just like anything else, and wherever the marker particles end up defines where the fluid exists or doesn't. This is pretty much the simplest method of defining the interior vs exterior of a fluid, so it has a lot of pitfalls, but I'll get to those in a minute. The issue is, though, that most everyone doesn't talk about this method (because of the many many issues it has) and so they use something called level sets. I've tried implementing level sets several times, and marker particles are just so much simpler in every way.
 
-# Marker Particles
+Marker Particles
+===
 
-So the biggest pitfall about marker particles is that, due to numerical inaccuracy and a bunch of other issues, they tend to bunch up a lot in certain places. Namely, places where the divergence of the velocity field is still positive even after the incompressibility pressure solver. You'd think that, since the pressure is positive in some places, it'd be negative in the same area, cancelling each other out, but it's not. The fact that gravity is always pulling down on the fluid makes it not always true, so what ends up happening is a net loss of volume from full to nearly 0 in a couple minutes.
+So the biggest pitfall about marker particles is that, due to numerical inaccuracy and a bunch of other issues, they tend to bunch up a lot in certain places. Namely, places where the divergence of the velocity field is still positive even after the incompressibility pressure solver. You'd think that, since the pressure is positive in some places, it'd be negative in the same area, canceling each other out, but it's not. The fact that gravity is always pulling down on the fluid makes it not always true, so what ends up happening is a net loss of volume from full to nearly 0 in a couple minutes.
 
 So what I tried to do, instead of using level sets like a sane person, I decided to force the fluid to conserve volume. The way I did this is pretty straightforward, and is the "find/re-position particles" part of the above algorithm. Basically,
 
@@ -52,17 +55,30 @@ So what I tried to do, instead of using level sets like a sane person, I decided
 
 This is rather finicky in practice. For example, if I set minDensity to maxDensity, you see a lot of artifacts from there not being enough particles in the re-position pool to accommodate (because of the overall positive divergence I mentioned). A happy median, I found, was setting maxDensity to anywhere between 2 or 3 times the minDensity. Sure, this DOES lead to volume loss by a factor of whatever multiple you choose, but it's much better than having visually disgusting and simulations.
 
-[attachment=29248:lolp.jpg]
+![Marker particles]({{ site.url }}/assets/2015-09-29-fluid-dyanamic-update/marker.jpg)
 
 To be fair, the simulation without re-position looks a lot more fluid and water-like. However, conserving volume it too important to be avoided. Oh well.
 
-#CUDA
+CUDA
+===
 
 I've been translating small pieces of the simulation to use the GPGPU via CUDA. I've gotten the "update particle" portion completely ported to the GPU, which is just a simple advection and setting type fields. The really neat one is the pressure solver.
 
-In order to find the pressure in each cell, long story short, you need to construct a matrix something like this:
-[attachment=29249:matrix.jpg]
-, and then solve for pressure. On the cpu I used Gauss-Seidel to solve it, but I have no idea how to do it on the GPU. Luckily, there's a library called cusp that implemented everything for me!
+In order to find the pressure in each cell, long story short, you need to construct a matrix equation something like this:
+
+$$
+    \Bigg[
+        \text{pain and suffering}
+    \Bigg]
+    \Bigg[
+        \text{pressure}
+    \Bigg] = 
+    \Bigg[
+        \text{divergence}
+    \Bigg]
+$$
+
+, and then solve for pressure. On the CPU I used Gauss-Seidel to solve it, but I have no idea how to do it on the GPU. Luckily, there's a library called cusp that implemented everything for me!
 
     struct cuspTriple
     {
@@ -205,6 +221,7 @@ Also, the GPU version is around 3-4 times faster than the CPU version! Now, on t
 In short, kill me now.
 
 Conclusion
+===
 
 Could someone please give me stars in Super Mario Maker? I'm addicted and I need all you have. One of my levels' ID is 04B7-0000-0069-DB69 and from there you should be able to access the 3 levels I've uploaded. They have < 20% clear rate on each of them for some strange reason, even though I think they're pretty easy (and fun).
 

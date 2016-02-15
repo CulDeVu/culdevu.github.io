@@ -48,6 +48,7 @@ Features of the current version:
 - Embree raytracing kernel recently replaced my own BVH implementation
 - Imports 3D models and textures
 - Microfacet BRDF, with importance sampling of the Beckmann Distribution of microfacets
+- Layered materials, inspired by [Arnold](https://www.solidangle.com/arnold/) renderer
 - OpenGL window rendering the current image as it's being created
 
 <br />
