@@ -4,7 +4,9 @@ title: Portfolio
 permalink: /portfolio/
 ---
 
-I have tinkered with a lot of different things in a lot of different areas, from computer graphics, to game programming, to CUDA programming blah blah blah
+I have tried my best to tinker with a lot of different things in a lot of different areas, from CUDA programming, to game programming; from computer graphics to computational physics. I really like to spend a couple months really digging down into a particular topic, trying to delve as deep as I can into any given topic as I can before something else steals my curiosity. Because of this, they end up being kinda complex, and detailed enough for me to be able to spend multiple months working on. 
+
+Here is a sampling of the projects that have taken the longest, or are the most complex, or I'm just plain really proud of.
 
 <br />
 <hr>

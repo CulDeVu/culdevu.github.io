@@ -109,6 +109,10 @@ a {
     &.nav-button {
         color: $palette-light !important;
     }
+
+    &.social-media-container:hover {
+        color: $palette-dark !important;
+    }
 }
 
 .social-media-container {

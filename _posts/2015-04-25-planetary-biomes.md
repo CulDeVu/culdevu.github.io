@@ -6,7 +6,7 @@ categories: procedural-generation math graphics
 ---
 Not many images or videos this time around, unfortunately. It's mostly about updates about what I'm up to and what I'm working on.
 
-So, first off, the non-euclidean stretchy game thingy. Turns out that some people in my art class had taken an interest in it when I was working on it in class, and they offered to help offload some of the content generation, like making art, animations, level design, etc. This is actually exactly what I need in order to continue working on it, so you'll be seeing some gosh-darn pretty images in the future, after finals are over! Look forward to it! Posted Image
+So, first off, the non-euclidean stretchy game thingy. Turns out that some people in my art class had taken an interest in it when I was working on it in class, and they offered to help offload some of the content generation, like making art, animations, level design, etc. This is actually exactly what I need in order to continue working on it, so you'll be seeing some gosh-darn pretty images in the future, after finals are over! Look forward to it!
 
 In the meantime though, as I always need something to procrastinate on homework with, I've been playing around with a space flying simulation, one where you can get really close to the ground!
 

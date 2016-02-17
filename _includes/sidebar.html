@@ -14,14 +14,14 @@
 {% endfor %}
 
 <p>
-    <a href="https://github.com/culdevu">
-        <span class="social-media-container">{% include icon-github.svg %}</span>
+    <a href="https://github.com/culdevu" class="social-media-container">
+        {% include icon-github.svg %}
     </a>
-    <a href="https://twitter.com/culdevu">
-        <span class="social-media-container">{% include icon-twitter.svg %}</span>
+    <a href="https://twitter.com/culdevu" class="social-media-container">
+        {% include icon-twitter.svg %}
     </a>
-    <a href="{{ "/feed.xml" | prepend: site.baseurl }}">
-        <span class="social-media-container">{% include icon-rss.svg %}</span>
+    <a href="{{ "/feed.xml" | prepend: site.baseurl }}" class="social-media-container">
+        {% include icon-rss.svg %}
     </a>
 </p>
 
