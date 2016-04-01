@@ -8,8 +8,7 @@
 # Site settings
 title: CulDeVu
 email: culdevu@gmail.com
-description: > # this means to ignore newlines until "baseurl:"
-    [sort description and key words to shove in meta tags]
+
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://djtaylor.me" # the base hostname & protocol for your site
 twitter_username: CulDeVu

@@ -5,6 +5,7 @@ $palette-red: rgb(197, 51, 39);
 $title-font-size: 40px;
 $title-font-weight: none;
 
+$content-width: 740px;
 $sidebar-width: 320px;
 
 /**
@@ -16,6 +17,7 @@ html, body {
     
     background-color: $palette-dark;
 }
+
 .sidebar-content {
     position: absolute;
     left: 0;
@@ -28,13 +30,14 @@ html, body {
     
     display: inline-block;
 }
+
 .content {
     top: 0;
     
     margin-left: 320px;
 
     width: calc(100% - 320px);
-    min-width: calc(800px + 2 * 40px);
+    min-width: 740px;
     min-height: 1200px;
     
     display:inline-block;
@@ -66,9 +69,6 @@ html, body {
     text-align: center;
     
     display: block;
-
-    /*transition: border-width, padding-top, padding-bottom, width;
-    transition-duration: 1s;*/
 }
 .nav-button:hover {
     width: calc(100% - 30px - 6px);
@@ -127,6 +127,77 @@ a {
         path {
             fill: $palette-light;
         }
+    }
+}
+
+def {
+    display: block;
+
+    margin-top: -1em;
+    margin-bottom: 1em;
+
+    padding: 10px;
+
+    border: 1px solid;
+    border-color: $palette-red;
+
+    background-color: rgba(197, 51, 39, 0.1);
+}
+
+/*
+-------------------------------------------------------------------------------
+  Handheld version
+-------------------------------------------------------------------------------
+*/
+@media screen and (max-width: 1060px) {
+    .sidebar-content {
+        position: relative;
+        
+        padding: 30px;
+        
+        width: calc(100% - 2*30px);
+        
+        color: $palette-light;
+        
+        display: inline-block;
+    }
+    .misc-sidebar-info {
+        display: none;
+    }
+
+    .content {
+        top: 0;
+        
+        margin-left: 0px;
+
+        width: 100%;
+        min-width: 0px;
+        min-height: 1200px;
+        
+        display:inline-block;
+
+        background-color: $palette-light;
+
+        font-size: 1em;
+    }
+    .content-wrapper {
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-top: 20px;
+
+        width: calc(100% - 2*40px);
+
+        display:inline-block;
+    }
+
+    .site-title {
+        text-align: center;
+
+        color: $palette-light;
+        
+        font-size: 65px;
+
+        display: block;
     }
 }
 
