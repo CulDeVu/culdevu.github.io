@@ -70,7 +70,7 @@ $$ = a_n - a_{n - 1} + a_{n-2} - ... - a_2 = - \epsilon + \pi $$
 
 The case of n begin odd can be thrown out because, as you see, it's only true for specific angles (specific offsets epsilon from $$ a_1 $$), but the definition above states that it should be true for EVERY angle around the vertex.
 
-(as a side note, this is a variant of Kawasaki's Theorem, but since I came up with it independently, along with everything else described here, I'm claiming all credit for my own variant)
+(as a side note, this is a variant of something called Kawasaki's Theorem. I proved all of these things myself before figuring out that these things were already known. Oh well.)
 
 This is a very nice equation. It allows us to solve for any missing angle if one is needed, and also acts as a really simple validator. You can check each vertex one by one with this equation to check the simple case of correctness-by-rotating-around. However, that is a very simple case. Paths can take any form, but they all need to exhibit the property listed above, not just paths spinning around vertexes.
 
