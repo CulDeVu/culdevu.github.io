@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio</title>
+<meta name="description" content="The personal website of Daniel Taylor">
+<meta name="generator" content="Hugo 0.31.1" />
+<meta property="og:title" content="Portfolio" />
+<meta property="og:description" content="I have tried my best to tinker with a lot of different things in a lot of different areas, from CUDA programming, to game programming; from computer graphics to computational physics. I really like to spend a couple months really digging down into a particular topic, trying to delve as deep as I can into any given topic as I can before something else steals my curiosity. Because of this, they end up being kinda complex, and detailed enough for me to be able to spend multiple months working on." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://culdevu.github.io/portfolio/" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+<link rel="dns-prefetch" href="//fonts.gstatic.com" />
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700" type="text/css" media="all" />
+<link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
+<script type="text/javascript" src="/js/scripts.js"></script>
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML'></script>
+
+</head>
+<body class="body body-right-sidebar mobile" itemscope="itemscope" itemtype="http://schema.org/WebPage">
+	<div class="container container-outer">
+		<header class="header" itemscope="itemscope" itemtype="http://schema.org/WPHeader">
+			<div class="container container-inner clearfix">
+				<div class="logo" role="banner" itemscope="itemscope" itemtype="http://schema.org/Brand">
+					<a class="logo__link" href="/" title="CulDeVu" rel="home">
+						<h1 class="logo__title">CulDeVu</h1>
+						<h2 class="logo__tagline">Just another site</h2>
+					</a>
+				</div>
+			</div>
+			
+<nav class="menu" itemscope="itemscope" itemtype="http://schema.org/SiteNavigationElement">
+	<ul class="menu__list">
+		<li class="menu__item menu__item--active"><a class="menu__link" href="/portfolio/">PORTFOLIO</a></li>
+		<li class="menu__item"><a class="menu__link" href="/resume/">RESUME</a></li>
+	</ul>
+</nav>
+
+		</header>
+		<div class="wrapper clearfix">
+
+<main class="main-content content" role="main" itemprop="mainContentOfPage">
+	<article class="post">
+		<header class="post__header clearfix">
+			<h1 class="post__title">Portfolio</h1>
+		</header>
+		<div class="post__content clearfix">
+			
+
+<p>I have tried my best to tinker with a lot of different things in a lot of different areas, from CUDA programming, to game programming; from computer graphics to computational physics. I really like to spend a couple months really digging down into a particular topic, trying to delve as deep as I can into any given topic as I can before something else steals my curiosity. Because of this, they end up being kinda complex, and detailed enough for me to be able to spend multiple months working on.</p>
+
+<p>Here is a sampling of the projects that have taken the longest, or are the most complex, or I&rsquo;m just plain really proud of.</p>
+
+<p><br />
+<hr>
+<br /></p>
+
+<h1 id="computational-origami-and-paper-folding">Computational Origami and Paper Folding</h1>
+
+<p><img src="/portfolio/origami.png" alt="Origami Designer window" /></p>
+
+<p>Years: 2015-2016</p>
+
+<p>For those that don&rsquo;t know, mathematic paper folding is the study of turning origami and other paper folding crafts into rules that can be followed, and reaching conclusions from the crease patterns that result. This has (or had at one point) many uses, including optimal folding of solar sails in space shuttles, or how to rigid-fold sheet metal.</p>
+
+<p>I worked on an origami editor that was supposed to be vastly superior to <a href="http://mitani.cs.tsukuba.ac.jp/oripa/">ORIPA</a>, currently the most widely used origami crease pattern editor for academic purposes. My editor was able to show, in real-time wire-frame 3D rendering, every change made to the crease pattern. Also supported was crease suggestions, for being able to auto-complete folds in the paper. At the editor&rsquo;s base was a small, fast, and lightweight  API, with just a handful of classes, that delivered the full functionality of the editor including auto-completion. It is no longer in development anymore, however. You can find the source for the project <a href="https://github.com/CulDeVu/OrigamiConverter">here</a>, (for Windows only).</p>
+
+<p>Of the hurdles that were overcome making this, the most significant:</p>
+
+<ul>
+<li>Developing a novel and fast folding algorithm that takes advantage of the way that transformation matrices across crease patterns create identities as they circle around certain features</li>
+<li>Developing a working auto-complete functionality, again taking advantage of these identity matrices and the matrix forms used to construct them</li>
+<li>Creating a file format that&rsquo;s simpler than ORIPA&rsquo;s XML-based file type</li>
+<li>Extending all calculations (including auto-complete) into non-flat creases</li>
+</ul>
+
+<p><br />
+<hr>
+<br /></p>
+
+<h1 id="global-illumination">Global Illumination</h1>
+
+<p><img src="/portfolio/sponza.png" alt="Sponza atrium with bust of Lenin" /></p>
+
+<p>Years: Off and on for 2013-2016</p>
+
+<p>Global Illumination algorithms are a class of algorithms that simulate the way that light bounces and interacts with real-world materials. It models, mathematically, light exiting from a source, bouncing off of objects, and hitting a camera lens. Light paths, direction, and power are all generated from the properties of the materials they interact with, and accumulate to create a finished image. This is the same method that is used to generate almost all CGI in movies like Disney Pixar films.</p>
+
+<p>This particular project I&rsquo;ve been working on a little bit for a couple years now. This is the sort of project I love working on: the type that I can pour hundreds of hours into, and still have barely scratched the surface of what I know that I&rsquo;m capable of making. There&rsquo;s a low barrier to understanding, but a much higher barrier to implementing everything properly.</p>
+
+<p>Features of the current version:</p>
+
+<ul>
+<li>Embree raytracing kernel recently replaced my own BVH implementation</li>
+<li>Imports 3D models and textures</li>
+<li>Microfacet BRDF, with importance sampling of the Beckmann Distribution of microfacets</li>
+<li>Layered materials, inspired by <a href="https://www.solidangle.com/arnold/">Arnold</a> renderer</li>
+<li>OpenGL window rendering the current image as it&rsquo;s being created</li>
+</ul>
+
+<p><br />
+<hr>
+<br /></p>
+
+<h1 id="video-game-prototypes">Video Game prototypes</h1>
+
+<p>I&rsquo;ve made quite a few little video game tech demos showing a video game mechanic I had been toying with. Each one of them are themed completely around a mechanic that I thought would be &ldquo;fun&rdquo; to play an actual video game with. All of the art is hand-done by me, which is why there&rsquo;s not much of it. Each of these were made over the course of 2 or 3 months, and are, at the moment, at varying levels of polish and stability.</p>
+
+<h2 id="contorted">Contorted</h2>
+
+<p><img src="/portfolio/contorted.jpg" alt="Contorted game prototype" /></p>
+
+<p>Year: 2015</p>
+
+<p>Contorted is a game where you bend space in order to move around and solve puzzles in the game world. The movement was based around a grappling hook that pulls ledges and objects toward you, instead of the other way around. A video (and a sampling of some of my best vector artwork abilities) can be seen of it in action here:</p>
+
+<iframe width="640" height="360" src="https://www.youtube.com/embed/h2K6sl1c4fY" frameborder="0" allowfullscreen></iframe>
+
+<p>The main feature of this game, and the part that took the most time, was creating the physics engine. Box2D, Chipmunk2D, and really all other mainstream physics engines, require that you submit static fixtures around even dynamic objects. Even with soft-bodies, these physics engines take huge performance hits when modifying fixture shapes, so a special engine had to be made to support a constantly bending world at a decent framerate. The final engine was modeled off of, with many modifications and improvements, Paul Firth&rsquo;s speculative physics write-up <a href="http://www.wildbunny.co.uk/blog/2011/03/25/speculative-contacts-an-continuous-collision-engine-approach-part-1/">here</a>.</p>
+
+<p>Including the physics engine, barriers that I had to overcome included:</p>
+
+<ul>
+<li>Extending Little Big Planet&rsquo;s speculative physics system with friction (not seen in above video)</li>
+<li>Created a class of distortion functions that prevented discontinuities, even with the existence of 5 or 6 conflicting distortions, but also provided variable &ldquo;weight&rdquo; to the distortions</li>
+<li>Mesh optimization, so that world bending could be done at mesh vertexes and have minimal holes show up</li>
+<li>Creating an art style that would synergize with the new movement capabilities of the player character</li>
+</ul>
+
+<h2 id="crystal">Crystal</h2>
+
+<p><img src="/portfolio/crystal_advert_header.png" alt="Crystal game prototype" /></p>
+
+<p>Year: 2014</p>
+
+<p>Crystal is a game where you attach gravity wells to various objects in the world. In this game, you manipulate gravity to solve puzzles and to navigate the world.</p>
+
+<p>You can then use the gravity wells to scale walls, to reach otherwise impossible places, to walk on the undersides of platforms, and loads of other cool tricks. You can use your powers creating and canceling gravity to fling yourself (and enemies, and other objects) around level, to manipulate swinging platforms, to solve puzzles, the whole nine platforming yards!</p>
+
+<p>This game demo was (largely) made for and shown at a tech expo that is hosted annually at high-school during my senior year there. This game demo is, at the time of writing, the largest and most elaborate project that any student has ever submitted and displayed.</p>
+
+<p>Things I learned and barriers that I had to overcome:</p>
+
+<ul>
+<li>Learned how to interface with LWJGL and OpenAL, and Box2D</li>
+<li>Learned practical methods to overcome Java&rsquo;s garbage collector to maintain a relatively constant framerate</li>
+<li>Built a graphics module designed for rapid prototyping but that was also clean and fast</li>
+</ul>
+
+		</div>
+		
+
+	</article>
+	
+<div class="authorbox clearfix">
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Daniel Taylor</span>
+	</div>
+	<div class="authorbox__description">
+		Email: culdevu@gmail.com
+	</div>
+</div>
+	
+
+	
+</main>
+
+<aside class="sidebar" itemscope="itemscope" itemtype="http://schema.org/WPSideBar">
+	
+<div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="//google.com/search">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="http://culdevu.github.io/" />
+	</form>
+</div>
+	
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/post/2018-01-02-nopelepsy-02/">Nopelepsy Technical Introduction</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-03-31-nopelepsy-01/">Tools for Photosensitive Epilepsy I: Flashing</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-02-02-microfacet-dummies/">Microfacet Importance Sampling: For Dummies</a></li>
+		</ul>
+	</div>
+</div>
+
+	
+	
+
+	
+</aside>
+
+	</div>
+		<footer class="footer" itemscope="itemscope" itemtype="http://schema.org/WPFooter">
+			<div class="container container-inner">
+				<p class="footer__copyright">&copy; 2018 CulDeVu. <span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad theme</a>.</span></p>
+			</div>
+		</footer>
+	</div>
+
+<script>
+	var navigation = responsiveNav(".menu", {
+		navClass: "menu--collapse",
+	});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+
+</body>
+</html>

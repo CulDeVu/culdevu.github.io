@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Illumination Math</title>
+<meta name="description" content="The personal website of Daniel Taylor">
+<meta name="generator" content="Hugo 0.31.1" />
+<meta property="og:title" content="Global Illumination Math" />
+<meta property="og:description" content="The personal website of Daniel Taylor" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="http://culdevu.github.io/categories/global-illumination-math/" />
+
+
+
+<meta property="og:updated_time" content="2015-07-20T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+<link rel="dns-prefetch" href="//fonts.gstatic.com" />
+<link rel="alternate" type="application/rss+xml" title="CulDeVu Feed" href="http://culdevu.github.io/categories/global-illumination-math/index.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700" type="text/css" media="all" />
+<link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
+<script type="text/javascript" src="/js/scripts.js"></script>
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML'></script>
+
+</head>
+<body class="body body-right-sidebar mobile" itemscope="itemscope" itemtype="http://schema.org/WebPage">
+	<div class="container container-outer">
+		<header class="header" itemscope="itemscope" itemtype="http://schema.org/WPHeader">
+			<div class="container container-inner clearfix">
+				<div class="logo" role="banner" itemscope="itemscope" itemtype="http://schema.org/Brand">
+					<a class="logo__link" href="/" title="CulDeVu" rel="home">
+						<h1 class="logo__title">CulDeVu</h1>
+						<h2 class="logo__tagline">Just another site</h2>
+					</a>
+				</div>
+			</div>
+			
+<nav class="menu" itemscope="itemscope" itemtype="http://schema.org/SiteNavigationElement">
+	<ul class="menu__list">
+		<li class="menu__item"><a class="menu__link" href="/portfolio/">PORTFOLIO</a></li>
+		<li class="menu__item"><a class="menu__link" href="/resume/">RESUME</a></li>
+	</ul>
+</nav>
+
+		</header>
+		<div class="wrapper clearfix">
+
+	<main class="main-content list content" role="main">
+		<header class="page-header">
+			<h1 class="page-header__title">Global Illumination Math</h1>
+		</header><article class="list__item post clearfix">
+	<div class="list__content clearfix">
+		<header class="list__header">
+			<h3 class="list__title post__title ">
+				<a href="/to_be_organized_later/2015-07-20-factored-brdf/" rel="bookmark">Factored BRDF Representation</a>
+			</h3>
+			<div class="list__meta meta">
+				<svg class="icon icon-time" height="14" viewBox="0 0 16 16" width="14" xmlns="http://www.w3.org/2000/svg"><path d="m8-.0000003c-4.4 0-8 3.6-8 8 0 4.4000003 3.6 8.0000003 8 8.0000003 4.4 0 8-3.6 8-8.0000003 0-4.4-3.6-8-8-8zm0 14.4000003c-3.52 0-6.4-2.88-6.4-6.4000003 0-3.52 2.88-6.4 6.4-6.4 3.52 0 6.4 2.88 6.4 6.4 0 3.5200003-2.88 6.4000003-6.4 6.4000003zm.4-10.4000003h-1.2v4.8l4.16 2.5600003.64-1.04-3.6-2.1600003z"/></svg>
+				<time class="list__meta-date" datetime="2015-07-20T00:00:00">July 20, 2015</time>
+			</div>
+		</header>
+		<div class="list__excerpt">
+			It&rsquo;s been quite a while.
+So I&rsquo;ve been working on life/jobs/family/etc the past couple months. A couple weeks ago, however, I decided to implement a type of arbitrary BRDF sampling based on factoring large matrices, found here: http://gfx.cs.princeton.edu/proj/brdf/brdf.pdf
+The idea is to convert the BRDF into a series of matrix representations in such a way that
+\[ f_r(\omega_i, \omega_o)(wi \cdot \textbf{n}) \approx \sum{l=1}^{L}{ F_l(\omega_o) u_l(\theta_h) v_l(\phi_h) } \]
+, where \( F_l \), \( u_l \), and \( vl \) are massive matrices that depend on outgoing direction, half angle azimuth, and half angle zenith about surface normal, respectively.
+		</div>
+	</div>
+</article>
+<article class="list__item post clearfix">
+	<div class="list__content clearfix">
+		<header class="list__header">
+			<h3 class="list__title post__title ">
+				<a href="/to_be_organized_later/2015-01-31-hbr/" rel="bookmark">HBR: Human Based Rendering</a>
+			</h3>
+			<div class="list__meta meta">
+				<svg class="icon icon-time" height="14" viewBox="0 0 16 16" width="14" xmlns="http://www.w3.org/2000/svg"><path d="m8-.0000003c-4.4 0-8 3.6-8 8 0 4.4000003 3.6 8.0000003 8 8.0000003 4.4 0 8-3.6 8-8.0000003 0-4.4-3.6-8-8-8zm0 14.4000003c-3.52 0-6.4-2.88-6.4-6.4000003 0-3.52 2.88-6.4 6.4-6.4 3.52 0 6.4 2.88 6.4 6.4 0 3.5200003-2.88 6.4000003-6.4 6.4000003zm.4-10.4000003h-1.2v4.8l4.16 2.5600003.64-1.04-3.6-2.1600003z"/></svg>
+				<time class="list__meta-date" datetime="2015-01-31T00:00:00">January 31, 2015</time>
+			</div>
+		</header>
+		<div class="list__excerpt">
+			Heyy all!
+So the graphics professor at school here was talking to me and he was like &ldquo;you know what would be a cool idea?&rdquo; Turns out, it WAS a cool idea.
+So! I present to you:
+HBR: Human Based Rendering (the photon mapping of the next generation) The general idea is to either get the user that&rsquo;s looking at a screen to plot the photons themselves, or somehow crowd-source rendering an environment by manually tracing out light paths.
+		</div>
+	</div>
+</article>
+
+
+		
+	</main>
+
+<aside class="sidebar" itemscope="itemscope" itemtype="http://schema.org/WPSideBar">
+	
+<div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="//google.com/search">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="http://culdevu.github.io/" />
+	</form>
+</div>
+	
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/post/2018-01-02-nopelepsy-02/">Nopelepsy Technical Introduction</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-03-31-nopelepsy-01/">Tools for Photosensitive Epilepsy I: Flashing</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-02-02-microfacet-dummies/">Microfacet Importance Sampling: For Dummies</a></li>
+		</ul>
+	</div>
+</div>
+
+	
+	
+
+	
+</aside>
+
+	</div>
+		<footer class="footer" itemscope="itemscope" itemtype="http://schema.org/WPFooter">
+			<div class="container container-inner">
+				<p class="footer__copyright">&copy; 2018 CulDeVu. <span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad theme</a>.</span></p>
+			</div>
+		</footer>
+	</div>
+
+<script>
+	var navigation = responsiveNav(".menu", {
+		navClass: "menu--collapse",
+	});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+
+</body>
+</html>

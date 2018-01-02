@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on CulDeVu</title>
+    <link>http://culdevu.github.io/post/</link>
+    <description>Recent content in Posts on CulDeVu</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 02 Jan 2018 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://culdevu.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Nopelepsy Technical Introduction</title>
+      <link>http://culdevu.github.io/post/2018-01-02-nopelepsy-02/</link>
+      <pubDate>Tue, 02 Jan 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/post/2018-01-02-nopelepsy-02/</guid>
+      <description>In my last post a little under two years ago, I talked about a theoretical way to tackle the problem of removing flashes from video, specifically those that can cause epileptic events. Due to technical limitations, time, and scope change, this project has changed a lot over that time. A couple months ago I stopped stalling and buckled down to actually built a working version of the damn thing. It took a lot of trial and error, false starts, and good old fashioned procrastination, but I have a working copy now call Nopelepsy.</description>
+    </item>
+    
+    <item>
+      <title>Tools for Photosensitive Epilepsy I: Flashing</title>
+      <link>http://culdevu.github.io/post/2016-03-31-nopelepsy-01/</link>
+      <pubDate>Thu, 31 Mar 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/post/2016-03-31-nopelepsy-01/</guid>
+      <description>In 2009 engineers from the University of Wisconsin released a piece of software called PEAT. This software has been used in medicine since as a tool to diagnose patients with photosensitive epilepsy. This is a disease where strobing lights cause seizures, and it currently has no cure. Things that trigger it include lightning, flashing sirens, flickering lights, and other similar strobe effects. Other triggers that seem unrelated, but are also very cyclic in nature, include rapidly changing images, and even certain stationary stripes and checkerboard patterns.</description>
+    </item>
+    
+    <item>
+      <title>Microfacet Importance Sampling: For Dummies</title>
+      <link>http://culdevu.github.io/post/2016-02-02-microfacet-dummies/</link>
+      <pubDate>Tue, 02 Feb 2016 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/post/2016-02-02-microfacet-dummies/</guid>
+      <description>Despite how important of a topic good importance sampling is in the area of global illumination, it&#39;s usually left out of all common-English conversations and tutorials about path tracing (with the exception of the Lambertian case, which is a good introduction to importance sampling). If you want to get into microfacet importance sampling, multiple importance sampling, or even, God forbid, Metropolis light transport, you&#39;re on your own. And, probably for a good reason.</description>
+    </item>
+    
+  </channel>
+</rss>
