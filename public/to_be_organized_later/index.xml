@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>To_be_organized_laters on CulDeVu</title>
+    <link>http://culdevu.github.io/to_be_organized_later/</link>
+    <description>Recent content in To_be_organized_laters on CulDeVu</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 15 Dec 2015 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://culdevu.github.io/to_be_organized_later/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Mathematics of Origami: Flat Folding</title>
+      <link>http://culdevu.github.io/to_be_organized_later/2015-12-15-flat-folding/</link>
+      <pubDate>Tue, 15 Dec 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/to_be_organized_later/2015-12-15-flat-folding/</guid>
+      <description>So. Back at this.
+First things first. You can safely disregard most everything I said last post. All of that was very observation-based, and is actually incorrect in almost every way. Which might seem strange, cause most of it made sense. For clarity and completeness, though, here&#39;s a list of why everything last post was wrong:
+ The idea that a fold is a collection of fold segments in order starts falling apart after you do certain folds, like petal folds.</description>
+    </item>
+    
+    <item>
+      <title>Origami and the Associated Maths</title>
+      <link>http://culdevu.github.io/to_be_organized_later/2015-11-09-origami-01/</link>
+      <pubDate>Mon, 09 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/to_be_organized_later/2015-11-09-origami-01/</guid>
+      <description>So this is going to be another one of those write-it-out-so-that-I-can-better-understand-it sort of things. Just a heads up. This IS a journal, after all, and functions as advertisement second.
+So. Origami and mathematics. We know that the two are related because, if you fold a piece of paper the same way twice, you&amp;rsquo;ll get two of the same shape, so there&amp;rsquo;s rules governing it. And some smart people have tried figuring out those rules.</description>
+    </item>
+    
+    <item>
+      <title>Fluid dynamics update</title>
+      <link>http://culdevu.github.io/to_be_organized_later/2015-09-29-fluid-dyanamic-update/</link>
+      <pubDate>Tue, 29 Sep 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/to_be_organized_later/2015-09-29-fluid-dyanamic-update/</guid>
+      <description>I&amp;rsquo;m not really going to talk about much math-y stuff this time. I&amp;rsquo;ve covered too much ground since my last entry to be able to remember all the pitfalls I ran into. So this time I&amp;rsquo;m only really going to be talking about the general algorithm, how I deal with the pitfalls of the marker particle method, and the ongoing translation to CUDA. And probably share some of my Mario Maker levels.</description>
+    </item>
+    
+    <item>
+      <title>Factored BRDF Representation</title>
+      <link>http://culdevu.github.io/to_be_organized_later/2015-07-20-factored-brdf/</link>
+      <pubDate>Mon, 20 Jul 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/to_be_organized_later/2015-07-20-factored-brdf/</guid>
+      <description>It&amp;rsquo;s been quite a while.
+So I&amp;rsquo;ve been working on life/jobs/family/etc the past couple months. A couple weeks ago, however, I decided to implement a type of arbitrary BRDF sampling based on factoring large matrices, found here: http://gfx.cs.princeton.edu/proj/brdf/brdf.pdf
+The idea is to convert the BRDF into a series of matrix representations in such a way that
+\[ f_r(\omega_i, \omega_o)(wi \cdot \textbf{n}) \approx \sum{l=1}^{L}{ F_l(\omega_o) u_l(\theta_h) v_l(\phi_h) } \]
+, where \( F_l \), \( u_l \), and \( vl \) are massive matrices that depend on outgoing direction, half angle azimuth, and half angle zenith about surface normal, respectively.</description>
+    </item>
+    
+    <item>
+      <title>Planetary Biomes</title>
+      <link>http://culdevu.github.io/to_be_organized_later/2015-04-25-planetary-biomes/</link>
+      <pubDate>Sat, 25 Apr 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/to_be_organized_later/2015-04-25-planetary-biomes/</guid>
+      <description>Not many images or videos this time around, unfortunately. It&amp;rsquo;s mostly about updates about what I&amp;rsquo;m up to and what I&amp;rsquo;m working on.
+So, first off, the non-euclidean stretchy game thingy. Turns out that some people in my art class had taken an interest in it when I was working on it in class, and they offered to help offload some of the content generation, like making art, animations, level design, etc.</description>
+    </item>
+    
+    <item>
+      <title>HBR: Human Based Rendering</title>
+      <link>http://culdevu.github.io/to_be_organized_later/2015-01-31-hbr/</link>
+      <pubDate>Sat, 31 Jan 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/to_be_organized_later/2015-01-31-hbr/</guid>
+      <description>Heyy all!
+So the graphics professor at school here was talking to me and he was like &amp;ldquo;you know what would be a cool idea?&amp;rdquo; Turns out, it WAS a cool idea.
+So! I present to you:
+HBR: Human Based Rendering (the photon mapping of the next generation) The general idea is to either get the user that&amp;rsquo;s looking at a screen to plot the photons themselves, or somehow crowd-source rendering an environment by manually tracing out light paths.</description>
+    </item>
+    
+  </channel>
+</rss>

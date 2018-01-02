@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Global Illumination Math on CulDeVu</title>
+    <link>http://culdevu.github.io/categories/global-illumination-math/</link>
+    <description>Recent content in Global Illumination Math on CulDeVu</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 20 Jul 2015 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://culdevu.github.io/categories/global-illumination-math/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Factored BRDF Representation</title>
+      <link>http://culdevu.github.io/to_be_organized_later/2015-07-20-factored-brdf/</link>
+      <pubDate>Mon, 20 Jul 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/to_be_organized_later/2015-07-20-factored-brdf/</guid>
+      <description>It&amp;rsquo;s been quite a while.
+So I&amp;rsquo;ve been working on life/jobs/family/etc the past couple months. A couple weeks ago, however, I decided to implement a type of arbitrary BRDF sampling based on factoring large matrices, found here: http://gfx.cs.princeton.edu/proj/brdf/brdf.pdf
+The idea is to convert the BRDF into a series of matrix representations in such a way that
+\[ f_r(\omega_i, \omega_o)(wi \cdot \textbf{n}) \approx \sum{l=1}^{L}{ F_l(\omega_o) u_l(\theta_h) v_l(\phi_h) } \]
+, where \( F_l \), \( u_l \), and \( vl \) are massive matrices that depend on outgoing direction, half angle azimuth, and half angle zenith about surface normal, respectively.</description>
+    </item>
+    
+    <item>
+      <title>HBR: Human Based Rendering</title>
+      <link>http://culdevu.github.io/to_be_organized_later/2015-01-31-hbr/</link>
+      <pubDate>Sat, 31 Jan 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/to_be_organized_later/2015-01-31-hbr/</guid>
+      <description>Heyy all!
+So the graphics professor at school here was talking to me and he was like &amp;ldquo;you know what would be a cool idea?&amp;rdquo; Turns out, it WAS a cool idea.
+So! I present to you:
+HBR: Human Based Rendering (the photon mapping of the next generation) The general idea is to either get the user that&amp;rsquo;s looking at a screen to plot the photons themselves, or somehow crowd-source rendering an environment by manually tracing out light paths.</description>
+    </item>
+    
+  </channel>
+</rss>

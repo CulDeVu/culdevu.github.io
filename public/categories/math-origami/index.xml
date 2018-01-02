@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Math Origami on CulDeVu</title>
+    <link>http://culdevu.github.io/categories/math-origami/</link>
+    <description>Recent content in Math Origami on CulDeVu</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 09 Nov 2015 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="http://culdevu.github.io/categories/math-origami/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Origami and the Associated Maths</title>
+      <link>http://culdevu.github.io/to_be_organized_later/2015-11-09-origami-01/</link>
+      <pubDate>Mon, 09 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/to_be_organized_later/2015-11-09-origami-01/</guid>
+      <description>So this is going to be another one of those write-it-out-so-that-I-can-better-understand-it sort of things. Just a heads up. This IS a journal, after all, and functions as advertisement second.
+So. Origami and mathematics. We know that the two are related because, if you fold a piece of paper the same way twice, you&amp;rsquo;ll get two of the same shape, so there&amp;rsquo;s rules governing it. And some smart people have tried figuring out those rules.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>http://culdevu.github.io/post/2016-03-31-nopelepsy-01/</loc>
+    <lastmod>2016-03-31T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/post/2016-02-02-microfacet-dummies/</loc>
+    <lastmod>2016-02-02T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/to_be_organized_later/2015-12-15-flat-folding/</loc>
+    <lastmod>2015-12-15T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/to_be_organized_later/2015-11-09-origami-01/</loc>
+    <lastmod>2015-11-09T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/to_be_organized_later/2015-09-29-fluid-dyanamic-update/</loc>
+    <lastmod>2015-09-29T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/to_be_organized_later/2015-07-20-factored-brdf/</loc>
+    <lastmod>2015-07-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/to_be_organized_later/2015-04-25-planetary-biomes/</loc>
+    <lastmod>2015-04-25T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/to_be_organized_later/2015-01-31-hbr/</loc>
+    <lastmod>2015-01-31T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/</loc>
+    <lastmod>2016-03-31T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/categories/fluid-dynamics-math/</loc>
+    <lastmod>2015-09-29T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/categories/global-illumination-math/</loc>
+    <lastmod>2015-07-20T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/categories/math-origami/</loc>
+    <lastmod>2015-11-09T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/portfolio/</loc>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/post/</loc>
+    <lastmod>2016-03-31T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/categories/procedural-generation-math-graphics/</loc>
+    <lastmod>2015-04-25T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/resume/</loc>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://culdevu.github.io/to_be_organized_later/</loc>
+    <lastmod>2015-12-15T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+</urlset>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nopelepsy Technical Introduction</title>
+<meta name="description" content="The personal website of Daniel Taylor">
+<meta name="generator" content="Hugo 0.31.1" />
+<meta property="og:title" content="Nopelepsy Technical Introduction" />
+<meta property="og:description" content="In my last post a little under two years ago, I talked about a theoretical way to tackle the problem of removing flashes from video, specifically those that can cause epileptic events. Due to technical limitations, time, and scope change, this project has changed a lot over that time. A couple months ago I stopped stalling and buckled down to actually built a working version of the damn thing. It took a lot of trial and error, false starts, and good old fashioned procrastination, but I have a working copy now call Nopelepsy." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://culdevu.github.io/post/2018-01-02-nopelepsy-02/" />
+
+
+
+<meta property="article:published_time" content="2018-01-02T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2018-01-02T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+<link rel="dns-prefetch" href="//fonts.gstatic.com" />
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700" type="text/css" media="all" />
+<link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
+<script type="text/javascript" src="/js/scripts.js"></script>
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML'></script>
+
+</head>
+<body class="body body-right-sidebar mobile" itemscope="itemscope" itemtype="http://schema.org/WebPage">
+	<div class="container container-outer">
+		<header class="header" itemscope="itemscope" itemtype="http://schema.org/WPHeader">
+			<div class="container container-inner clearfix">
+				<div class="logo" role="banner" itemscope="itemscope" itemtype="http://schema.org/Brand">
+					<a class="logo__link" href="/" title="CulDeVu" rel="home">
+						<h1 class="logo__title">CulDeVu</h1>
+						<h2 class="logo__tagline">Just another site</h2>
+					</a>
+				</div>
+			</div>
+			
+<nav class="menu" itemscope="itemscope" itemtype="http://schema.org/SiteNavigationElement">
+	<ul class="menu__list">
+		<li class="menu__item"><a class="menu__link" href="/portfolio/">PORTFOLIO</a></li>
+		<li class="menu__item"><a class="menu__link" href="/resume/">RESUME</a></li>
+	</ul>
+</nav>
+
+		</header>
+		<div class="wrapper clearfix">
+
+<main class="main-content content" role="main" itemprop="mainContentOfPage">
+	<article class="post">
+		<header class="post__header clearfix">
+			<h1 class="post__title">Nopelepsy Technical Introduction</h1>
+			<p class="post__meta meta">
+				<svg class="icon icon-time" height="14" viewBox="0 0 16 16" width="14" xmlns="http://www.w3.org/2000/svg"><path d="m8-.0000003c-4.4 0-8 3.6-8 8 0 4.4000003 3.6 8.0000003 8 8.0000003 4.4 0 8-3.6 8-8.0000003 0-4.4-3.6-8-8-8zm0 14.4000003c-3.52 0-6.4-2.88-6.4-6.4000003 0-3.52 2.88-6.4 6.4-6.4 3.52 0 6.4 2.88 6.4 6.4 0 3.5200003-2.88 6.4000003-6.4 6.4000003zm.4-10.4000003h-1.2v4.8l4.16 2.5600003.64-1.04-3.6-2.1600003z"/></svg>
+				<time class="post__meta-date" datetime="2018-01-02T00:00:00">January 02, 2018</time>
+			</p>
+		</header>
+		<div class="post__content clearfix">
+			<p>In my last post a little under two years ago, I talked about a theoretical way to tackle the problem of removing flashes from video, specifically those that can cause epileptic events. Due to technical limitations, time, and scope change, this project has changed a lot over that time. A couple months ago I stopped stalling and buckled down to actually built a working version of the damn thing. It took a lot of trial and error, false starts, and good old fashioned procrastination, but I have a working copy now call Nopelepsy. (It's in closed alpha at the time of writing, but you want a copy, email me. My contact info is at the bottom of the page). This is my attempt at writing up what I've done so far, from ideas to implementation to pitfalls.</p>
+
+<h1 id="whats-changed">What's Changed</h1>
+
+<p>Last time I wrote about this, I was trying to read directly off of the visible screen and preemptively block out areas of the screen that might flash too many times in too short of a period. The idea was that you wouldn't have to download YouTube videos and run them through a converter in order to watch YouTube videos, or do something similar for gifs on the internet. It would be a one-time thing, just run it and be protected while on your computer. There was one little problem, though.</p>
+
+<p>This was <strong>slow</strong>.</p>
+
+<p>Like, way too slow, and it's not the kind of slow that can be sped up easily either. Nopelepsy needed to be fast enough to detect flashes that are at least 1/30th of a second, and there was no way that method was going to be getting those kinds of benchmarks. Also, during that time I figured that I should also support detection for people who are photosensitive in general, but that would be impossible without having some access to future information on the screen.</p>
+
+<p>So I eventually decided, instead of making a shitty screen reader system, to make a video converter and make it good. This way I can have access to future information about the screen, and can theoretically have perfect flash detection.</p>
+
+<p>This is how the current version of Nopelepsy works. It takes in a video file (like a movie or something), processes it, and then spits out a different video file with all of the light flashes gone. The techniques are in their infancy, but they work. Here are some videos of it in action:</p>
+
+<p><strong>Warning: To my knowledge these videos do not contain any harmful flashes, but they might. Some of these clips were initially flash-heavy before being ran through the converter, so some flashing may have gotten through.</strong></p>
+
+<!-- <iframe width="480" height="270" src="https://www.youtube.com/embed/N1PXvDUS9GU" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+<iframe width="480" height="270" src="https://www.youtube.com/embed/yyI32THa8B0" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe>
+
+<iframe width="480" height="270" src="https://www.youtube.com/embed/VCxveDEhV9s" frameborder="0" gesture="media" allow="encrypted-media" allowfullscreen></iframe> -->
+
+<h1 id="algorithm-overview">Algorithm Overview</h1>
+
+<p>The method I currently use to detect and remove flashes has had a checkered past. Here I'm going to try to describe what I do to get the results that I do, and also some of what doesn't work. First though, we need to get some objectives and definitions out of the way. All of these are inspired or come straight from <a href="https://www.w3.org/WAI/GL/WCAG20/#general-thresholddef">the W3C accessibility spec</a>.</p>
+
+<blockquote>
+<p>Def. Potential flash:
+An increase followed by a decrease in the luminance of a pixel of at least 1/10th the maximum sRGB luminance. These are defined by the pixel location and the range of time that this takes place.</p>
+</blockquote>
+
+<p>The dependence on sRGB luminance instead of some other color space shouldn't be necessary, but it's what the spec uses so I'm going to stick with that for now. The range of time that a potential flash is happening over will be called its <strong>domain</strong>. Also note that potential flashes can overlap and can nest inside each other.</p>
+
+<blockquote>
+<p>Def. General flash:
+When 25% or more of the pixels inside of any 0.024 steradian region (relative to the viewer) all experience a potential flash concurrently.</p>
+</blockquote>
+
+<p>This definition comes (modified) from the W3C spec. It's rather ambiguous as to what it means by &quot;concurrently&quot; and &quot;region&quot;, so I'm setting some additional guidelines to make the problem more defined and also a bit easier:</p>
+
+<ul>
+<li>Even though more pixels fill a 0.024 steradian region near the corner of a screen than in the middle (assuming the viewer's head is closer to the middle than the corners), I'm going to a constant number of pixels for that calculation. It makes the problem a bit easier, and honestly, who cares? It's not like this is going to be used in an IMAX theater...</li>
+<li>That area of pixels is assumed to a simple shape, like a square or a circle.</li>
+</ul>
+
+<p>Now to take care of the &quot;concurrently&quot; problem. Depending on how you define it, you can have a mess on your hands. For example, say pixels A, B, and C all have potential flashes, named $p_A$, $p_B$, and $p_C$, respectively. Now also assume that $p_A$ flashes concurrently with $p_B$, and that $p_B$ flashes concurrently with $p_C$. Now is it necessarily true that $p_A$ and $p_C$ flash concurrently as well? How you answer this affects how you solve the problem.</p>
+
+<p>In Nopelepsy, we assume that yes, it's necessarily true that $p_A$ and $p_C$ must also flash concurrently. Denote $\sim$ to be a relation and $p_X \sim p_Y$ to mean &quot;$p_X$ and $p_Y$ flash concurrently.&quot;</p>
+
+		</div>
+		
+
+	</article>
+	
+<div class="authorbox clearfix">
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Daniel Taylor</span>
+	</div>
+	<div class="authorbox__description">
+		Email: culdevu@gmail.com
+	</div>
+</div>
+	
+
+	
+</main>
+
+<aside class="sidebar" itemscope="itemscope" itemtype="http://schema.org/WPSideBar">
+	
+<div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="//google.com/search">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="http://culdevu.github.io/" />
+	</form>
+</div>
+	
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/post/2018-01-02-nopelepsy-02/">Nopelepsy Technical Introduction</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-03-31-nopelepsy-01/">Tools for Photosensitive Epilepsy I: Flashing</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-02-02-microfacet-dummies/">Microfacet Importance Sampling: For Dummies</a></li>
+		</ul>
+	</div>
+</div>
+
+	
+	
+
+	
+</aside>
+
+	</div>
+		<footer class="footer" itemscope="itemscope" itemtype="http://schema.org/WPFooter">
+			<div class="container container-inner">
+				<p class="footer__copyright">&copy; 2018 CulDeVu. <span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad theme</a>.</span></p>
+			</div>
+		</footer>
+	</div>
+
+<script>
+	var navigation = responsiveNav(".menu", {
+		navClass: "menu--collapse",
+	});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+
+</body>
+</html>

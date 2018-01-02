@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on CulDeVu</title>
+    <link>http://culdevu.github.io/categories/</link>
+    <description>Recent content in Categories on CulDeVu</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="http://culdevu.github.io/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Fluid Dynamics Math</title>
+      <link>http://culdevu.github.io/categories/fluid-dynamics-math/</link>
+      <pubDate>Tue, 29 Sep 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/categories/fluid-dynamics-math/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Global Illumination Math</title>
+      <link>http://culdevu.github.io/categories/global-illumination-math/</link>
+      <pubDate>Mon, 20 Jul 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/categories/global-illumination-math/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Math Origami</title>
+      <link>http://culdevu.github.io/categories/math-origami/</link>
+      <pubDate>Mon, 09 Nov 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/categories/math-origami/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Procedural Generation Math Graphics</title>
+      <link>http://culdevu.github.io/categories/procedural-generation-math-graphics/</link>
+      <pubDate>Sat, 25 Apr 2015 00:00:00 +0000</pubDate>
+      
+      <guid>http://culdevu.github.io/categories/procedural-generation-math-graphics/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
