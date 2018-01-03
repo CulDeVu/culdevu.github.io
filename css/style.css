@@ -277,10 +277,12 @@ pre {
 	border: 1px solid #ebebeb;
 	padding: 20px;
 	padding: 1.25rem;
-	white-space: pre-wrap;
-	white-space: -o-pre-wrap;
-	white-space: -moz-pre-wrap;
-	white-space: -webkit-pre-wrap;
+	white-space: pre;
+	white-space: -o-pre;
+	white-space: -moz-pre;
+	white-space: -webkit-pre;
+
+	overflow-x: auto;
 }
 
 pre code {
@@ -289,6 +291,8 @@ pre code {
 	background: inherit;
 	color: inherit;
 	white-space: inherit;
+
+	overflow-wrap: normal;
 }
 
 kbd {
