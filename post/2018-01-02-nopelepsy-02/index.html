@@ -172,8 +172,8 @@ When 25% or more of the pixels inside of any 0.024 steradian region (relative to
 <p>Center of Mass equality: Let $[a, b]$ and $[c, d]$ be as before, and also let $\left( p_{i} \right)$ and $\left( q_{i} \right)$ be the luminance histograms of the two potential flashes, respectively. Denote</p>
 
 <p><span  class="math">\[
-P = \left[ \sum_{i=a}^{b} \frac{p_i}{b - a} \right] \\
-Q = \left[ \sum_{i=c}^{d} \frac{q_i}{d - c} \right]
+P = \left[ \sum_{i=a}^{b} \frac{i p_i}{\sum p_i} \right] \\
+Q = \left[ \sum_{i=c}^{d} \frac{i q_i}{\sum q_i} \right]
 \]</span></p>
 
 <p>, where $[ \cdot ]$ means &quot;nearest integer, rounding up at 0.5, etc.&quot; The Center of Mass $\sim$ is satisfied if and only if $P = Q$. This is meant to quantify a bit about the &quot;shape&quot; of the luminance graph. It's rather crude, and that's why it's still tagged &quot;EXPERIMENTAL&quot; in Nopelepsy, but it seems to work just fine...</p>
