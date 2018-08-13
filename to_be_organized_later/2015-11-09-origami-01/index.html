@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Origami and the Associated Maths</title>
+<meta name="description" content="The personal website of Daniel Taylor">
+<meta name="generator" content="Hugo 0.46" />
+<meta property="og:title" content="Origami and the Associated Maths" />
+<meta property="og:description" content="So this is going to be another one of those write-it-out-so-that-I-can-better-understand-it sort of things. Just a heads up. This IS a journal, after all, and functions as advertisement second.
+So. Origami and mathematics. We know that the two are related because, if you fold a piece of paper the same way twice, you&rsquo;ll get two of the same shape, so there&rsquo;s rules governing it. And some smart people have tried figuring out those rules." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://culdevu.github.io/to_be_organized_later/2015-11-09-origami-01/" />
+
+
+
+<meta property="article:published_time" content="2015-11-09T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2015-11-09T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+<link rel="dns-prefetch" href="//fonts.gstatic.com" />
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700" type="text/css" media="all" />
+<link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
+<script type="text/javascript" src="/js/scripts.js"></script>
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML'></script>
+
+</head>
+<body class="body body-right-sidebar mobile" itemscope="itemscope" itemtype="http://schema.org/WebPage">
+	<div class="container container-outer">
+		<header class="header" itemscope="itemscope" itemtype="http://schema.org/WPHeader">
+			<div class="container container-inner clearfix">
+				<div class="logo" role="banner" itemscope="itemscope" itemtype="http://schema.org/Brand">
+					<a class="logo__link" href="/" title="CulDeVu" rel="home">
+						<h1 class="logo__title">CulDeVu</h1>
+						<h2 class="logo__tagline">An alternative to just talking to myself</h2>
+					</a>
+				</div>
+			</div>
+			
+<nav class="menu" itemscope="itemscope" itemtype="http://schema.org/SiteNavigationElement">
+	<ul class="menu__list">
+		<li class="menu__item"><a class="menu__link" href="/portfolio/">PORTFOLIO</a></li>
+		<li class="menu__item"><a class="menu__link" href="/resume/">RESUME</a></li>
+	</ul>
+</nav>
+
+		</header>
+		<div class="wrapper clearfix">
+
+<main class="main-content content" role="main" itemprop="mainContentOfPage">
+	<article class="post">
+		<header class="post__header clearfix">
+			<h1 class="post__title">Origami and the Associated Maths</h1>
+			<p class="post__meta meta">
+				<svg class="icon icon-time" height="14" viewBox="0 0 16 16" width="14" xmlns="http://www.w3.org/2000/svg"><path d="m8-.0000003c-4.4 0-8 3.6-8 8 0 4.4000003 3.6 8.0000003 8 8.0000003 4.4 0 8-3.6 8-8.0000003 0-4.4-3.6-8-8-8zm0 14.4000003c-3.52 0-6.4-2.88-6.4-6.4000003 0-3.52 2.88-6.4 6.4-6.4 3.52 0 6.4 2.88 6.4 6.4 0 3.5200003-2.88 6.4000003-6.4 6.4000003zm.4-10.4000003h-1.2v4.8l4.16 2.5600003.64-1.04-3.6-2.1600003z"/></svg>
+				<time class="post__meta-date" datetime="2015-11-09T00:00:00">November 09, 2015</time>
+			</p>
+		</header>
+		<div class="post__content clearfix">
+			
+
+<p>So this is going to be another one of those write-it-out-so-that-I-can-better-understand-it sort of things. Just a heads up. This IS a journal, after all, and functions as advertisement second.</p>
+
+<p>So. Origami and mathematics. We know that the two are related because, if you fold a piece of paper the same way twice, you&rsquo;ll get two of the same shape, so there&rsquo;s rules governing it. And some smart people have tried figuring out those rules. There&rsquo;s a bunch of them, but they all fall short for what I&rsquo;m wanting to do. So here it goes:</p>
+
+<p>Together with research in 1992, and again in 2002, a total of 7 axioms for flat folding paper were created, detailing exactly which basic operations could be performed with paper. These were laid out in much the same way that Euclid&rsquo;s axioms of geometry were laid out. This is basically the way that most research that I&rsquo;ve been able to turn up on the internet is: interesting constructions that, using the axioms, prove something about something else.</p>
+
+<p>What I&rsquo;m wanting to do, however, is a lot different. I&rsquo;m wanting to be able to take a collection of creases and their associated information, and turn it into a model of the finished product. A kind of crease instruction to finished origami model converter if you will. To do this I&rsquo;ve tried a couple methods, like physics based, relaxation and constraint based, and they&rsquo;ve failed for one reason or another. I&rsquo;ve settled on doing something sort of finite-element based: given a point on the original piece of paper and all the folds, where will that point be located in 3D space?</p>
+
+<p><img src="{{ site.url }}//assets/2015-11-09-origami-01/illu1.jpg" alt="" />
+<br />
+<em>[turn up for trackpad art]</em></p>
+
+<p>Unfortunately, there doesn&rsquo;t seem to be any information on the topic, so I guess I&rsquo;ll have to do it. Which is good, because I really wanted an interesting problem to work on. The rest of the entry will be about the stuff I&rsquo;ve concluded so far, and the questions I have.</p>
+
+<h1 id="types-of-folds">Types of folds</h1>
+
+<p>Folds are what what happen when you crease the paper in a straight line, and either fold the other side down or turn it some arbitrary angle around the fold. I&rsquo;ll be using the term &ldquo;fold&rdquo; and &ldquo;crease&rdquo; interchangeably.</p>
+
+<p>Folds can created that do one of two things:
+start at one edge of a piece of paper and end at another
+loop back in on itself
+(a fold can also start and stop on the same point on the edge of a piece of paper, but I&rsquo;ll ignore that case and say it&rsquo;s case #1)</p>
+
+<p><img src="{{ site.url }}//assets/2015-11-09-origami-01/illu2.jpg" alt="" /></p>
+
+<p>As you can see in the above examples, folds can be segmented into multiple parts going different directions, but are still connected end to end. I&rsquo;ll call these fold segments. They come in 2 flavors:</p>
+
+<ol>
+<li>mountain</li>
+<li>valley</li>
+</ol>
+
+<p>These types mean essentially nothing by themselves. They represent a direction to fold relative to your viewing angle. What&rsquo;s important is that they are opposites, and reversing every single fold segment will result in the exact same origami (this is equivalent to turning the piece of paper over). In this journal, all mountain folds are shown as dotted lines in red, and all valley folds are shown as dashed lines in blue, unless i&rsquo;m trying to point something out.</p>
+
+<h1 id="things-you-can-do-with-folds">Things you can do with folds</h1>
+
+<p>Origami is all about layering paper folds, one after another, in order, to create something. The &ldquo;in order&rdquo; part is important. You can&rsquo;t create the head and tail of a paper crane (the last steps) before you make all the other folds. However, folds are not always dependent on all of the previous ones. Sometimes folds are made purely to get a reference point for some other fold later on down the line. Some folds cancel out the symmetry of previous folds (more on that later). Further, some steps can be done in parallel, like the 2 wings of a paper plane, because they are independent of each other.</p>
+
+<p>When you make a fold, sometimes the mountain fold that you thought you made is actually a bunch of mountain-valley segments. To clear this up, I&rsquo;ll call the starting fold segment the fold seed.</p>
+
+<p><img src="{{ site.url }}//assets/2015-11-09-origami-01/illu3.jpg" alt="" />
+<br />
+<em>[the green fold segment is the fold seed. The purple fold segments were calculated from other information about symmetry and dependency]</em></p>
+
+<p>There are 4 types of fold seeds that I&rsquo;ll support for right now. They are:</p>
+
+<ol>
+<li>mountain</li>
+<li>valley</li>
+<li>inside-reverse (more on this one later)</li>
+<li>outside-reverse (the opposite of inside-reverse)</li>
+</ol>
+
+<p><img src="{{ site.url }}//assets/2015-11-09-origami-01/illu4.jpg" alt="" />
+<br />
+<em>[from left to right: mountain, valley, inside-reverse, outside-reverse. The green is the seed, and this shows what happens when each fold interacts with a single dependent]</em></p>
+
+<p>I chose these specifically because these are the types of fold seeds that are needed (with the exception to #4) to create a paper crane. I figured if I can&rsquo;t create a origami interpreter that can&rsquo;t interpret the quintessential piece of origami, I&rsquo;ve failed. The first 2 are really obvious and the latter two I&rsquo;m saving for a later time. There are certain issues about them that make them more complicated.</p>
+
+<p>You&rsquo;ve likely noticed in all of the pictures you&rsquo;ve seen so far there&rsquo;s a lot of reflection about lines going on. I&rsquo;ll call this reflecting about lines &ldquo;dependency,&rdquo; because of the its ordering properties. When a fold segment is dependent on another fold segment, it will reflect about the other line and change from mountain to valley or vice versa. Here&rsquo;s a pic:</p>
+
+<p><img src="{{ site.url }}//assets/2015-11-09-origami-01/illu5.jpg" alt="" /></p>
+
+<p>An important thing to note about this dependency is that the line that is being reflected about <em>has</em> to be done first. The only exception to the rule is fold segments at 90 degree angles on the paper, which can be done interchangeably (which I think says something very interesting about these types of folds).</p>
+
+<p>All of the above info has led me to use a tree to talk about origami folds. the parents of the tree represent dependency, while the nodes represent fold seeds.</p>
+
+<p><img src="{{ site.url }}//assets/2015-11-09-origami-01/illu6.jpg" alt="" /></p>
+
+<p>For mountain and valley fold seeds, this representation encompasses everything that needs to be said about an origami: from parallelism to dependency to ordering to direction.</p>
+
+<h1 id="other-fun-facts">Other fun facts</h1>
+
+<p>Here are just some neat things that happen to be true, that are essential to have a complete implementation of a origami interpreter, but aren&rsquo;t essential to have a complete understanding of what&rsquo;s happening. In no particular order:</p>
+
+<ul>
+<li>Everything talked about above has to do with planar folds, folds that create something that ends up laying down flat (180 degree folds). Non-planar folds act the exact same way but have an additional constraint: they can have no children in the dependency tree.</li>
+<li>For planar folds, every vertex where fold segments intersect, there are always the number of valley folds segments and mountain ones always differ by 2. For vertexes where fold segments and paper edges intersect, all bets are off. For non-planar fold segments, you can treat them like paper edges for the purpose of counting mountain-valley folds. This is an easy way to tell if a fold is valid or not.</li>
+<li>For mountain and valley fold seeds only, if a fold seed is dependent on a parent, which is dependent on a grandparent, then the fold seed is also dependent on the grandparent. This is not true for inside-reverse or outside-reverse folds.</li>
+<li>Folds that do not touch their parent fold in the dependency tree can be turned into 2 separate folds without any issues. For non-planar folds, it get&rsquo;s a bit more complicated. This is the only time self-intersection of paper is a problem, and I think I can safely ignore this case as it&rsquo;s fairly easy to work around. I think.</li>
+<li>Nodes on the same layer of the dependency tree that are not dependent on each other can be done in parallel, or in any order.</li>
+<li>Each node on the dependency tree must be unique, otherwise it&rsquo;d be kind of hard to do anything with it or conclude anything from it.</li>
+</ul>
+
+<h1 id="yup">Yup.</h1>
+
+<p>Well that&rsquo;s about it. That&rsquo;s all I&rsquo;m really semi-confident about at the moment. There are a bunch of things I still have to look into and figure out before all is said and done though.</p>
+
+<p>Tune in next time to find out what any of this has to do with finite element transformations, what the deal is with inside- and outside-reverse fold seeds and why they throw a kink in everything, and how any of this will help creating a fold to origami interpreter.</p>
+
+		</div>
+		
+
+	</article>
+	
+<div class="authorbox clearfix">
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Daniel Taylor</span>
+	</div>
+	<div class="authorbox__description">
+		Email: culdevu@gmail.com
+	</div>
+</div>
+	
+
+	
+</main>
+
+<aside class="sidebar" itemscope="itemscope" itemtype="http://schema.org/WPSideBar">
+	
+<div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="//google.com/search">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="http://culdevu.github.io/" />
+	</form>
+</div>
+	
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/post/2018-08-12-nopelepsy-03/">2018 08 12 Nopelepsy 03</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2018-01-02-nopelepsy-02/">Nopelepsy Technical Introduction</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-03-31-nopelepsy-01/">Tools for Photosensitive Epilepsy I: Flashing</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-02-02-microfacet-dummies/">Microfacet Importance Sampling: For Dummies</a></li>
+		</ul>
+	</div>
+</div>
+
+	
+	
+
+	
+</aside>
+
+	</div>
+		<footer class="footer" itemscope="itemscope" itemtype="http://schema.org/WPFooter">
+			<div class="container container-inner">
+				<p class="footer__copyright">&copy; 2018 CulDeVu. <span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad theme</a>.</span></p>
+			</div>
+		</footer>
+	</div>
+
+<script>
+	var navigation = responsiveNav(".menu", {
+		navClass: "menu--collapse",
+	});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+
+</body>
+</html>

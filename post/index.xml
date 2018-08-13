@@ -6,10 +6,21 @@
     <description>Recent content in Posts on CulDeVu</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 02 Jan 2018 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 12 Aug 2018 20:02:01 -0400</lastBuildDate>
     
 	<atom:link href="http://culdevu.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>2018 08 12 Nopelepsy 03</title>
+      <link>http://culdevu.github.io/post/2018-08-12-nopelepsy-03/</link>
+      <pubDate>Sun, 12 Aug 2018 20:02:01 -0400</pubDate>
+      
+      <guid>http://culdevu.github.io/post/2018-08-12-nopelepsy-03/</guid>
+      <description>Hello again! This one is a doozy, but that&#39;s okay. We&#39;ll get through it together
+What&#39;s changed For one, Nopelepsy is public on Github now! So that&#39;s cool.
+There&#39;s been a big rewrite since last time. Firstly, the Java implementation was ported to C++, and a lot of the single-threaded functionality I figured out how to re-cast into algebraic operations on wide vectors. So that&#39;s cool too. In fact, that&#39;s what most of this is going to be about</description>
+    </item>
     
     <item>
       <title>Nopelepsy Technical Introduction</title>

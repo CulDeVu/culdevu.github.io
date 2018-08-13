@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluid dynamics update</title>
+<meta name="description" content="The personal website of Daniel Taylor">
+<meta name="generator" content="Hugo 0.46" />
+<meta property="og:title" content="Fluid dynamics update" />
+<meta property="og:description" content="I&rsquo;m not really going to talk about much math-y stuff this time. I&rsquo;ve covered too much ground since my last entry to be able to remember all the pitfalls I ran into. So this time I&rsquo;m only really going to be talking about the general algorithm, how I deal with the pitfalls of the marker particle method, and the ongoing translation to CUDA. And probably share some of my Mario Maker levels." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://culdevu.github.io/to_be_organized_later/2015-09-29-fluid-dyanamic-update/" />
+
+
+
+<meta property="article:published_time" content="2015-09-29T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2015-09-29T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+<link rel="dns-prefetch" href="//fonts.gstatic.com" />
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700" type="text/css" media="all" />
+<link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
+<script type="text/javascript" src="/js/scripts.js"></script>
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML'></script>
+
+</head>
+<body class="body body-right-sidebar mobile" itemscope="itemscope" itemtype="http://schema.org/WebPage">
+	<div class="container container-outer">
+		<header class="header" itemscope="itemscope" itemtype="http://schema.org/WPHeader">
+			<div class="container container-inner clearfix">
+				<div class="logo" role="banner" itemscope="itemscope" itemtype="http://schema.org/Brand">
+					<a class="logo__link" href="/" title="CulDeVu" rel="home">
+						<h1 class="logo__title">CulDeVu</h1>
+						<h2 class="logo__tagline">An alternative to just talking to myself</h2>
+					</a>
+				</div>
+			</div>
+			
+<nav class="menu" itemscope="itemscope" itemtype="http://schema.org/SiteNavigationElement">
+	<ul class="menu__list">
+		<li class="menu__item"><a class="menu__link" href="/portfolio/">PORTFOLIO</a></li>
+		<li class="menu__item"><a class="menu__link" href="/resume/">RESUME</a></li>
+	</ul>
+</nav>
+
+		</header>
+		<div class="wrapper clearfix">
+
+<main class="main-content content" role="main" itemprop="mainContentOfPage">
+	<article class="post">
+		<header class="post__header clearfix">
+			<h1 class="post__title">Fluid dynamics update</h1>
+			<p class="post__meta meta">
+				<svg class="icon icon-time" height="14" viewBox="0 0 16 16" width="14" xmlns="http://www.w3.org/2000/svg"><path d="m8-.0000003c-4.4 0-8 3.6-8 8 0 4.4000003 3.6 8.0000003 8 8.0000003 4.4 0 8-3.6 8-8.0000003 0-4.4-3.6-8-8-8zm0 14.4000003c-3.52 0-6.4-2.88-6.4-6.4000003 0-3.52 2.88-6.4 6.4-6.4 3.52 0 6.4 2.88 6.4 6.4 0 3.5200003-2.88 6.4000003-6.4 6.4000003zm.4-10.4000003h-1.2v4.8l4.16 2.5600003.64-1.04-3.6-2.1600003z"/></svg>
+				<time class="post__meta-date" datetime="2015-09-29T00:00:00">September 29, 2015</time>
+			</p>
+		</header>
+		<div class="post__content clearfix">
+			
+
+<p>I&rsquo;m not really going to talk about much math-y stuff this time. I&rsquo;ve covered too much ground since my last entry to be able to remember all the pitfalls I ran into. So this time I&rsquo;m only really going to be talking about the general algorithm, how I deal with the pitfalls of the marker particle method, and the ongoing translation to CUDA. And probably share some of my Mario Maker levels. I&rsquo;m addicted to stars :(</p>
+
+<p>So! Let&rsquo;s do this!</p>
+
+<iframe width="640" height="390" src="https://www.youtube.com/embed/0xBAqjxHUkA" frameborder="0" allowfullscreen></iframe>
+
+<p>Sorry for the video being kinda shaky. OBS is having a hard time capturing details and YouTube thinks everything ever is a camcorder, so it looks a little strange. It gets across the idea, though. Note that there is still no surface tension, which would account for just about everything else strange looking with the simulation.</p>
+
+<h1 id="the-general-algorithm">The General Algorithm</h1>
+
+<p>So the algorithm for simulating a Eulerian fluid goes as follows:</p>
+
+<pre><code>init particles
+init velocity field, type field, etc
+
+for each frame:
+    apply external forces to velocity field
+
+    clear type field
+    update particle positions and apply to type field
+    extrapolate the velocity field
+
+    find particles to re-position
+    re-position those particles
+
+    build pressure matrices
+    solve the pressure equation
+    apply the pressure to the velocity field
+
+    enforce boundary conditions
+
+    advect the velocity field
+</code></pre>
+
+<p>The velocity field is the standard MAC staggered grid, cause why not, and because it&rsquo;s useful for pressure computation and velocity extrapolation. The extrapolation and pressure step are straight out of academic papers so it&rsquo;s standard stuff.</p>
+
+<p>The marker particles are the part I don&rsquo;t really know about. I just advect the marker particles through the velocity field just like anything else, and wherever the marker particles end up defines where the fluid exists or doesn&rsquo;t. This is pretty much the simplest method of defining the interior vs exterior of a fluid, so it has a lot of pitfalls, but I&rsquo;ll get to those in a minute. The issue is, though, that most everyone doesn&rsquo;t talk about this method (because of the many many issues it has) and so they use something called level sets. I&rsquo;ve tried implementing level sets several times, and marker particles are just so much simpler in every way.</p>
+
+<h1 id="marker-particles">Marker Particles</h1>
+
+<p>So the biggest pitfall about marker particles is that, due to numerical inaccuracy and a bunch of other issues, they tend to bunch up a lot in certain places. Namely, places where the divergence of the velocity field is still positive even after the incompressibility pressure solver. You&rsquo;d think that, since the pressure is positive in some places, it&rsquo;d be negative in the same area, canceling each other out, but it&rsquo;s not. The fact that gravity is always pulling down on the fluid makes it not always true, so what ends up happening is a net loss of volume from full to nearly 0 in a couple minutes.</p>
+
+<p>So what I tried to do, instead of using level sets like a sane person, I decided to force the fluid to conserve volume. The way I did this is pretty straightforward, and is the &ldquo;find/re-position particles&rdquo; part of the above algorithm. Basically,</p>
+
+<ol>
+<li>iterate over every particle over a grid and see if there are already more than a certain number of particles (max density, if you will) in that grid cell. If there are, I mark it to be re-positioned</li>
+<li>iterate over every grid cell where and see if there are less than some other number of particles (min density), and if there are, start pulling from the re-position pool and fill in those spots</li>
+</ol>
+
+<p>This is rather finicky in practice. For example, if I set minDensity to maxDensity, you see a lot of artifacts from there not being enough particles in the re-position pool to accommodate (because of the overall positive divergence I mentioned). A happy median, I found, was setting maxDensity to anywhere between 2 or 3 times the minDensity. Sure, this DOES lead to volume loss by a factor of whatever multiple you choose, but it&rsquo;s much better than having visually disgusting and simulations.</p>
+
+<p><img src="{{ site.url }}/assets/2015-09-29-fluid-dyanamic-update/marker.jpg" alt="Marker particles" /></p>
+
+<p>To be fair, the simulation without re-position looks a lot more fluid and water-like. However, conserving volume it too important to be avoided. Oh well.</p>
+
+<h1 id="cuda">CUDA</h1>
+
+<p>I&rsquo;ve been translating small pieces of the simulation to use the GPGPU via CUDA. I&rsquo;ve gotten the &ldquo;update particle&rdquo; portion completely ported to the GPU, which is just a simple advection and setting type fields. The really neat one is the pressure solver.</p>
+
+<p>In order to find the pressure in each cell, long story short, you need to construct a matrix equation something like this:</p>
+
+<p>$$
+    \Bigg[
+        \text{pain and suffering}
+    \Bigg]
+    \Bigg[
+        \text{pressure}
+    \Bigg] =
+    \Bigg[
+        \text{divergence}
+    \Bigg]
+$$</p>
+
+<p>, and then solve for pressure. On the CPU I used Gauss-Seidel to solve it, but I have no idea how to do it on the GPU. Luckily, there&rsquo;s a library called cusp that implemented everything for me!</p>
+
+<pre><code>struct cuspTriple
+{
+    int row, col;
+    float amount;
+};
+cusp::array1d&lt;float, cusp::host_memory&gt; pressure(mapW * mapH);
+void project()
+{
+    cusp::array1d&lt;float, cusp::host_memory&gt; b(mapW * mapH);
+    {
+        float scale = rho / dt;
+        for (int y = 0; y &lt; mapH; ++y)
+        {
+            for (int x = 0; x &lt; mapW; ++x)
+            {
+                int index = y * mapW + x;
+                b[index] = scale * (u-&gt;at(x + 1, y) - u-&gt;at(x, y) +
+                    v-&gt;at(x, y + 1) - v-&gt;at(x, y));
+            }
+        }
+    }
+
+    vector&lt;cuspTriple&gt; data;
+    {
+        for (int y = 0; y &lt; mapH; ++y)
+        {
+            for (int x = 0; x &lt; mapW; ++x)
+            {
+                float scale = 1;
+                int n = 0;
+
+                if (x &gt; 0) 
+                {
+                    if (type[y * mapW + x - 1] != SOLID)
+                    {
+                        if (type[y * mapW + x - 1] == WATER)
+                        {
+                            cuspTriple t;
+                            t.row = y * mapW + x;
+                            t.col = y * mapW + x - 1;
+                            t.amount = 1;
+                            data.push_back(t);
+                        }
+                        ++n;
+                    }
+                }
+                if (y &gt; 0) {
+                    if (type[(y - 1) * mapW + x] != SOLID)
+                    {
+                        if (type[(y - 1) * mapW + x] == WATER)
+                        {
+                            cuspTriple t;
+                            t.row = y * mapW + x;
+                            t.col = (y - 1) * mapW + x;
+                            t.amount = 1;
+                            data.push_back(t);
+                        }
+                        ++n;
+                    }
+                }
+                if (x &lt; mapW - 1) {
+                    if (type[y * mapW + x + 1] != SOLID)
+                    {
+                        if (type[y * mapW + x + 1] == WATER)
+                        {
+                            cuspTriple t;
+                            t.row = y * mapW + x;
+                            t.col = y * mapW + x + 1;
+                            t.amount = 1;
+                            data.push_back(t);
+                        }
+                        ++n;
+                    }
+                }
+                if (y &lt; mapH - 1) {
+                    if (type[(y + 1) * mapW + x] != SOLID)
+                    {
+                        if (type[(y + 1) * mapW + x] == WATER)
+                        {
+                            cuspTriple t;
+                            t.row = y * mapW + x;
+                            t.col = (y + 1) * mapW + x;
+                            t.amount = 1;
+                            data.push_back(t);
+                        }
+                        ++n;
+                    }
+                }
+
+                cuspTriple t;
+                t.row = y * mapW + x;
+                t.col = y * mapW + x;
+                t.amount = -n;
+                data.push_back(t);
+            }
+        }
+
+    }
+    cusp::coo_matrix&lt;int, float, cusp::host_memory&gt; A(mapW * mapH, mapW * mapH, data.size());
+    {
+        for (int i = 0; i &lt; data.size(); ++i)
+        {
+            A.row_indices[i] = data[i].row;
+            A.column_indices[i] = data[i].col;
+            A.values[i] = data[i].amount;
+        }
+    }
+
+    cusp::default_monitor&lt;float&gt; monitor(b, 600, 0.01, 0);
+    cusp::precond::diagonal&lt;float, cusp::host_memory&gt; M(A);
+
+    cusp::krylov::cg(A, pressure, b, monitor, M);
+}
+void applyPressure()
+{
+    float scale = dt / (rho);
+
+    for (int y = 0; y &lt; mapH; y++)
+    {
+        for (int x = 0; x &lt; mapW; x++)
+        {
+            if (type[y * mapW + x] != WATER)
+                continue;
+
+            float p = pressure[y * mapW + x];
+
+            u-&gt;at(x, y) -= scale * p;
+            u-&gt;at(x + 1, y) += scale * p;
+            v-&gt;at(x, y) -= scale * p;
+            v-&gt;at(x, y + 1) += scale * p;
+        }
+    }
+}
+</code></pre>
+
+<p>This is the version of the GPU solver I have right now. It has a ton of theoretical std::vector overhead (idk how well the CUDA compiler does to try to optimize things out), so the next thing I&rsquo;m going to be testing is whether or not over-approximating the number of non-zero elements in the sparse matrix will still be efficient.</p>
+
+<p>Also, the GPU version is around 3-4 times faster than the CPU version! Now, on the other hand, it&rsquo;s only 3 or 4 times faster than the CPU version. That&rsquo;s with copying data back and forth from the GPU, so I give it a little bit of a break, but not much. I&rsquo;m extremely confident that I could easily squeeze much more efficiency out of it, so that will have to be something I&rsquo;ll deal with at a later date, after I port a bit more to the GPU.</p>
+
+<p>In short, kill me now.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Could someone please give me stars in Super Mario Maker? I&rsquo;m addicted and I need all you have. One of my levels&rsquo; ID is 04B7-0000-0069-DB69 and from there you should be able to access the 3 levels I&rsquo;ve uploaded. They have &lt; 20% clear rate on each of them for some strange reason, even though I think they&rsquo;re pretty easy (and fun).</p>
+
+<p>Anyway, thanks for reading!</p>
+
+		</div>
+		
+
+	</article>
+	
+<div class="authorbox clearfix">
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Daniel Taylor</span>
+	</div>
+	<div class="authorbox__description">
+		Email: culdevu@gmail.com
+	</div>
+</div>
+	
+
+	
+</main>
+
+<aside class="sidebar" itemscope="itemscope" itemtype="http://schema.org/WPSideBar">
+	
+<div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="//google.com/search">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="http://culdevu.github.io/" />
+	</form>
+</div>
+	
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/post/2018-08-12-nopelepsy-03/">2018 08 12 Nopelepsy 03</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2018-01-02-nopelepsy-02/">Nopelepsy Technical Introduction</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-03-31-nopelepsy-01/">Tools for Photosensitive Epilepsy I: Flashing</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-02-02-microfacet-dummies/">Microfacet Importance Sampling: For Dummies</a></li>
+		</ul>
+	</div>
+</div>
+
+	
+	
+
+	
+</aside>
+
+	</div>
+		<footer class="footer" itemscope="itemscope" itemtype="http://schema.org/WPFooter">
+			<div class="container container-inner">
+				<p class="footer__copyright">&copy; 2018 CulDeVu. <span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad theme</a>.</span></p>
+			</div>
+		</footer>
+	</div>
+
+<script>
+	var navigation = responsiveNav(".menu", {
+		navClass: "menu--collapse",
+	});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factored BRDF Representation</title>
+<meta name="description" content="The personal website of Daniel Taylor">
+<meta name="generator" content="Hugo 0.46" />
+<meta property="og:title" content="Factored BRDF Representation" />
+<meta property="og:description" content="It&rsquo;s been quite a while.
+So I&rsquo;ve been working on life/jobs/family/etc the past couple months. A couple weeks ago, however, I decided to implement a type of arbitrary BRDF sampling based on factoring large matrices, found here: http://gfx.cs.princeton.edu/proj/brdf/brdf.pdf
+The idea is to convert the BRDF into a series of matrix representations in such a way that
+\[ f_r(\omega_i, \omega_o)(wi \cdot \textbf{n}) \approx \sum{l=1}^{L}{ F_l(\omega_o) u_l(\theta_h) v_l(\phi_h) } \]
+, where \( F_l \), \( u_l \), and \( vl \) are massive matrices that depend on outgoing direction, half angle azimuth, and half angle zenith about surface normal, respectively." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://culdevu.github.io/to_be_organized_later/2015-07-20-factored-brdf/" />
+
+
+
+<meta property="article:published_time" content="2015-07-20T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2015-07-20T00:00:00&#43;00:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<link rel="dns-prefetch" href="//fonts.googleapis.com" />
+<link rel="dns-prefetch" href="//fonts.gstatic.com" />
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700" type="text/css" media="all" />
+<link rel="stylesheet" href="/css/style.css" type="text/css" media="all" />
+<script type="text/javascript" src="/js/scripts.js"></script>
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+    TeX: { equationNumbers: { autoNumber: "AMS" },
+         extensions: ["AMSmath.js", "AMSsymbols.js"] }
+  }
+});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML'></script>
+
+</head>
+<body class="body body-right-sidebar mobile" itemscope="itemscope" itemtype="http://schema.org/WebPage">
+	<div class="container container-outer">
+		<header class="header" itemscope="itemscope" itemtype="http://schema.org/WPHeader">
+			<div class="container container-inner clearfix">
+				<div class="logo" role="banner" itemscope="itemscope" itemtype="http://schema.org/Brand">
+					<a class="logo__link" href="/" title="CulDeVu" rel="home">
+						<h1 class="logo__title">CulDeVu</h1>
+						<h2 class="logo__tagline">An alternative to just talking to myself</h2>
+					</a>
+				</div>
+			</div>
+			
+<nav class="menu" itemscope="itemscope" itemtype="http://schema.org/SiteNavigationElement">
+	<ul class="menu__list">
+		<li class="menu__item"><a class="menu__link" href="/portfolio/">PORTFOLIO</a></li>
+		<li class="menu__item"><a class="menu__link" href="/resume/">RESUME</a></li>
+	</ul>
+</nav>
+
+		</header>
+		<div class="wrapper clearfix">
+
+<main class="main-content content" role="main" itemprop="mainContentOfPage">
+	<article class="post">
+		<header class="post__header clearfix">
+			<h1 class="post__title">Factored BRDF Representation</h1>
+			<p class="post__meta meta">
+				<svg class="icon icon-time" height="14" viewBox="0 0 16 16" width="14" xmlns="http://www.w3.org/2000/svg"><path d="m8-.0000003c-4.4 0-8 3.6-8 8 0 4.4000003 3.6 8.0000003 8 8.0000003 4.4 0 8-3.6 8-8.0000003 0-4.4-3.6-8-8-8zm0 14.4000003c-3.52 0-6.4-2.88-6.4-6.4000003 0-3.52 2.88-6.4 6.4-6.4 3.52 0 6.4 2.88 6.4 6.4 0 3.5200003-2.88 6.4000003-6.4 6.4000003zm.4-10.4000003h-1.2v4.8l4.16 2.5600003.64-1.04-3.6-2.1600003z"/></svg>
+				<time class="post__meta-date" datetime="2015-07-20T00:00:00">July 20, 2015</time>
+			</p>
+		</header>
+		<div class="post__content clearfix">
+			
+
+<p>It&rsquo;s been quite a while.</p>
+
+<p>So I&rsquo;ve been working on life/jobs/family/etc the past couple months. A couple weeks ago, however, I decided to implement a type of arbitrary BRDF sampling based on factoring large matrices, found here: <a href="http://gfx.cs.princeton.edu/proj/brdf/brdf.pdf">http://gfx.cs.princeton.edu/proj/brdf/brdf.pdf</a></p>
+
+<p>The idea is to convert the BRDF into a series of matrix representations in such a way that</p>
+
+<p>\[ f_r(\omega_i, \omega_o)(w<em>i \cdot \textbf{n}) \approx
+    \sum</em>{l=1}^{L}{ F_l(\omega_o) u_l(\theta_h) v_l(\phi_h) } \]</p>
+
+<p>, where \( F_l \), \( u_l \), and \( vl \) are massive matrices that depend on outgoing direction, half angle azimuth, and half angle zenith about surface normal, respectively. Now that the functions for half angle azimuth and zenith are separated out, it&rsquo;s trivial to construct a probability density function based on each. From then on, it&rsquo;s the whole uniform random number -&gt; CDF -&gt; random ray thing like we&rsquo;re used to. The PDF is defined by</p>
+
+<p>\[
+    pdf(\theta_h, \phi_h \vert \omega<em>o) =
+    \left(
+        \sum</em>{l=1}^{L}{\frac{ F_l(\omega_o) u_l(\theta_h) v_l(\phi<em>h)}{\sum</em>{j=1}^{L}{F_j(\omega_o)}}}
+    \right)
+    \frac{1}{4 (\omega_i \cdot \omega_h) }
+\]</p>
+
+<p>, where that last term is the Jacobian between half angle representation and normal paths.</p>
+
+<h1 id="pretty-pictures-and-opinions">Pretty Pictures and Opinions</h1>
+
+<p><img src="{{ site.url }}/assets/2015-07-20-factored-brdf/3bounce.jpg" alt="3 bounce comparison" />
+<em>[Left: factored BRDF representation, Right: Path traced reference, 200 samples each]</em></p>
+
+<p>On to my personal thoughts. (Just as a warning, I&rsquo;ve checked and re-checked my math a hundred times, so I don&rsquo;t think anything is wrong. If it is, though, be sure to sufficiently embarrass me on the Internet)</p>
+
+<p>So. The big issue is that, while the representation is extremely good at importance sampling shiny materials, it does so at the expense of accurately representing more Lambertian properties. The effect can be seen when only one bounce is traversed:</p>
+
+<p><img src="{{ site.url }}/assets/2015-07-20-factored-brdf/1bounce.jpg" alt="1 bounce comparison" />
+<em>[Left: 256 u terms, 128 v terms, Middle: path traced reference, Right: 512 u terms, 256 v terms, all images rendered with 200 samples]</em>
+(btw, the blue ball is the only thing in the picture that new material is applied to here. In case you couldn&rsquo;t tell.)</p>
+
+<p>This issue arises because of its discrete nature. In order to get a good enough representation of the BRDF to sample it in this manner, you have to throw more and more samples at the BRDF. In this type of representation, a pure mirror would work very well, and diffuse materials would work less well, because this representation prefers more jagged BRDFs that so that it can sample the correct lobe. Otherwise, it has to make approximations at to what the CDF is, in the same way that a Euler integrator has issues because of regular sampling that doesn&rsquo;t capture the essence of the function. If that makes sense. A graph of what this looks like might be something like</p>
+
+<p><img src="{{ site.url }}//assets/2015-07-20-factored-brdf/illu.jpg" alt="" /></p>
+
+<p>I could show some close-ups like in normal graphics papers, but there&rsquo;s no real point as the differences are so massive.</p>
+
+<p>Welp. Hoped you liked it. The factored representation is still fantastic if you want to store measured BRDF data, but it doesn&rsquo;t suit my needs for an actual path tracer. Oh well. I&rsquo;m bound to find some other fancy graphics paper to try to implement soon</p>
+
+		</div>
+		
+
+	</article>
+	
+<div class="authorbox clearfix">
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Daniel Taylor</span>
+	</div>
+	<div class="authorbox__description">
+		Email: culdevu@gmail.com
+	</div>
+</div>
+	
+
+	
+</main>
+
+<aside class="sidebar" itemscope="itemscope" itemtype="http://schema.org/WPSideBar">
+	
+<div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="//google.com/search">
+		<label>
+			<span class="screen-reader-text">Search for:</span>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="http://culdevu.github.io/" />
+	</form>
+</div>
+	
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/post/2018-08-12-nopelepsy-03/">2018 08 12 Nopelepsy 03</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2018-01-02-nopelepsy-02/">Nopelepsy Technical Introduction</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-03-31-nopelepsy-01/">Tools for Photosensitive Epilepsy I: Flashing</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/2016-02-02-microfacet-dummies/">Microfacet Importance Sampling: For Dummies</a></li>
+		</ul>
+	</div>
+</div>
+
+	
+	
+
+	
+</aside>
+
+	</div>
+		<footer class="footer" itemscope="itemscope" itemtype="http://schema.org/WPFooter">
+			<div class="container container-inner">
+				<p class="footer__copyright">&copy; 2018 CulDeVu. <span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad theme</a>.</span></p>
+			</div>
+		</footer>
+	</div>
+
+<script>
+	var navigation = responsiveNav(".menu", {
+		navClass: "menu--collapse",
+	});
+</script>
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+
+</body>
+</html>

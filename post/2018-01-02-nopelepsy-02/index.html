@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nopelepsy Technical Introduction</title>
 <meta name="description" content="The personal website of Daniel Taylor">
-<meta name="generator" content="Hugo 0.31.1" />
+<meta name="generator" content="Hugo 0.46" />
 <meta property="og:title" content="Nopelepsy Technical Introduction" />
 <meta property="og:description" content="In my last post a little under two years ago, I talked about a theoretical way to tackle the problem of removing flashes from video, specifically those that can cause epileptic events. Due to technical limitations, time, and scope change, this project has changed a lot over that time. A couple months ago I stopped stalling and buckled down to actually built a working version of the damn thing. It took a lot of trial and error, false starts, and good old fashioned procrastination, but I have a working copy now call Nopelepsy." />
 <meta property="og:type" content="article" />
@@ -172,8 +172,8 @@ When 25% or more of the pixels inside of any 0.024 steradian region (relative to
 <p>Center of Mass equality: Let $[a, b]$ and $[c, d]$ be as before, and also let $\left( p_{i} \right)$ and $\left( q_{i} \right)$ be the luminance histograms of the two potential flashes, respectively. Denote</p>
 
 <p><span  class="math">\[
-P = \left[ \sum_{i=a}^{b} \frac{i p_i}{\sum p_i} \right] \\
-Q = \left[ \sum_{i=c}^{d} \frac{i q_i}{\sum q_i} \right]
+P = \left[ \sum_{i=a}^{b} \frac{i p_i}{\sum p_j} \right] \\
+Q = \left[ \sum_{i=c}^{d} \frac{i q_i}{\sum q_j} \right]
 \]</span></p>
 
 <p>, where $[ \cdot ]$ means &quot;nearest integer, rounding up at 0.5, etc.&quot; The Center of Mass $\sim$ is satisfied if and only if $P = Q$. This is meant to quantify a bit about the &quot;shape&quot; of the luminance graph. It's rather crude, and that's why it's still tagged &quot;EXPERIMENTAL&quot; in Nopelepsy, but it seems to work just fine...</p>
@@ -285,6 +285,7 @@ for each frame in the video
 	<h4 class="widget__title">Recent Posts</h4>
 	<div class="widget__content">
 		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/post/2018-08-12-nopelepsy-03/">2018 08 12 Nopelepsy 03</a></li>
 			<li class="widget__item"><a class="widget__link" href="/post/2018-01-02-nopelepsy-02/">Nopelepsy Technical Introduction</a></li>
 			<li class="widget__item"><a class="widget__link" href="/post/2016-03-31-nopelepsy-01/">Tools for Photosensitive Epilepsy I: Flashing</a></li>
 			<li class="widget__item"><a class="widget__link" href="/post/2016-02-02-microfacet-dummies/">Microfacet Importance Sampling: For Dummies</a></li>

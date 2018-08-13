@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Microfacet Importance Sampling: For Dummies</title>
 <meta name="description" content="The personal website of Daniel Taylor">
-<meta name="generator" content="Hugo 0.31.1" />
+<meta name="generator" content="Hugo 0.46" />
 <meta property="og:title" content="Microfacet Importance Sampling: For Dummies" />
 <meta property="og:description" content="Despite how important of a topic good importance sampling is in the area of global illumination, it&#39;s usually left out of all common-English conversations and tutorials about path tracing (with the exception of the Lambertian case, which is a good introduction to importance sampling). If you want to get into microfacet importance sampling, multiple importance sampling, or even, God forbid, Metropolis light transport, you&#39;re on your own. And, probably for a good reason." />
 <meta property="og:type" content="article" />
@@ -251,18 +251,18 @@ f_d * (1 - F(\textbf{i}, \textbf{h})) +
 <pre><code>Generate random number r1
 
 for each layer in material:
-    determine the new half-vector (or microfacet normal)
-    f = Fresnel function using that half-vector
+	determine the new half-vector (or microfacet normal)
+	f = Fresnel function using that half-vector
 
-    if (r1 &gt; f):
-        r1 -= f
-        continue
+	if (r1 &gt; f):
+		r1 -= f
+		continue
 
-    calculate outbound ray
-    generate BRDF for current layer and inbound and outbound rays
-    generate pdf for outbound ray
+	calculate outbound ray
+	generate BRDF for current layer and inbound and outbound rays
+	generate pdf for outbound ray
 
-    sample and accumulate as normal
+	sample and accumulate as normal
 </code></pre>
 
 <p>The only thing left to do is get rid of the Fresnel term from the microfacet BRDF and the $(1 - F)$ from in front of the Lambertian term: it won't be of any more use to us right there, as that calculation is handled implicitly now. That function now serves as a Russian Roulette mechanism to switch between layers, and is no longer needed to scale the energy of the microfacet BRDF, as the $D$ and $G$ term are perfectly capable of doing exactly that on their own.</p>
@@ -310,6 +310,7 @@ for each layer in material:
 	<h4 class="widget__title">Recent Posts</h4>
 	<div class="widget__content">
 		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/post/2018-08-12-nopelepsy-03/">2018 08 12 Nopelepsy 03</a></li>
 			<li class="widget__item"><a class="widget__link" href="/post/2018-01-02-nopelepsy-02/">Nopelepsy Technical Introduction</a></li>
 			<li class="widget__item"><a class="widget__link" href="/post/2016-03-31-nopelepsy-01/">Tools for Photosensitive Epilepsy I: Flashing</a></li>
 			<li class="widget__item"><a class="widget__link" href="/post/2016-02-02-microfacet-dummies/">Microfacet Importance Sampling: For Dummies</a></li>

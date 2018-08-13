@@ -3,16 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>404 Page not found</title>
+<title>HBR: Human Based Rendering</title>
 <meta name="description" content="The personal website of Daniel Taylor">
 <meta name="generator" content="Hugo 0.46" />
-<meta property="og:title" content="404 Page not found" />
-<meta property="og:description" content="The personal website of Daniel Taylor" />
-<meta property="og:type" content="website" />
-<meta property="og:url" content="" />
+<meta property="og:title" content="HBR: Human Based Rendering" />
+<meta property="og:description" content="Heyy all!
+So the graphics professor at school here was talking to me and he was like &ldquo;you know what would be a cool idea?&rdquo; Turns out, it WAS a cool idea.
+So! I present to you:
+HBR: Human Based Rendering (the photon mapping of the next generation) The general idea is to either get the user that&rsquo;s looking at a screen to plot the photons themselves, or somehow crowd-source rendering an environment by manually tracing out light paths." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://culdevu.github.io/to_be_organized_later/2015-01-31-hbr/" />
 
 
 
+<meta property="article:published_time" content="2015-01-31T00:00:00&#43;00:00"/>
+
+<meta property="article:modified_time" content="2015-01-31T00:00:00&#43;00:00"/>
 
 
 
@@ -75,10 +81,63 @@ MathJax.Hub.Config({
 		<div class="wrapper clearfix">
 
 <main class="main-content content" role="main" itemprop="mainContentOfPage">
-	<div class="warning">
-		<h1 class="warning__headline">404. Page not found</h1>
-		<p class="warning__text">The page you were looking for appears to have been moved, deleted or does not exist. Please, use search or go to <a href="/">main page</a>.</p>
+	<article class="post">
+		<header class="post__header clearfix">
+			<h1 class="post__title">HBR: Human Based Rendering</h1>
+			<p class="post__meta meta">
+				<svg class="icon icon-time" height="14" viewBox="0 0 16 16" width="14" xmlns="http://www.w3.org/2000/svg"><path d="m8-.0000003c-4.4 0-8 3.6-8 8 0 4.4000003 3.6 8.0000003 8 8.0000003 4.4 0 8-3.6 8-8.0000003 0-4.4-3.6-8-8-8zm0 14.4000003c-3.52 0-6.4-2.88-6.4-6.4000003 0-3.52 2.88-6.4 6.4-6.4 3.52 0 6.4 2.88 6.4 6.4 0 3.5200003-2.88 6.4000003-6.4 6.4000003zm.4-10.4000003h-1.2v4.8l4.16 2.5600003.64-1.04-3.6-2.1600003z"/></svg>
+				<time class="post__meta-date" datetime="2015-01-31T00:00:00">January 31, 2015</time>
+			</p>
+		</header>
+		<div class="post__content clearfix">
+			
+
+<p>Heyy all!</p>
+
+<p>So the graphics professor at school here was talking to me and he was like &ldquo;you know what would be a cool idea?&rdquo; Turns out, it WAS a cool idea.</p>
+
+<p>So! I present to you:</p>
+
+<h1 id="hbr-human-based-rendering-the-photon-mapping-of-the-next-generation">HBR: Human Based Rendering (the photon mapping of the next generation)</h1>
+
+<p>The general idea is to either get the user that&rsquo;s looking at a screen to plot the photons themselves, or somehow crowd-source rendering an environment by manually tracing out light paths.</p>
+
+<p>It&rsquo;s a novel technique, you see. Instead of you offloading the work to the GPU, the GPU is offloading the work to you. The former has been explored many times, but the other side of the symmetry has not. While HBR is not a silver bullet, we believe that, if used in conjunction with more conventional GPU usage, HBR will become a powerful tool in a graphics programmer&rsquo;s toolbox.</p>
+
+<p><img src="{{ site.url }}/assets/2015-01-31-HBR/illu1.jpg" alt="" />
+<br />
+<img src="{{ site.url }}/assets/2015-01-31-HBR/illu1.jpg" alt="" />
+<br />
+<em>[all screenshots above were rendered with real humans!]</em></p>
+
+<p>This has many advantages over normal rendering techniques. A few:</p>
+
+<ul>
+<li>Aesthetically Accurate over Physically Accurate: the end result of a render will look like how the user thinks the environment should look. This weight on personal stylistic choice builds the illusion that they&rsquo;re crafting the environment themselves. This is why we believe that HBR, the act of manually placing and tracing photons, will increase immersion in games.</li>
+<li>GPU Empathy: as previously stated, instead of you offloading the work to the GPU, the GPU is offloading work to you. When you have to manually render each frame yourself, you start being a little more okay with the thought of awful looking graphics.</li>
+<li>Cheap for Static Geometry: this just comes with photon mapping. a pre-computation is all you need to cull offscreen photons, and BOOM! you&rsquo;re realtime.</li>
+</ul>
+
+<p>:D</p>
+
+<p>Jesting aside, it would actually be really cool to have a crowdsourced rendered cornell box, where people come to place photons and render the scene themselves, and see how far off of the ground truth it is.</p>
+
+		</div>
+		
+
+	</article>
+	
+<div class="authorbox clearfix">
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Daniel Taylor</span>
 	</div>
+	<div class="authorbox__description">
+		Email: culdevu@gmail.com
+	</div>
+</div>
+	
+
+	
 </main>
 
 <aside class="sidebar" itemscope="itemscope" itemtype="http://schema.org/WPSideBar">
