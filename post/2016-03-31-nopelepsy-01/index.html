@@ -5,27 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tools for Photosensitive Epilepsy I: Flashing</title>
 <meta name="description" content="The personal website of Daniel Taylor">
-<meta name="generator" content="Hugo 0.46" />
+<meta name="generator" content="Hugo 0.53" />
 <meta property="og:title" content="Tools for Photosensitive Epilepsy I: Flashing" />
 <meta property="og:description" content="In 2009 engineers from the University of Wisconsin released a piece of software called PEAT. This software has been used in medicine since as a tool to diagnose patients with photosensitive epilepsy. This is a disease where strobing lights cause seizures, and it currently has no cure. Things that trigger it include lightning, flashing sirens, flickering lights, and other similar strobe effects. Other triggers that seem unrelated, but are also very cyclic in nature, include rapidly changing images, and even certain stationary stripes and checkerboard patterns." />
 <meta property="og:type" content="article" />
-<meta property="og:url" content="http://culdevu.github.io/post/2016-03-31-nopelepsy-01/" />
-
-
-
-<meta property="article:published_time" content="2016-03-31T00:00:00&#43;00:00"/>
-
+<meta property="og:url" content="http://culdevu.github.io/post/2016-03-31-nopelepsy-01/" /><meta property="article:published_time" content="2016-03-31T00:00:00&#43;00:00"/>
 <meta property="article:modified_time" content="2016-03-31T00:00:00&#43;00:00"/>
-
-
-
-
-
-
-
-
-
-
 
 <link rel="dns-prefetch" href="//fonts.googleapis.com" />
 <link rel="dns-prefetch" href="//fonts.gstatic.com" />
@@ -146,10 +131,10 @@ There is a decrease followed by an increase, or an increase followed by a decrea
 
 <pre><code>(Sample phase) Create histogram of luminance over the past second of every sampled pixel on the screen
 (Frame Flash phase) For every pixel:
-	Create a list of all frame flashes by looking at the peaks of their histogram
+    Create a list of all frame flashes by looking at the peaks of their histogram
 (Gather phase) For each frame:
-	Try to find a 0.024 steradian area where 25% or more pixels experienced a frame flash on that frame
-	If such an area is found, increment the general flash counter by 1
+    Try to find a 0.024 steradian area where 25% or more pixels experienced a frame flash on that frame
+    If such an area is found, increment the general flash counter by 1
 If the general flash counter is greater than 3, an epileptic event is possible
 </code></pre>
 
@@ -199,38 +184,38 @@ int numPairs = 0;
 int lastExtrema = lumHistogram[(sampleCounter + 1) % NUM_SAMPLES];
 for (int i = 1; i &lt; NUM_SAMPLES - 1; ++i)
 {
-	int prevI = ...;
-	int currI = ...;
-	int postI = ...;
+    int prevI = ...;
+    int currI = ...;
+    int postI = ...;
 
-	float x_prev = lumHistogram[prevI];
-	float x_curr = lumHistogram[currI];
-	float x_post = lumHistogram[postI];
+    float x_prev = lumHistogram[prevI];
+    float x_curr = lumHistogram[currI];
+    float x_post = lumHistogram[postI];
 
-	float dx1 = x_curr - x_prev;
-	float dx2 = x_curr - x_post;
+    float dx1 = x_curr - x_prev;
+    float dx2 = x_curr - x_post;
 
-	// test for local extrema
-	if ((dx1 &gt; 0) == (dx2 &gt; 0) &amp;&amp; (dx1 != 0) &amp;&amp; (dx2 != 0))
-	{
-		float dx = x_curr - lastExtrema;
+    // test for local extrema
+    if ((dx1 &gt; 0) == (dx2 &gt; 0) &amp;&amp; (dx1 != 0) &amp;&amp; (dx2 != 0))
+    {
+        float dx = x_curr - lastExtrema;
 
-		if (0.1 &lt;= dx &amp;&amp; dx &lt;= 0.1)
-			continue;
-		if (lastExtrema &gt; 0.8 &amp;&amp; x_curr &gt; 0.8)
-			continue;
+        if (0.1 &lt;= dx &amp;&amp; dx &lt;= 0.1)
+            continue;
+        if (lastExtrema &gt; 0.8 &amp;&amp; x_curr &gt; 0.8)
+            continue;
 
-		lastExtrema = x_curr;
+        lastExtrema = x_curr;
 
-		if (dx1 &lt; 0)
-			pairs[numPairs] = DECREASE;
-		else
-			pairs[numPairs] = INCREASE;
+        if (dx1 &lt; 0)
+            pairs[numPairs] = DECREASE;
+        else
+            pairs[numPairs] = INCREASE;
 
-		extrema[numPairs] = i;
+        extrema[numPairs] = i;
 
-		++numPairs;
-	}
+        ++numPairs;
+    }
 }
 </code></pre>
 
@@ -305,7 +290,7 @@ for (int i = 1; i &lt; NUM_SAMPLES - 1; ++i)
 	</div>
 		<footer class="footer" itemscope="itemscope" itemtype="http://schema.org/WPFooter">
 			<div class="container container-inner">
-				<p class="footer__copyright">&copy; 2018 CulDeVu. <span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad theme</a>.</span></p>
+				<p class="footer__copyright">&copy; 2019 CulDeVu. <span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad theme</a>.</span></p>
 			</div>
 		</footer>
 	</div>
