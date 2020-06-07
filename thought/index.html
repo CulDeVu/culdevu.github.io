@@ -1,6 +1,14 @@
 <html>
 	<head>
 		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+			}
+
 			.nav {
 				display: inline-block;
 			}
@@ -23,6 +31,13 @@
 				/*color: #fa0;*/
 				transition: background 0.125s ease;
 				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
 			}
 
 			.codeblock {
@@ -61,7 +76,19 @@
 
 				font-style: italic;
 			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
 		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
 		<div style="background: #fafafa; padding: 20px">
@@ -69,9 +96,10 @@
 			<div><i>Insert dumb tagline here</i></div>
 		</div>
 		<div style="background: #222; color: #fafafa">
-			<ul style="list-style:none; padding:0; margin:0">
+			<!--<ul style="list-style:none; padding:0; margin:0">
 				<li class="nav"><a href="/" class="navitem">BLOG</a></li><li class="nav"><a href="/thought/" class="navitem">THOUGHTS</a></li><li class="nav"><a href="/portfolio/" class="navitem">PROJECTS</a></li><li class="nav"><a href="/resume/" class="navitem">RESUME</a></li>
-			</ul>
+			</ul>-->
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
 		</div>
 
 		<div style="background: #fafafa; padding: 20px"><p>This is where I put much shorter pieces that are less informative and opinionated/inflamatory enough for me to not put on my front page.</p><hr><h2 style="margin-bottom:0.5rem"><a href="/thought/2020-06-06-jvm-sucks/" class="primary_link">JVM bytecode sucks</a></h2><i style="padding-left:0ch">Pub. 2020 Jun 6</i><p>I get mad at people who think that JVMs and the .class file format are good ideas</p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">Copywrite 2020 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>

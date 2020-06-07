@@ -21,7 +21,7 @@ char *thought_href[50] = {0};
 char *thought_names[50] = {0};
 char *thought_descr[50] = {0};
 
-char *resume = "I'm currently job-seeking. My resume can be found as a pdf link(resume/Daniel_Taylor_Resume_Jan_2019.pdf)[here] and also embeded using your browser's default pdf viewer below. Last updated January 2019.\n\n<embed src=\"/resume/Daniel_Taylor_Resume_Jan_2019.pdf\" style=\"width: 100%; height:800px\" type=\"application/pdf\">";
+char *resume = "I'm currently job-seeking. My resume can be found as a pdf link(/resume/Daniel_Taylor_Resume_Jan_2019.pdf)[here] and also embeded using your browser's default pdf viewer below. Last updated January 2019.\n\n<embed src=\"/resume/Daniel_Taylor_Resume_Jan_2019.pdf\" style=\"width: 100%; height:800px\" type=\"application/pdf\">";
 
 void consume_whitespace(char **head)
 {
@@ -80,14 +80,14 @@ void format_line(FILE *fout, char *line)
 		}
 		else if (*line == '`' && !plain_text_mode)
 		{
-			fprintf(fout, "<tt class=\"codeinline\">");
+			fprintf(fout, "<code class=\"codeinline\">");
 			++line;
 			while (strlen(line) && *line != '`')
 			{
 				fprintf(fout, "%c", *line);
 				++line;
 			}
-			fprintf(fout, "</tt>");
+			fprintf(fout, "</code>");
 			++line;
 		}
 		else if (strlen(line) >= 4 && !memcmp(line, "img(", 4)) // images in the form img(link)[bottom text]
@@ -250,7 +250,7 @@ void write_markdown(FILE *fout, char *buf, char **name, char **descr)
 			line += 1;
 			consume_whitespace(&line);
 
-			fprintf(fout, "<h3>%s</h3>", line);
+			fprintf(fout, "<h3 class=\"section_heading\">%s</h3>", line);
 		}
 		else if (strlen(line) >= 3 && !memcmp(line, "```", 3)) // Code blocks
 		{

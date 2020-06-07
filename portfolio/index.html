@@ -1,6 +1,14 @@
 <html>
 	<head>
 		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+			}
+
 			.nav {
 				display: inline-block;
 			}
@@ -23,6 +31,13 @@
 				/*color: #fa0;*/
 				transition: background 0.125s ease;
 				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
 			}
 
 			.codeblock {
@@ -61,7 +76,19 @@
 
 				font-style: italic;
 			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
 		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
 		<div style="background: #fafafa; padding: 20px">
@@ -69,10 +96,11 @@
 			<div><i>Insert dumb tagline here</i></div>
 		</div>
 		<div style="background: #222; color: #fafafa">
-			<ul style="list-style:none; padding:0; margin:0">
+			<!--<ul style="list-style:none; padding:0; margin:0">
 				<li class="nav"><a href="/" class="navitem">BLOG</a></li><li class="nav"><a href="/thought/" class="navitem">THOUGHTS</a></li><li class="nav"><a href="/portfolio/" class="navitem">PROJECTS</a></li><li class="nav"><a href="/resume/" class="navitem">RESUME</a></li>
-			</ul>
+			</ul>-->
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
 		</div>
 
-		<div style="background: #fafafa; padding: 20px"><p>I'm young enough that my little side projects are still my largest source experience, and that breaking my programming life up into 4 year chunks is still a reasonable way or organizing time. The individual things mentioned I will have spent anywhere from a couple weeks to a couple months to a couple years on (appropriately scaled to how productive I was at that time). I'm always playing with things, so the ones listed might not be the coolest now, but are either the ones that would be the most relevant to employers or the ones that I thought were coolest at the time. Last updated June 2020.</p><p>I don't like bragging about this kind of thing or making things seem like bigger accomplishments than they actually were, so the descriptions will be short.</p><p><hr></p><h3>Post-college</h3><p><figure><img src="nodestar1-small.jpg" style="max-width:100%"><figcaption></figcaption></figure></p><p>I started work at <a href="https://www.metsci.com/">Metron</a> early 2019. I work on a team that uses monte carlo techniques to track moving objects. The actual project is a decendant of <a href="https://www.metsci.com/ama/nodestar/">this one</a>, which has the only publicly available description and image that I could find of the project.</p><p><hr></p><h3>College</h3><p>(No image shown) several prototype projects aimed at removing epilepsy-sensitive flashes from video.</p><p><figure><img src="origami.png" style="max-width:100%"><figcaption></figcaption></figure></p><p>Computational origami. Flat and non-flat folds. Horrible UI, but it worked.</p><p><figure><img src="contorted.jpg" style="max-width:100%"><figcaption></figcaption></figure></p><p>More video game prototypes: now with stretchy platformer physics! Used a modified version the system that Little Big Planet 3 physics used, but with new stretchy capabilities.</p><p><hr></p><h3>High school</h3><p><figure><img src="sponza.png" style="max-width:100%"><figcaption></figcaption></figure></p><p>Global illumination: simulating the way light bounces off of real-world materials. I actually spent a bunch of years off and on playing with this stuff.</p><p><figure><img src="crystal_advert_header.png" style="max-width:100%"><figcaption></figcaption></figure></p><p>Video game prototypes: everyone loves gravity-based puzzles, right?</p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">Copywrite 2020 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<div style="background: #fafafa; padding: 20px"><p>I'm young enough that my little side projects are still my largest source experience, and that breaking my programming life up into 4 year chunks is still a reasonable way or organizing time. The individual things mentioned I will have spent anywhere from a couple weeks to a couple months to a couple years on (appropriately scaled to how productive I was at that time). I'm always playing with things, so the ones listed might not be the coolest now, but are either the ones that would be the most relevant to employers or the ones that I thought were coolest at the time. Last updated June 2020.</p><p>I don't like bragging about this kind of thing or making things seem like bigger accomplishments than they actually were, so the descriptions will be short.</p><h3 class="section_heading">Post-college</h3><p><figure><img src="nodestar1-small.jpg" style="max-width:100%"><figcaption></figcaption></figure></p><p>I started work at <a href="https://www.metsci.com/">Metron</a> early 2019. I work on a team that uses monte carlo techniques to track moving objects. The actual project is a decendant of <a href="https://www.metsci.com/ama/nodestar/">this one</a>, which has the only publicly available description and image that I could find of the project.</p><h3 class="section_heading">College</h3><p>(No image shown) several prototype projects aimed at removing epilepsy-sensitive flashes from video.</p><p><figure><img src="origami.png" style="max-width:100%"><figcaption></figcaption></figure></p><p>Computational origami. Flat and non-flat folds. Horrible UI, but it worked.</p><p><figure><img src="contorted.jpg" style="max-width:100%"><figcaption></figcaption></figure></p><p>More video game prototypes: now with stretchy platformer physics! Used a modified version the system that Little Big Planet 3 physics used, but with new stretchy capabilities.</p><h3 class="section_heading">High school</h3><p><figure><img src="sponza.png" style="max-width:100%"><figcaption></figcaption></figure></p><p>Global illumination: simulating the way light bounces off of real-world materials. I actually spent a bunch of years off and on playing with this stuff.</p><p><figure><img src="crystal_advert_header.png" style="max-width:100%"><figcaption></figcaption></figure></p><p>Video game prototypes: everyone loves gravity-based puzzles, right?</p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">Copywrite 2020 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="/3rd-party/mathjax.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
