@@ -3,29 +3,41 @@
 		<style>
 			.nav {
 				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
 				padding: 10px;
 				min-width: 100px;
 				text-align: center;
 
+				color: #fff;
+				text-decoration: none;
+
 				transition: background 0.25s ease;
 			}
 
-			.nav:hover {
+			.navitem:hover {
 				background: #b50;
 				/*color: #fa0;*/
 				transition: background 0.125s ease;
 				color: #fff;
 			}
 
-			.navitem {
-				color: #fff;
-				text-decoration: none;
-			}
-
 			.codeblock {
 				border: 1px solid;
 				padding: 1em;
 				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding: 0.1em;
 			}
 
 			.primary_link {
@@ -36,14 +48,27 @@
 				color: #b50;
 				text-decoration: none;
 			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
 		</style>
 	</head>
 	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
 		<div style="background: #fafafa; padding: 20px">
-			<div><h1 style="margin-bottom: 0.2em">djtalor.me</h1></div>
-			<div><i>Insert tagline here</i></div>
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.2em">djtalor.me</h1></div>
+			<div><i>Insert dumb tagline here</i></div>
 		</div>
-		<div style="background: #222; color: #fff">
+		<div style="background: #222; color: #fafafa">
 			<ul style="list-style:none; padding:0; margin:0">
 				<li class="nav"><a href="/" class="navitem">BLOG</a></li><li class="nav"><a href="/thought/" class="navitem">THOUGHTS</a></li><li class="nav"><a href="/portfolio/" class="navitem">PROJECTS</a></li><li class="nav"><a href="/resume/" class="navitem">RESUME</a></li>
 			</ul>

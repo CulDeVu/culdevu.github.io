@@ -8,16 +8,20 @@
 typedef uint8_t u8;
 
 int post_num = 0;
+char *post_rss_date[50] = {0};
+char *post_date[50] = {0};
 char *post_href[50] = {0};
 char *post_names[50] = {0};
 char *post_descr[50] = {0};
 
 int thought_num = 0;
+char *thought_rss_date[50] = {0};
+char *thought_date[50] = {0};
 char *thought_href[50] = {0};
 char *thought_names[50] = {0};
 char *thought_descr[50] = {0};
 
-char *resume = "As stated in the sidebar, I'm currently job-seeking. My resume can be found as a pdf link(resume/Daniel_Taylor_Resume_Jan_2019.pdf)[here] and also embeded using your browser's default pdf viewer below:\n\n<embed src=\"/resume/Daniel_Taylor_Resume_Jan_2019.pdf\" style=\"width: 100%; height:800px\" type=\"application/pdf\">";
+char *resume = "I'm currently job-seeking. My resume can be found as a pdf link(resume/Daniel_Taylor_Resume_Jan_2019.pdf)[here] and also embeded using your browser's default pdf viewer below. Last updated January 2019.\n\n<embed src=\"/resume/Daniel_Taylor_Resume_Jan_2019.pdf\" style=\"width: 100%; height:800px\" type=\"application/pdf\">";
 
 void consume_whitespace(char **head)
 {
@@ -76,7 +80,7 @@ void format_line(FILE *fout, char *line)
 		}
 		else if (*line == '`' && !plain_text_mode)
 		{
-			fprintf(fout, "<tt>");
+			fprintf(fout, "<tt class=\"codeinline\">");
 			++line;
 			while (strlen(line) && *line != '`')
 			{
@@ -204,7 +208,8 @@ void write_header(FILE *fout)
 }
 void write_footer(FILE *fout)
 {
-	fprintf(fout, "</div><script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>\n<script id=\"MathJax-script\" async src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js\"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>");
+	fprintf(fout, "</div><div style=\"background-color: #222; padding: 1em; color: #fafafa\">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style=\"color: #aaa\">Copywrite 2020 by Daniel Taylor</span></div>");
+	fprintf(fout, "<script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>\n<script id=\"MathJax-script\" async src=\"/3rd-party/mathjax.js\"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>");
 }
 void write_markdown(FILE *fout, char *buf, char **name, char **descr)
 {
@@ -215,7 +220,6 @@ void write_markdown(FILE *fout, char *buf, char **name, char **descr)
 	while (strlen(buf))
 	{
 		lines[line_num] = consume_line(&buf);
-		// printf("%zd ", strlen(lines[line_num]));
 		++line_num;
 	}
 
@@ -223,7 +227,7 @@ void write_markdown(FILE *fout, char *buf, char **name, char **descr)
 	{
 		char *line = lines[i];
 
-		if (strlen(line) >= 2 && !memcmp(line, "===", 3)) // Description
+		if (strlen(line) >= 3 && !memcmp(line, "===", 3)) // Description
 		{
 			line += 3;
 			consume_whitespace(&line);
@@ -267,6 +271,29 @@ void write_markdown(FILE *fout, char *buf, char **name, char **descr)
 			++i;
 			fprintf(fout, "</code></pre>");
 		}
+		else if (strlen(line) >= 1 && !memcmp(line, ">", 1)) // Block quotes
+		{
+			line += 1;
+			consume_whitespace(&line);
+
+			fprintf(fout, "<blockquote>%s</blockquote>", line);
+		}
+		else if (strlen(line) >= 1 && !memcmp(line, "-", 1)) // Bullet points
+		{
+			fprintf(fout, "<ul>");
+			while (i < line_num && strlen(lines[i]) != 0)
+			{
+				char *l = lines[i];
+				l += 1;
+				consume_whitespace(&l);
+
+				fprintf(fout, "<li>");
+				format_line(fout, l);
+				fprintf(fout, "</li>");
+				++i;
+			}
+			fprintf(fout, "</ul>");
+		}
 		else if (strlen(line) == 0)
 		{
 			continue;
@@ -292,8 +319,23 @@ void write_markdown(FILE *fout, char *buf, char **name, char **descr)
 	write_footer(fout);
 }
 
+char *month_table[12] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 void process_post(char *name)
 {
+	// Date
+	{
+		int year, month, day;
+		sscanf(name, "%d-%d-%d", &year, &month, &day);
+
+		char *tmp = calloc(200, 1);
+		sprintf(tmp, "%d %s %d", year, month_table[month - 1], day);
+		post_date[post_num] = tmp;
+
+		tmp = calloc(200, 1);
+		sprintf(tmp, "%d %s %d", day, month_table[month - 1], year);
+		post_rss_date[post_num] = tmp;
+	}
+
 	char *in_name = calloc(strlen(name) + 100, 1);
 	sprintf(in_name, "../post/%s.md", name);
 
@@ -322,6 +364,20 @@ void process_post(char *name)
 
 void process_thought(char *name)
 {
+	// Date
+	{
+		int year, month, day;
+		sscanf(name, "%d-%d-%d", &year, &month, &day);
+
+		char *tmp = calloc(200, 1);
+		sprintf(tmp, "%d %s %d", year, month_table[month - 1], day);
+		thought_date[thought_num] = tmp;
+
+		tmp = calloc(200, 1);
+		sprintf(tmp, "%d %s %d", day, month_table[month - 1], year);
+		thought_rss_date[thought_num] = tmp;
+	}
+
 	char *in_name = calloc(strlen(name) + 100, 1);
 	sprintf(in_name, "../thought/%s.md", name);
 
@@ -351,16 +407,24 @@ void process_thought(char *name)
 int main()
 {
 	process_post("2018-08-12-nopelepsy-03");
+	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
 	process_thought("2020-06-06-jvm-sucks");
 
+	char *post_header = "<h2 style=\"margin-bottom:0.5rem\"><a href=\"%s\" class=\"primary_link\">%s</a></h2><i style=\"padding-left:0ch\">Pub. %s</i>";
+
 	{
 		FILE *fout = fopen("../index.html", "w");
 		write_header(fout);
+		fprintf(fout, "<p>This is where longer pieces go where I talk about things I've been playing with in my spare time. I constantly have side projects, but I don't always feel like writing long pieces about them. These are posted very very rarely.</p><hr>");
 		for (int i = 0; i < post_num; ++i)
 		{
-			fprintf(fout, "<h2><a href=\"%s\">%s</a></h2><p>%s</p>", post_href[i], post_names[i], post_descr[i]);
+			fprintf(fout, post_header, post_href[i], post_names[i], post_date[i]);
+			fprintf(fout, "<p>%s</p>", post_descr[i]);
+
+			if (i != post_num - 1)
+				fprintf(fout, "<hr>");
 		}
 		write_footer(fout);
 	}
@@ -371,7 +435,8 @@ int main()
 		fprintf(fout, "<p>This is where I put much shorter pieces that are less informative and opinionated/inflamatory enough for me to not put on my front page.</p><hr>");
 		for (int i = 0; i < thought_num; ++i)
 		{
-			fprintf(fout, "<h2><a href=\"%s\" class=\"primary_link\">%s</a></h2><p>%s</p>", thought_href[i], thought_names[i], thought_descr[i]);
+			fprintf(fout, post_header, thought_href[i], thought_names[i], thought_date[i]);
+			fprintf(fout, "<p>%s</p>", thought_descr[i]);
 		}
 		write_footer(fout);
 	}
@@ -379,6 +444,39 @@ int main()
 	{
 		FILE *fout = fopen("../resume/index.html", "w");
 		write_markdown(fout, resume, NULL, NULL);
+	}
+
+	{
+		FILE *fin = fopen("../portfolio/portfolio.md", "rb");
+		fseek(fin, 0, SEEK_END);
+		int size = ftell(fin);
+		rewind(fin);
+
+		char *buf = calloc(size + 1, 1);
+		fread(buf, 1, size, fin);
+		fclose(fin);
+
+		FILE *fout = fopen("../portfolio/index.html", "w");
+		write_markdown(fout, buf, NULL, NULL);
+	}
+
+	// RSS feed
+	{
+		FILE *fout = fopen("../feed.xml", "w");
+		// TODO: lastBuildDate tag
+		fprintf(fout, "<rss version=\"2.0\"><channel><title>djtaylor.me</title><link>http://djtaylor.me</link><description>Daniel Taylor's blog</description>");
+
+		for (int i = 0; i < post_num; ++i)
+		{
+			fprintf(fout, "<item><title>%s</title><link>%s</link><pubDate>%s</pubDate><description>%s</description></item>", post_names[i], post_href[i], post_rss_date[i], post_descr[i]);
+		}
+
+		for (int i = 0; i < thought_num; ++i)
+		{
+			fprintf(fout, "<item><title>%s</title><link>%s</link><pubDate>%s</pubDate><description>%s</description></item>", thought_names[i], thought_href[i], thought_rss_date[i], thought_descr[i]);
+		}
+
+		fprintf(fout, "</channel></rss>");
 	}
 
 	printf("end");
