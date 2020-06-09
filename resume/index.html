@@ -1,5 +1,7 @@
 <html>
 	<head>
+		<meta charset="UTF-8">
+		
 		<style>
 			body {
 				-webkit-text-size-adjust: none;
@@ -64,6 +66,26 @@
 				text-decoration: none;
 			}
 
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
 			blockquote {
 				margin: 0;
 				padding-left: 2ch;
@@ -102,5 +124,5 @@
 			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
 		</div>
 
-		<div style="background: #fafafa; padding: 20px"><p>I'm currently job-seeking. My resume can be found as a pdf <a href="/resume/Daniel_Taylor_Resume_Jan_2019.pdf">here</a> and also embeded using your browser's default pdf viewer below. Last updated January 2019.</p><p><embed src="/resume/Daniel_Taylor_Resume_Jan_2019.pdf" style="width: 100%; height:800px" type="application/pdf"></p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">Copywrite 2020 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="/3rd-party/mathjax.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
+		<div style="background: #fafafa; padding: 20px"><p>I'm currently job-seeking. My resume can be found as a pdf <a href="/resume/Daniel_Taylor_Resume_Jan_2019.pdf">here</a> and also embeded using your browser's default pdf viewer below. Last updated January 2019.</p><p><embed src="/resume/Daniel_Taylor_Resume_Jan_2019.pdf" style="width: 100%; height:800px" type="application/pdf"></p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">© 2020 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>

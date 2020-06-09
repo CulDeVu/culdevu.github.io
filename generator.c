@@ -101,23 +101,30 @@ void format_line(FILE *fout, char *line)
 				++line;
 			}
 			++line;
+			fprintf(fout, "\" style=\"align-self: center; max-width:100%%\">");
+
 			assert(*line == '[');
 			++line;
-			fprintf(fout, "\" style=\"max-width:100%%\"><figcaption>");
-
-			while (*line != ']')
+			if (*line != ']')
 			{
-				fprintf(fout, "%c", *line);
-				++line;
+				// Only include a caption if there's a caption to write
+				fprintf(fout, "<figcaption>");
+
+				while (*line != ']')
+				{
+					fprintf(fout, "%c", *line);
+					++line;
+				}
+				fprintf(fout, "</figcaption>");
 			}
 			++line;
 
-			fprintf(fout, "</figcaption></figure>");
+			fprintf(fout, "</figure>");
 		}
 		else if (strlen(line) >= 7 && !memcmp(line, "imgcmp(", 7)) // side-by-side image comparison
 		{
 			// NOTE: this should be improved in the future. Currently the images being compared don't go onto separate lines when the window width becomes too small to fit both images.
-			fprintf(fout, "<table><tr style=\"vertical-align:top\"><td><figure style=\"margin:0\"><img src=\"");
+			fprintf(fout, "<table><tr style=\"vertical-align:top\"><td width=50%%><figure><img src=\"");
 			line += 7;
 
 			while (*line != ')')
@@ -140,7 +147,7 @@ void format_line(FILE *fout, char *line)
 			fprintf(fout, "</figcaption></figure></td>");
 
 			// And now the second one
-			fprintf(fout, "<td><figure style=\"margin:0\"><img src=\"");
+			fprintf(fout, "<td><figure><img src=\"");
 			assert(*line == '(');
 			++line;
 
@@ -208,10 +215,11 @@ void write_header(FILE *fout)
 }
 void write_footer(FILE *fout)
 {
-	fprintf(fout, "</div><div style=\"background-color: #222; padding: 1em; color: #fafafa\">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style=\"color: #aaa\">Copywrite 2020 by Daniel Taylor</span></div>");
-	fprintf(fout, "<script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>\n<script id=\"MathJax-script\" async src=\"/3rd-party/mathjax.js\"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>");
+	char *str = u8"</div><div style=\"background-color: #222; padding: 1em; color: #fafafa\">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style=\"color: #aaa\">\u00a9 2020 by Daniel Taylor</span></div>";
+	fwrite(str, 1, strlen(str), fout);
+	fprintf(fout, "<script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>\n<script id=\"MathJax-script\" async src=\"/3rd-party/mathjax/tex-mml-chtml.js\"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>");
 }
-void write_markdown(FILE *fout, char *buf, char **name, char **descr)
+void write_markdown(FILE *fout, char *buf, char **name, char **descr, char *date)
 {
 	write_header(fout);
 
@@ -232,7 +240,6 @@ void write_markdown(FILE *fout, char *buf, char **name, char **descr)
 			line += 3;
 			consume_whitespace(&line);
 
-			// post_descr[post_num] = line;
 			*descr = line;
 		}
 		else if (strlen(line) >= 2 && !memcmp(line, "==", 2)) // Title
@@ -240,10 +247,9 @@ void write_markdown(FILE *fout, char *buf, char **name, char **descr)
 			line += 2;
 			consume_whitespace(&line);
 
-			// post_names[post_num] = line;
 			*name = line;
 
-			fprintf(fout, "<h2>%s</h2>", line);
+			fprintf(fout, "<h2 style=\"margin-bottom:0.5rem\">%s</h2><i>Pub. %s</i>", line, date);
 		}
 		else if (strlen(line) >= 1 && !memcmp(line, "#", 1)) // Headings
 		{
@@ -357,7 +363,7 @@ void process_post(char *name)
 	fread(buf, 1, size, fin);
 	fclose(fin);
 
-	write_markdown(fout, buf, &post_names[post_num], &post_descr[post_num]);
+	write_markdown(fout, buf, &post_names[post_num], &post_descr[post_num], post_date[post_num]);
 
 	post_num += 1;
 }
@@ -399,7 +405,7 @@ void process_thought(char *name)
 	fread(buf, 1, size, fin);
 	fclose(fin);
 
-	write_markdown(fout, buf, &thought_names[thought_num], &thought_descr[thought_num]);
+	write_markdown(fout, buf, &thought_names[thought_num], &thought_descr[thought_num], thought_date[thought_num]);
 
 	thought_num += 1;
 }
@@ -412,7 +418,7 @@ int main()
 
 	process_thought("2020-06-06-jvm-sucks");
 
-	char *post_header = "<h2 style=\"margin-bottom:0.5rem\"><a href=\"%s\" class=\"primary_link\">%s</a></h2><i style=\"padding-left:0ch\">Pub. %s</i>";
+	char *post_header = "<h2 style=\"margin-bottom:0.5rem\"><a href=\"%s\" class=\"primary_link\">%s</a></h2><i>Pub. %s</i>";
 
 	{
 		FILE *fout = fopen("../index.html", "w");
@@ -443,7 +449,7 @@ int main()
 
 	{
 		FILE *fout = fopen("../resume/index.html", "w");
-		write_markdown(fout, resume, NULL, NULL);
+		write_markdown(fout, resume, NULL, NULL, NULL);
 	}
 
 	{
@@ -457,7 +463,7 @@ int main()
 		fclose(fin);
 
 		FILE *fout = fopen("../portfolio/index.html", "w");
-		write_markdown(fout, buf, NULL, NULL);
+		write_markdown(fout, buf, NULL, NULL, NULL);
 	}
 
 	// RSS feed

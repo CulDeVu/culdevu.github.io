@@ -1,5 +1,7 @@
 <html>
 	<head>
+		<meta charset="UTF-8">
+		
 		<style>
 			body {
 				-webkit-text-size-adjust: none;
@@ -62,6 +64,26 @@
 			.primary_link:hover {
 				color: #b50;
 				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
 			}
 
 			blockquote {
