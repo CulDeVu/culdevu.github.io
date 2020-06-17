@@ -66,6 +66,18 @@ void format_line(FILE *fout, char *line)
 			fprintf(fout, "%c", *line);
 			++line;
 		}
+		else if (strlen(line) >= 2 && !memcmp(line, "**", 2) && !plain_text_mode)
+		{
+			fprintf(fout, "<b>");
+			line += 2;
+			while (strlen(line) > 2 && memcmp(line, "**", 2))
+			{
+				fprintf(fout, "%c", *line);
+				++line;
+			}
+			fprintf(fout, "</b>");
+			line += 2;
+		}
 		else if (*line == '*' && !plain_text_mode)
 		{
 			fprintf(fout, "<i>");
@@ -338,7 +350,7 @@ void process_post(char *name)
 		post_date[post_num] = tmp;
 
 		tmp = calloc(200, 1);
-		sprintf(tmp, "%d %s %d", day, month_table[month - 1], year);
+		sprintf(tmp, "%02d %s %d 00:00:00 GMT", day, month_table[month - 1], year);
 		post_rss_date[post_num] = tmp;
 	}
 
@@ -380,7 +392,7 @@ void process_thought(char *name)
 		thought_date[thought_num] = tmp;
 
 		tmp = calloc(200, 1);
-		sprintf(tmp, "%d %s %d", day, month_table[month - 1], year);
+		sprintf(tmp, "%02d %s %d 00:00:00 GMT", day, month_table[month - 1], year);
 		thought_rss_date[thought_num] = tmp;
 	}
 
@@ -416,6 +428,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
+	// process_thought("2020-06-13-new-website");
 	process_thought("2020-06-06-jvm-sucks");
 
 	char *post_header = "<h2 style=\"margin-bottom:0.5rem\"><a href=\"%s\" class=\"primary_link\">%s</a></h2><i>Pub. %s</i>";
