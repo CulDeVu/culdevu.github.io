@@ -428,7 +428,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
-	// process_thought("2020-06-13-new-website");
+	process_thought("2020-06-18-new-website");
 	process_thought("2020-06-06-jvm-sucks");
 
 	char *post_header = "<h2 style=\"margin-bottom:0.5rem\"><a href=\"%s\" class=\"primary_link\">%s</a></h2><i>Pub. %s</i>";
@@ -440,7 +440,7 @@ int main()
 		for (int i = 0; i < post_num; ++i)
 		{
 			fprintf(fout, post_header, post_href[i], post_names[i], post_date[i]);
-			fprintf(fout, "<p>%s</p>", post_descr[i]);
+			fprintf(fout, "<p style=\"margin-top: 0.5rem\">%s</p>", post_descr[i]);
 
 			if (i != post_num - 1)
 				fprintf(fout, "<hr>");
@@ -455,7 +455,10 @@ int main()
 		for (int i = 0; i < thought_num; ++i)
 		{
 			fprintf(fout, post_header, thought_href[i], thought_names[i], thought_date[i]);
-			fprintf(fout, "<p>%s</p>", thought_descr[i]);
+			fprintf(fout, "<p style=\"margin-top: 0.5rem\">%s</p>", thought_descr[i]);
+
+			if (i != thought_num - 1)
+				fprintf(fout, "<hr>");
 		}
 		write_footer(fout);
 	}
