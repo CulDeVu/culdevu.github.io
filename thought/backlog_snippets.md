@@ -12,3 +12,96 @@ If it's not obvious, this applies to everything. Replace "CSS" with anything you
 
 I'm left wondering whether it was even a good idea to go into programming. Don't get me wrong, I love programming: I love creating things and computers are by far the greatest creation tools humans have ever made. But when I look at people in our sister profession, IT, I feel a little jealous. All the IT people that I've known all seem very chill and relaxed. They all seem to know that everything is broken but they still try to get everything working in the simplest possible way with the least amount of moving parts. Their decisions seem to come from actual experience with actual peoples' problems. This is contrasted against our profession, where it seems to me like solving actual peoples' problems is only an excuse, a backdrop to do what programmers *actually* want, which is to satisfy their aspyness and OCD cravings for everything to exist in hierarchies, for all things to be categorized and organized *just right*. I used to not like the idea of IT, and I told myself that it was because I don't like playing plumber, I don't like it when things fail silently or cryptically, and I don't like feeling like I have no control over a system of things that all act on their own. But looking back at the last couple days redoing this site, and my last year of professional programming I'm reminded of a pot that called a kettle black.
 
+--------------------------------
+# ??
+
+One big question that I have as an engineer is what linear-time costs I choose to accept and which ones I don't. 
+
+--------------------------------
+== Image codec ideas
+=== descr
+
+I have some ideas for how this should go.
+
+For a pixel block $A$, the traditional way of doing this is by using the $B = DCT$ matrix and transforming the rows and columns into frequency space, one after the other:
+
+$$
+B A B^T.
+$$
+
+In this post, we're going to be looking at different choices of B with `u8`s as its primary number system instead of floats.
+
+# What can we do from here?
+
+Traditionally, the point of the frequency change of basis is 3-fold:
+
+- To set the later entropy encoder up for success
+- Lossy compression by quantizing (rounding) some or all of the coefficients decays reasonably
+- Lossy compression by zeroing some or all of the coefficients decays reasonably
+
+As a simple, consider the matrix 4x4 matrix
+
+$$
+B = 
+\begin{pmatrix}
+	-3 &  2 & 1 & 1 \\
+	-4 &  2 & 1 & 1 \\
+	-2 &  1 & 0 & 1 \\
+	1  & -1 & 0 & 0
+\end{pmatrix}, B^{-1} =
+\begin{pmatrix}
+	1 & -1 &  0 & 0 \\
+	1 & -1 &  0 & -1 \\
+	1 &  0 & -1 & 1 \\
+	1 & -1 &  1 & 1
+\end{pmatrix}
+$$
+
+# Non-power-of-2 block sizes
+
+A more ideal change of basis would probably look something like
+
+$$
+B = 
+\begin{pmatrix}
+	\begin{matrix}
+		1 & 1 & \dots & 1 \\
+	\end{matrix} \\
+	\dots
+\end{pmatrix}, \, B^{-1} =
+\begin{pmatrix}
+	\begin{matrix}
+		1 \\ 1 \\ \vdots \\ 1
+	\end{matrix} & \>
+	\dots
+\end{pmatrix}.
+$$
+
+The reasoning her is that $B$ should mix all of the elements of $A$ together equally for the first element, and $\alpha B^{-1}$ should behave reasonably when the zeroing compression strategy is used (so when all but the first coefficient is zero'd out, the output should look something like an average of the pixels in $A$).
+
+and this is of course can't even be fixed with a scalar on the $B^{-1}$ if $n$ if even, since $(B B^{-1})_{11}$ will be even. But if $n$ is odd, this works. 
+
+[go into detail about why this doesn't work when averages are not multiples of 3]
+
+[go into detail about matrix generation and how that works]
+
+--------------------------------
+== O(1) becomes O(n) in a loop
+=== descr
+
+Once a week, every week, for the past 3 years I've gotten an email from Dropbox telling me that one of my accounts is almost full and that I should upgrade. 
+
+At work, every time I write a new class I type `private final Object lock = new Object();`, and most methods begin with `synchronized (lock) {`. How many times have I typed `private` without it doing anything?
+
+At work, the thing I just wrote does a `.put` into a hashmap, followed immediately by a `.get` on the same key every time a particular message gets processed. I was told I did "good work."
+
+--------------------------------
+==
+=== descr
+
+There's a general engineering practice that I think is kinda important, but I see people everywhere violating. Including me. To make it easier to talk about, here are 3 concrete and very common manifestations:
+
+- A program dealing with physical quantities, whose values are "unit agnostic." Not in the $\pi$-theorem way, but where the values supposed to be in some unknown/unimportant units, and when dealing with real units you need to do conversions. So calls like `meters_2_length()` and `time_2_seconds()`. However, upon closer inspection these imaginary units are just the standard SI units (meters, seconds, watts, etc), and the conversions from SI units to the imaginary ones and back are just the identity function.
+- A program has a concept of `memory` in buffer+length form, and pointer-length strings are defined something like `typedef memory string`. Another example, a codebase wants to talk about time quantities but needs it to be easy to work with (adding, subtracting, scaling, passing to libraries, etc), so there's a `time_dif` type that ultimately comes down to a `typedef double time_dif` or `typedef int64_t time_dif` or similar.
+- 
+

@@ -263,6 +263,13 @@ void write_markdown(FILE *fout, char *buf, char **name, char **descr, char *date
 
 			fprintf(fout, "<h2 style=\"margin-bottom:0.5rem\">%s</h2><i>Pub. %s</i>", line, date);
 		}
+		else if (strlen(line) >= 2 && !memcmp(line, "##", 2)) // Headings
+		{
+			line += 2;
+			consume_whitespace(&line);
+
+			fprintf(fout, "<h4>%s</h3>", line);
+		}
 		else if (strlen(line) >= 1 && !memcmp(line, "#", 1)) // Headings
 		{
 			line += 1;
@@ -400,10 +407,18 @@ void process_thought(char *name)
 	sprintf(in_name, "../thought/%s.md", name);
 
 	FILE *fin = fopen(in_name, "rb");
+	if (!fin)
+	{
+		printf("Could not open file %s", in_name);
+	}
 
 	char *out_name = calloc(strlen(name) + 100, 1);
 	sprintf(out_name, "../thought/%s/index.html", name);
 	FILE *fout = fopen(out_name, "w");
+	if (!fout)
+	{
+		printf("Count not open file %s", out_name);
+	}
 
 	char *out_href = calloc(strlen(name) + 100, 1);
 	sprintf(out_href, "/thought/%s/", name);
@@ -428,6 +443,9 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
+	process_thought("2020-09-03-stack");
+	process_thought("2020-08-05-sending-strings");
+	process_thought("2020-07-17-units-typedefs");
 	process_thought("2020-06-18-new-website");
 	process_thought("2020-06-06-jvm-sucks");
 
@@ -449,18 +467,25 @@ int main()
 	}
 
 	{
-		FILE *fout = fopen("../thought/index.html", "w");
-		write_header(fout);
-		fprintf(fout, "<p>This is where I put much shorter pieces that are less informative and opinionated/inflamatory enough for me to not put on my front page.</p><hr>");
+		FILE *fout_finished = fopen("../thought/index.html", "w");
+		write_header(fout_finished);
+		fprintf(fout_finished, "<p>This is where I put much shorter pieces that are less informative and opinionated/inflamatory enough for me to not put on my front page. Unfinished posts are located <a href=\"/thought/wip.html\">here</a></p>");
+
+		FILE *fout_wip = fopen("../thought/wip.html", "w");
+		write_header(fout_wip);
+		fprintf(fout_wip, "<p>This is where I put unfinished posts and notes about things to write about later.</p>");
+
 		for (int i = 0; i < thought_num; ++i)
 		{
-			fprintf(fout, post_header, thought_href[i], thought_names[i], thought_date[i]);
-			fprintf(fout, "<p style=\"margin-top: 0.5rem\">%s</p>", thought_descr[i]);
+			FILE *fout_dest = (strcmp(thought_descr[i], "wip") == 0) ? fout_wip : fout_finished;
 
-			if (i != thought_num - 1)
-				fprintf(fout, "<hr>");
+			fprintf(fout_dest, "<hr>");
+
+			fprintf(fout_dest, post_header, thought_href[i], thought_names[i], thought_date[i]);
+			fprintf(fout_dest, "<p style=\"margin-top: 0.5rem\">%s</p>", thought_descr[i]);
 		}
-		write_footer(fout);
+		write_footer(fout_finished);
+		write_footer(fout_wip);
 	}
 
 	{
