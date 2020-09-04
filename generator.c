@@ -520,7 +520,10 @@ int main()
 
 		for (int i = 0; i < thought_num; ++i)
 		{
-			fprintf(fout, "<item><title>%s</title><link>%s</link><pubDate>%s</pubDate><description>%s</description></item>", thought_names[i], thought_href[i], thought_rss_date[i], thought_descr[i]);
+			if (strcmp(thought_descr[i], "wip") != 0)
+			{
+				fprintf(fout, "<item><title>%s</title><link>%s</link><pubDate>%s</pubDate><description>%s</description></item>", thought_names[i], thought_href[i], thought_rss_date[i], thought_descr[i]);
+			}
 		}
 
 		fprintf(fout, "</channel></rss>");
