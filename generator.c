@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <windows.h>
+#include <string.h>
 
 typedef uint8_t u8;
 
@@ -219,6 +219,7 @@ void write_header(FILE *fout)
 	FILE *f_template_in = fopen("../template.html", "rb");
 
 	// Dump in the template html
+	// TODO: on windows this inserts extra newline characters
 	char c;
 	while ((c = fgetc(f_template_in)) != EOF)
 	{
@@ -443,6 +444,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
+	process_thought("2021-02-06-u8-encoding");
 	process_thought("2020-09-03-stack");
 	process_thought("2020-08-05-sending-strings");
 	process_thought("2020-07-17-units-typedefs");
