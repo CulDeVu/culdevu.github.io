@@ -1,0 +1,302 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">X11 NASM</h2><i>Pub. 2021 Jun 4</i><p>The NASM code below creates a blank X11 window. No effort was made to make sure that the 'X' close button works properly.</p><p>Compile and link with:</p><pre class="codeblock"><code>nasm -f elf64 main.asm -o main.o
+ld -melf_x86_64 -o main main.o -lX11 --dynamic-linker /lib64/ld-linux-x86-64.so.2 -lc
+</code></pre><p>The code:</p><pre class="codeblock"><code>global _start
+
+extern XOpenDisplay
+extern XNextEvent
+extern XPending
+extern XCreateSimpleWindow
+extern XMapRaised
+extern XSetStandardProperties
+extern XCreateGC
+extern XSetBackground
+extern XSetForeground
+extern XClearWindow
+
+section .bss
+
+dis: resq 1
+screen: resd 1
+win: resq 1
+gc: resq 1
+black_pixel: resq 1
+root_window: resq 1
+
+struc XDisplay
+    .trash_1:        resb 224
+    .default_screen: resd 1
+    .nscreens:       resd 1
+    .screens:        resd 1
+endstruc
+
+struc XScreen
+    .trash_1:      resb 16
+    .root:         resq 1
+    .trash_2:      resb 64
+    .white_pixel:  resq 1
+    .black_pixel:  resq 1
+    .trash_3:      resb 24
+    .SIZE:         resb 0
+endstruc
+
+
+section .text
+
+init_x:
+
+    sub rsp, 8
+    xor rdi, rdi
+    call XOpenDisplay
+    mov qword [dis], rax
+    add rsp, 8
+
+    mov rax, qword [dis]
+    add rax, XDisplay.default_screen
+    mov eax, dword [rax]
+    mov dword [screen], eax
+
+    ; black=BlackPixel(dis, screen)
+    ; black = ((_XPrivDisplay)(dis))->screens[screen].black_pixel
+    mov rax, qword [dis]
+    mov rax, qword [rax + XDisplay.screens]
+    mov edx, dword [screen]
+    imul edx, XScreen.SIZE
+    add rax, rdx
+    mov rax, [rax + XScreen.black_pixel]
+    mov qword [black_pixel], rax
+
+    ; root_window = DefaultRootWindow(dis)
+    ; root_window = ((_XPrivDisplay)(dis))->screens[screen].root
+    mov rax, qword [dis]
+    mov rax, qword [rax + XDisplay.screens]
+    mov edx, dword [screen]
+    imul edx, XScreen.SIZE
+    add rax, rdx
+    mov rax, qword [rax + XScreen.root]
+    mov qword [root_window], rax
+
+    ; Set up window and related 
+
+    mov rax, [black_pixel]
+    push rax
+    push rax
+    push qword 0 ; I guess supposed to be 0?
+    mov rdi, [dis]
+    mov rsi, [root_window]
+    mov rdx, 0
+    mov rcx, 0
+    mov r8, 600
+    mov r9, 300
+    call XCreateSimpleWindow
+    mov [win], rax
+    pop rax
+    pop rax
+    pop rax
+
+    ; Give the window a title
+    sub rsp, 8
+    push qword 0
+    push qword 0
+    mov rdi, [dis]
+    mov rsi, [win]
+    mov rdx, window_title
+    mov rcx, icon_name
+    mov r8, 0
+    mov r9, 0
+    call XSetStandardProperties
+    pop rax
+    pop rax
+    add rsp, 8
+
+    ; Set background and show window
+    sub rsp, 8
+    mov rdi, [dis]
+    mov rsi, [win]
+    mov rdx, 0
+    call XCreateGC
+    mov qword [gc], rax
+    add rsp, 8
+
+    sub rsp, 8
+    mov rdi, [dis]
+    mov rsi, [gc]
+    mov rdx, [black_pixel]
+    call XSetBackground
+    add rsp, 8
+
+    sub rsp, 8
+    mov rdi, [dis]
+    mov rsi, [gc]
+    mov rdx, [black_pixel]
+    call XSetForeground
+    add rsp, 8
+
+    sub rsp, 8
+    mov rdi, [dis]
+    mov rsi, [win]
+    call XClearWindow
+    add rsp, 8
+
+    sub rsp, 8
+    mov rdi, [dis]
+    mov rsi, [win]
+    call XMapRaised
+    add rsp, 8
+
+    ret
+
+_start:
+    ; _start has no return address, so no need to align stack before init_x call.
+    
+    call init_x
+
+    ; event: rsp+0
+    sub rsp, 0xc0
+
+.main_loop:
+
+    mov rdi, [dis]
+    lea rsi, [rsp+0]
+    call XNextEvent
+
+    mov rdi, [dis]
+    mov rsi, [win]
+    call XClearWindow
+
+    jmp .main_loop
+    
+    mov rax, 60
+    syscall
+
+section .data
+    window_title: db "window title", 0
+    icon_name: db "", 0 ; icon name? Not sure what this does. But it's part of XSetStandardProperties so...
+
+</code></pre></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">© 2020 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
