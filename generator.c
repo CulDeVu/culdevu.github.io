@@ -444,6 +444,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
+	process_thought("2021-10-22-mcci");
 	process_thought("2021-06-16-chaos-engine");
 	process_thought("2021-06-11-segment-register");
 	process_thought("2021-06-04-x11-asm");

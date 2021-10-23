@@ -39,4 +39,5 @@ mov rax:qword ptr[16], 5     ; Writes 5 at 16 bytes off of the segment returned 
 
 In this snippet, the processor keeps some internal table of which segments are in use and how they're mapped, much like a virtual memory table today. The new instruction `seg` tells the processor "initialize this segments with no upper bound." From this point on, any time someone indexes off of that segment by *any amount*, it will work. At least until physical memory runs out.
 
-When a load or store happens to, say, `5:qword ptr[0xdead]`, a page will get committed to 
+When a load or store happens to, say, `5:qword ptr[0xdead]`, the page containing virtual address `0xdead` off of segment `5` will be committed to a physical page if it hasn't done so already.
+

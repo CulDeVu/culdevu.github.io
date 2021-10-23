@@ -1,0 +1,130 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Segment registers did nothing wrong</h2><i>Pub. 2021 Jun 11</i><p>They just had lousy parents, that's all.</p><p>I know a little bit about the history of segment registers in the x86 family of microarchitectures. I also know, through hearsay, that people universally hated them. And it's easy to see why, what with all the <code class="codeinline">near</code> and <code class="codeinline">far</code> pointer nonsense that was needed to use the minuscule amount of extra memory that it would have given you. But maybe there's another way.</p><h3 class="section_heading">Title</h3><p>I'm probably going to end up showing how much of a n00b I am, but whatevs.</p><p>Consider the lifecycle of a classic expanding array.</p><p>It starts out, as most things do, as a dead simple fixed-size array at global scope. I reference items in it with a pointer. These pointers are stable. Life is good.</p><p>Then, I need it to expand. So I go and make sure that all of the pointers referencing into the array are indices instead, so that the buffer can be relocated on resize. All of the little functions I have around making things work either have to be modified to take an index now, or have to be called with <code class="codeinline">func(&buf[index])</code>. Usually a lot more typing than that, though. And now a lot of care has to be taken if it also turns out that the buffer needs to be resizable in the middle of a "frame," since that means nothing on the stack can hold a pointer for any length of time either!</p><p>Welp, now I need more than one of those buffers. Time to start modifying all those functions again to take a pointer to the buffer now too!</p><p>That was tiring. There are some alternatives, though. The important ones, in my mind:</p><ul><li>Have the buffer broken into multiple parts, probably double-indirection style (as opposed to linked-list style). If the sizes of each chunk are fixed, then an index works well. Going from pointer to index, however, is going to be painful if you have to do it all the time. There are tricks here, like putting all of the metadata for a chunk at the beginning, and a guard page past the end to trigger expansion.</li><li>Reserve a huge region of virtual memory, like 100GB or something crazy. Commit/decommit the chunks on the end one at a time. Your pointers and indices are super easy to use, and all of your pointers are stable, even in the middle of modification.</li></ul><p>In practice, the virtual memory technique seems to work well for normal application code, and it's the way I do it for most of my personal projects. I'm not sure how much I'd appreciate a third-party library doing something like that though, so maybe library code should opt for the double indirection technique.</p><h3 class="section_heading">A mysterious third option</h3><p>I have an idea for a different type of memory architecture that might... I wouldn't say "solve" this problem, or make anything better really. The idea is based on segment registers.</p><p>(I have no idea if this is an idea that's been explored already by others; I don't know what keywords to use to start searching. If you know, email me!)</p><p>Imagine an architecture where there were, say, each process gets a billion "segments" that are numbered starting at 0. You can then do something like:</p><pre class="codeblock"><code>seg rax                      ; New instruction. Picks one of the currently unused segments, marks it as "used," and stores the index in rax
+mov rax:qword ptr[16], 5     ; Writes 5 at 16 bytes off of the segment returned in the last instruction
+</code></pre><p>In this snippet, the processor keeps some internal table of which segments are in use and how they're mapped, much like a virtual memory table today. The new instruction <code class="codeinline">seg</code> tells the processor "initialize this segments with no upper bound." From this point on, any time someone indexes off of that segment by <i>any amount</i>, it will work. At least until physical memory runs out.</p><p>When a load or store happens to, say, <code class="codeinline">5:qword ptr[0xdead]</code>, the page containing virtual address <code class="codeinline">0xdead</code> off of segment <code class="codeinline">5</code> will be committed to a physical page if it hasn't done so already.</p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">© 2020 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
