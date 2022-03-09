@@ -1,0 +1,118 @@
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+                                                  Huntsville AL 35802
+              Daniel Taylor                       804-712-5686
+                                                  http://djtaylor.me
+
+ Education    ------------------------------------------------------------------
+
+ Graduated    George Mason University
+ Dec 2018     B.S. in Mathematics
+              Extracurricular activities included: fluid simulation, video
+              processing, computational origami.
+
+
+              Appomattox Regional Governor’s School for the Arts and Technology
+ Sep 2010 -   Focus in Technology
+ Apr 2018     Extracurricular activities included: iris tracking, path tracing
+              for light simulation, and video game tech demos.
+
+ Employment   ------------------------------------------------------------------
+
+              Metron Inc.                         Reston, VA
+ Mar 2019 -   Junior Programmer
+ Mar 2021     I worked on a project that did motion, sensor, and Monte Carlo
+              simulations to track objects. Though mostly I worked on the
+              surrounding code: the UI, the 3D graphics, and runtime speedups
+              of the algorithms.
+
+
+              George Mason University             Fairfax, VA
+ Jan 2018 -   Mathematics Tutor
+ Mar 2019     Taught GMU undergraduate students at the school-sponsored tutoring
+              center. Worked with all skill levels, from Pre-Cal through Complex
+              Analysis courses, along with physics and computer science classes.
+
+
+              Bublup                              Rosslyn, VA
+ Apr 2018 -   QA Tester
+ Aug 2018     Did QA testing, but also wrote software for the QA team and
+              managed some of the testing SQL databases.
+
+
+              SC3                                 Alexandria, VA
+ May 2017 -   Application Programmer Intern
+ Aug 2018     Built a system for managing shift calendars, and software for
+              calculating pay and emailing invoices to contractors.
+
+
+              SC3                                 Alexandria, VA
+ Apr 2016 -   Graphics Design Intern
+ Aug 2016     Created promotional and internal material for the company. Also
+              designed graphics for winning proposals for US Capitol Police.
+
+
+              Little Caesars LLC
+ 2012-2016    Crew member
+
+
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+
+ Additional Experience
+--------------------------------------------------------------------------------
+- Programming languages:
+  Most proficient in C, Java, Python, C++ (pre-C++14)
+  Familiarity in  Javascript, HTML/CSS, C#
+  Passing familiarity with most other mainstream languages
+- Experience with popular graphics APIs, like CUDA, OpenCV, OpenGL, GLSL
+- Source control software like git, software methodologies like Agile
+- Many personal projects: a code editor, media players, physics simulations, an
+  extensive video processing project
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
