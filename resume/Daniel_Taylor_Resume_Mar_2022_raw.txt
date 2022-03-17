@@ -1,14 +1,14 @@
 01234567890123456789012345678901234567890123456789012345678901234567890123456789
 
-                                                  Huntsville AL 35802
-              Daniel Taylor                       804-712-5686
-                                                  http://djtaylor.me
+                                                            Huntsville AL 35802
+              Daniel Taylor                                 804-712-5686
+                                                            http://djtaylor.me
 
- Education    ------------------------------------------------------------------
+ -----------  Education  -------------------------------------------------------
 
- Graduated    George Mason University
- Dec 2018     B.S. in Mathematics
-              Extracurricular activities included: fluid simulation, video
+              George Mason University
+ Graduated    B.S. in Mathematics
+ Dec 2018     Extracurricular activities included: fluid simulation, video
               processing, computational origami.
 
 
@@ -17,43 +17,43 @@
  Apr 2018     Extracurricular activities included: iris tracking, path tracing
               for light simulation, and video game tech demos.
 
- Employment   ------------------------------------------------------------------
+ -----------  Employment  ------------------------------------------------------
 
-              Metron Inc.                         Reston, VA
- Mar 2019 -   Junior Programmer
+              Metron Inc.
+ Mar 2019 -   Junior Programmer                             Reston, VA
  Mar 2021     I worked on a project that did motion, sensor, and Monte Carlo
               simulations to track objects. Though mostly I worked on the
               surrounding code: the UI, the 3D graphics, and runtime speedups
               of the algorithms.
 
 
-              George Mason University             Fairfax, VA
- Jan 2018 -   Mathematics Tutor
+              George Mason University 
+ Jan 2018 -   Mathematics Tutor                             Fairfax, VA
  Mar 2019     Taught GMU undergraduate students at the school-sponsored tutoring
               center. Worked with all skill levels, from Pre-Cal through Complex
               Analysis courses, along with physics and computer science classes.
 
 
-              Bublup                              Rosslyn, VA
- Apr 2018 -   QA Tester
+              Bublup
+ Apr 2018 -   QA Tester                                     Rosslyn, VA
  Aug 2018     Did QA testing, but also wrote software for the QA team and
               managed some of the testing SQL databases.
 
 
-              SC3                                 Alexandria, VA
- May 2017 -   Application Programmer Intern
+              SC3
+ May 2017 -   Application Programmer Intern                 Alexandria, VA
  Aug 2018     Built a system for managing shift calendars, and software for
               calculating pay and emailing invoices to contractors.
 
 
-              SC3                                 Alexandria, VA
- Apr 2016 -   Graphics Design Intern
+              SC3
+ Apr 2016 -   Graphics Design Intern                        Alexandria, VA
  Aug 2016     Created promotional and internal material for the company. Also
               designed graphics for winning proposals for US Capitol Police.
 
 
               Little Caesars LLC
- 2012-2016    Crew member
+ 2012-2016    Crew member                                   Hopewell, VA
 
 
 01234567890123456789012345678901234567890123456789012345678901234567890123456789
@@ -62,7 +62,7 @@
  Additional Experience
 --------------------------------------------------------------------------------
 - Programming languages:
-  Most proficient in C, Java, Python, C++ (pre-C++14)
+  Most proficient in C, C++ (pre-C++14), Java, Python
   Familiarity in  Javascript, HTML/CSS, C#
   Passing familiarity with most other mainstream languages
 - Experience with popular graphics APIs, like CUDA, OpenCV, OpenGL, GLSL

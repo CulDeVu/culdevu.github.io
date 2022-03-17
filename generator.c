@@ -21,7 +21,7 @@ char *thought_href[50] = {0};
 char *thought_names[50] = {0};
 char *thought_descr[50] = {0};
 
-char *resume = "I'm currently job-seeking. My resume can be found as a pdf link(/resume/Daniel_Taylor_Resume_Jan_2019.pdf)[here] and also embeded using your browser's default pdf viewer below. Last updated January 2019.\n\n<embed src=\"/resume/Daniel_Taylor_Resume_Jan_2019.pdf\" style=\"width: 100%; height:800px\" type=\"application/pdf\">";
+char *resume = "I'm currently job-seeking. My resume can be found as a pdf link(/resume/Daniel_Taylor_Resume_Mar_2022.pdf)[here] and also embeded using your browser's default pdf viewer below. Last updated January 2022.\n\n<embed src=\"/resume/Daniel_Taylor_Resume_Mar_2022.pdf\" style=\"width: 100%; height:800px\" type=\"application/pdf\">";
 
 void consume_whitespace(char **head)
 {
