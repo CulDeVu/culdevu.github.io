@@ -1,0 +1,292 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">The world's shitties PS/2 device driver</h2><i>Pub. 2022 May 6</i><p>The problem: Julie wants to stop playing Minecraft on her Switch because the Switch version sucks. She wants to start playing on her Macbook, and it runs fine. But she feels more comfortable playing with controllers and joysticks over WASD.</p><p>There are a number of problems with this code. Here are a sampling for your enjoyment:</p><ul><li>The device is supposed to check periodically while sending messages to the host for the CLOCK line being pulled down by the host, signalling that the device needs to shut up and free up the data line and resend whatever it needs to later. I couldn't reliably get this state to trigger on my own, and the code that was supposed to do it was acting very strangely. I think my brain may have died and it's something incredible obvious, but as it stands right now it looks like that loop is just being skipped. Maybe someone else can verify this by undoing the <code class="codeinline">#if/#else</code> block below.</li><li>I have some evidence of power consumption issues: when I had two buttons hooked up to the board and I pressed both, the board would just die and reboot until I changed out some resistors for some heavier ones. Though it _seems_ to work fine now on my machine.</li><li>I just outright ignore all messages except the <code class="codeinline">0xff</code> reset message. The reason is mostly because, while writing this, I only ever got 3 messages from the host: <code class="codeinline">0xff</code> reset, <code class="codeinline">0xed</code> set LEDs, and <code class="codeinline">0xda</code> a mystery code that I can't find any info about on the internet. Between the <code class="codeinline">0xed</code> set LEDs message and the host sending the argument, an <code class="codeinline">0xfa</code> ack _seems_ to be required. Maybe when I hook this up to other computers this will change and I can post an update.</li><li>The documents I read on the protocol were unclear on this, but it made it sound like the device shouldn't send scan codes between a host's command and its arguments. But one thing that the documents didn't mention is that some hosts will sometimes just not send arguments at all! When I press the caps lock key on my keyboard, it sends a <code class="codeinline">0xed</code> set LEDs command to the device with the appropriate bits set. But when I press the caps lock key a second time to clear out all of the LED states, it sends a <code class="codeinline">0xed</code> command again. But instead of then sending an argument of <code class="codeinline">0</code>, it just doesn't send any argument! So I'm not sure how to interpret the document. It might be in there, and I just missed it. I remember reading something that said that the device expects to hear responses without 15ms or something. But I don't think I care enough to check. My current solution is to just ack after essentially every command and keep on keeping on. It works on my machine.</li></ul><pre class="codeblock"><code>int clock_in = 50;
+int clock_out = 40;
+int data_in = 51;
+int data_out = 41;
+
+int debug_pins[8] = {2,3,4,5,8,9,10,11};
+
+int w_pin = 30;
+bool w_down = false;
+
+// The output byte ring buffer.
+u8 buffer[256] = {0};
+int num_bytes = 0;
+int buffer_cursor = 0;
+
+void setup() {
+
+  pinMode(clock_in, INPUT);
+  pinMode(data_in, INPUT);
+
+  pinMode(clock_out, OUTPUT);
+  pinMode(data_out, OUTPUT);
+
+  for (int i = 0; i < 8; ++i) {
+    pinMode(debug_pins[i], OUTPUT);
+  }
+
+  pinMode(w_pin, INPUT);
+  w_down = false;
+
+  buffer[num_bytes % 256] = 0xaa;
+  num_bytes += 1;
+
+  // Sending the initial BAT code here without checks, since the CLOCK line can be a little fritzy at this point in the process.
+  {
+    bool bits[11];
+    bits[0] = 0;
+    bits[1] = ((buffer[buffer_cursor % 256] >> 0) & 0x01);
+    bits[2] = ((buffer[buffer_cursor % 256] >> 1) & 0x01);
+    bits[3] = ((buffer[buffer_cursor % 256] >> 2) & 0x01);
+    bits[4] = ((buffer[buffer_cursor % 256] >> 3) & 0x01);
+    bits[5] = ((buffer[buffer_cursor % 256] >> 4) & 0x01);
+    bits[6] = ((buffer[buffer_cursor % 256] >> 5) & 0x01);
+    bits[7] = ((buffer[buffer_cursor % 256] >> 6) & 0x01);
+    bits[8] = ((buffer[buffer_cursor % 256] >> 7) & 0x01);
+    bits[9] = 1 - (bits[1] + bits[2] + bits[3] + bits[4] + bits[5] + bits[6] + bits[7] + bits[8])%2;
+    bits[10] = 1;
+    for (int i = 0; i < 11; ++i) {
+      digitalWrite(data_out, 1-bits[i]);
+      digitalWrite(clock_out, 1);
+      delayMicroseconds(100);
+      digitalWrite(clock_out, 0);
+      delayMicroseconds(100);
+    }
+  }
+}
+
+void write_debug(u8 b) {
+  digitalWrite(debug_pins[0], (b >> 0) & 0x01);
+  digitalWrite(debug_pins[1], (b >> 1) & 0x01);
+  digitalWrite(debug_pins[2], (b >> 2) & 0x01);
+  digitalWrite(debug_pins[3], (b >> 3) & 0x01);
+  digitalWrite(debug_pins[4], (b >> 4) & 0x01);
+  digitalWrite(debug_pins[5], (b >> 5) & 0x01);
+  digitalWrite(debug_pins[6], (b >> 6) & 0x01);
+  digitalWrite(debug_pins[7], (b >> 7) & 0x01);
+}
+
+void loop() {
+  
+  if (digitalRead(clock_in) == HIGH && digitalRead(data_in) == HIGH &&
+      (buffer_cursor != num_bytes)) {
+
+    u8 message = buffer[buffer_cursor % 256];
+
+    bool bits[11];
+    bits[0] = 0;
+    bits[1] = ((message >> 0) & 0x01);
+    bits[2] = ((message >> 1) & 0x01);
+    bits[3] = ((message >> 2) & 0x01);
+    bits[4] = ((message >> 3) & 0x01);
+    bits[5] = ((message >> 4) & 0x01);
+    bits[6] = ((message >> 5) & 0x01);
+    bits[7] = ((message >> 6) & 0x01);
+    bits[8] = ((message >> 7) & 0x01);
+    bits[9] = 1 - (bits[1] + bits[2] + bits[3] + bits[4] + bits[5] + bits[6] + bits[7] + bits[8])%2;
+    bits[10] = 1;
+    for (int i = 0; i < 11; ++i) {
+      digitalWrite(data_out, 1-bits[i]);
+      digitalWrite(clock_out, 1);
+      delayMicroseconds(100);
+      digitalWrite(clock_out, 0);
+      #if 1
+      delayMicroseconds(100);
+      #else
+      for (int j = 0; j < 5; ++j) {
+        delayMicroseconds(20);
+        if (digitalRead(clock_in) == LOW) {
+          // The host is taking over the line! Just abort this message and try again later
+          write_debug(0x20);
+          goto packet_write_fail;
+        }
+      }
+      #endif
+    }
+
+    buffer_cursor += 1;
+
+    // Release control over the lines so that thay are in the correct state to send/recieve more
+    packet_write_fail:
+    digitalWrite(data_out, 0);
+    digitalWrite(clock_out, 0);
+  }
+
+  // Is it trying to send data?
+  {
+    if (digitalRead(data_in) == LOW) {
+      int bits[10] = {0};
+
+      for (int i = 0; i < 10; ++i) {
+        digitalWrite(clock_out, 1);
+        delayMicroseconds(100);
+        digitalWrite(clock_out, 0);
+        bits[i] = digitalRead(data_in);
+        delayMicroseconds(100);
+      }
+      digitalWrite(data_out, 1);
+      digitalWrite(clock_out, 1);
+      delayMicroseconds(100);
+      digitalWrite(data_out, 0);
+      digitalWrite(clock_out, 0);
+
+      u8 message = (bits[1]) | (bits[2] << 1) | (bits[3] << 2) | (bits[4] << 3) |
+        (bits[5] << 4) | (bits[6] << 5) | (bits[7] << 6) | (bits[8] << 7);
+
+      write_debug(message);
+
+      {
+        if (message == 0xff) {
+          buffer[num_bytes % 256] = 0xaa;
+        } else {
+          buffer[num_bytes % 256] = 0xfa;
+          ++num_bytes;
+        }
+      }
+    }
+  }
+
+  if (!w_down && digitalRead(w_pin) == HIGH) {
+    buffer[num_bytes % 256] = 0x1d;
+    ++num_bytes;
+    w_down = true;
+  }
+  if (w_down && digitalRead(w_pin) == LOW) {
+    buffer[num_bytes % 256] = 0xf0;
+    ++num_bytes;
+    buffer[num_bytes % 256] = 0x1d;
+    ++num_bytes;
+    w_down = false;
+  }
+
+  // Slow it all down a bit to 50kHz
+  delayMicroseconds(20);
+}
+</code></pre></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">© 2020 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>

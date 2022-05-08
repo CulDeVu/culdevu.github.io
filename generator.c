@@ -404,7 +404,7 @@ void process_thought(char *name)
 		thought_rss_date[thought_num] = tmp;
 	}
 
-	char *in_name = calloc(strlen(name) + 100, 1);
+	char *in_name = calloc(strlen(name) + 1024, 1);
 	sprintf(in_name, "../thought/%s.md", name);
 
 	FILE *fin = fopen(in_name, "rb");
@@ -413,7 +413,7 @@ void process_thought(char *name)
 		printf("Could not open file %s", in_name);
 	}
 
-	char *out_name = calloc(strlen(name) + 100, 1);
+	char *out_name = calloc(strlen(name) + 1024, 1);
 	sprintf(out_name, "../thought/%s/index.html", name);
 	FILE *fout = fopen(out_name, "w");
 	if (!fout)
@@ -421,7 +421,7 @@ void process_thought(char *name)
 		printf("Count not open file %s", out_name);
 	}
 
-	char *out_href = calloc(strlen(name) + 100, 1);
+	char *out_href = calloc(strlen(name) + 1024, 1);
 	sprintf(out_href, "/thought/%s/", name);
 	thought_href[thought_num] = out_href;
 
@@ -444,6 +444,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
+	process_thought("2022-05-06-shitty-ps2");
 	process_thought("2021-10-22-mcci");
 	process_thought("2021-06-16-chaos-engine");
 	process_thought("2021-06-11-segment-register");
