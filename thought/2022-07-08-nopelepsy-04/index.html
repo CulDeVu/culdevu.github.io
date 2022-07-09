@@ -1,0 +1,128 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Monte carlo confidence intervals</h2><i>Pub. 2022 Jul 8</i><p>Nopelepsy has changed a bit since the last time I wrote here about it. Every single thing said in my previous posts are out of date.</p><p>But this post isn't about how it works now, it's about how it <i>looks</i> now.</p><p>I'll be taking a fairly surface-level look at Nopelepsy over 4 different major versions and comparing them. Those versions are:</p><p>v1: a Java program, and one of my first attempts. This is the version that my first Nopelepsy post here is detailing. This one was a bit of a pain to get running again: it keeps crashing in the OpenCV library and, very strangely, only seems to consistently finish jobs when running in jdb. For some reason. This algorithm was based on dividing the program into large pixel blocks, looking at all of the frames before and after within a window, and clamping pixel blocks if they detect a flash. This algorithm was based on the guidelines written by the W3C on the topic.</p><p>v2: essentially v1, but rewritten in C++, my sort-of home base language. I don't recall the reason why I wrote v1 in Java, but I think it may have been because I perceived OpenCV to be easier to deal with in Java. But I needed more speed so I did a re-write. But after the re-write I still needed more speed so I re-wrote all of the OpenCV stuff, and ended up just interfacing with ffmpeg directly and scrapping OpenCV. These changes let me go from pixel blocks of 32pxls to 4pxls with a similar runtime. This version is based on a snapshot taken a little while after my second Nopelepsy post on this site.</p><p>v3: a complete re-do. After v2, I put this project on the shelf for a long time, until around late winter 2021. There was no way v2 was going to scale to what I wanted it to be. Based on my observations and the feedback I got from my human test subject, I wanted to do two things differently. I wanted Nopelepsy to be on-line, cleaning the most recent frame received with no knowledge of future frames. And I now know that the W3C guidelines, while I'm sure decent at what they're trying to accomplish, are nowhere near good enough. So I'm also going to be doing my own research. And I did, and it resulted in v3!</p><p>v4: my latest version. v4 was subjected to all of the extra conditions of v3, plus the requirement to run completely real time on a single thread on my dinky 2016 i3 laptop. Not flawless by any stretch of the imagination, but a huge step up from v1, v2, and v3, even while being significantly more constrained.</p><p>Let's look at one example:</p><p>(insert incredible here)</p><p>The Incredibles 2 was the movie that really got this project going in the first place, so here's a non-flashy clip to start us off. Right off, you can see that </p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">© 2022 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>

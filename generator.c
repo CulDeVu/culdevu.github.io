@@ -445,6 +445,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
+	process_thought("2022-07-08-nopelepsy-04");
 	process_thought("2022-05-06-shitty-ps2");
 	process_thought("2021-10-22-mcci");
 	process_thought("2021-06-16-chaos-engine");
