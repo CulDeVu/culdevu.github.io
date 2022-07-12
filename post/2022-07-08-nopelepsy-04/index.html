@@ -1,0 +1,128 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Nopelepsy update July 2022</h2><i>Pub. 2022 Jul 8</i><p>Nopelepsy has changed a bit since the last time I wrote here about it. Every single thing said in my previous posts are out of date.</p><p>But this post isn't about how it works now, it's about how it <i>looks</i> now.</p><p>I'll be taking a fairly surface-level look at Nopelepsy over 4 different major versions and comparing them. Those versions are:</p><p>v1: a Java program, and one of my first attempts. This is the version that my first Nopelepsy post here is detailing. This one was a bit of a pain to get running again: it keeps crashing in the OpenCV library and, very strangely, only seems to consistently finish jobs when running in jdb. For some reason. This algorithm was based on dividing the program into large pixel blocks, looking at all of the frames before and after within a window, and clamping pixel blocks if they detect a flash. This algorithm was based on the guidelines written by the W3C on the topic.</p><p>v2: essentially v1, but rewritten in C++, my sort-of home base language. I don't recall the reason why I wrote v1 in Java, but I think it may have been because I perceived OpenCV to be easier to deal with in Java. But I needed more speed so I did a re-write. But after the re-write I still needed more speed so I re-wrote all of the OpenCV stuff, and ended up just interfacing with ffmpeg directly and scrapping OpenCV. These changes let me go from pixel blocks of 32x32pxls to 4x4pxls with a similar runtime. This version is based on a snapshot taken a little while after my second Nopelepsy post on this site. After writing that post, I did get Nopelepsy running with OpenCL, and as I recall it was slightly faster, but suffered from having to send data back and forth over the bus all the time. But I couldn't get the OpenCL stuff working for this post.</p><p>v3: a complete re-do. After v2, I put this project on the shelf for a long time, until around late winter 2021. There was no way v2 was going to scale to what I wanted it to be. Based on my observations and the feedback I got from my favorite human test subject, I wanted to do two things differently. I wanted Nopelepsy to be on-line, cleaning the most recent frame received with no knowledge of future frames. And I now know that the W3C guidelines, while I'm sure decent at what they're trying to accomplish, are nowhere near good enough. So I'm also going to be doing my own research. And I did, and it resulted in v3!</p><p>v4: my latest version. v4 was subjected to all of the extra conditions of v3, plus the requirement to run completely real time on a single thread on my dinky 2016 i3 laptop. Not flawless by any stretch of the imagination, but a huge step up from v1, v2, and v3, even while being significantly more constrained.</p><p>Let's look at one example:</p><p><iframe style="max-width:100%" width="1191" height="497" src="https://www.youtube.com/embed/L8KL4RZDR6M" title="split screen incred" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></p><p>The Incredibles 2 was the movie that really got this project going in the first place, so here's a non-flashy clip to start us off. The video is split into 4 quadrants, from top-down left-right English reading order they're v1, v2, v3, and v4.</p><p>Right off, you can see that v2 and v4 look similar. v1 looks kinda blocky sometimes when there's a lot of motion, and v3... has its own thing going on. v2 and v4 sort of leave "shadows" behind (or in v2's case, sometimes in front!) when motion is happening, but v2 leaves much more than v4. In v2, the shadows have a way of "merging" back into the video, since v2 has future knowledge of frames, while in v4 the shadows "fade out." In certain places v1 looks more clear than v2, because v1 has a "this entire pixel region is either good or bad" mentality, and this allows it to keep large regions of pixels clear and untouched. But v4 is just as clear as v1 is usually, while at the same time having a much softer touch similar to v2.</p><p>v3 looks bad. The problem is that v3 was trying to employ the same kind of reasoning that v1 and v2 did, but online, and without knowledge of future pixels. For example, if the brightness of a pixel increased and then decreased, v3 couldn't go back in time and correct the increase, so it had to prevent the any subsequent decreases within a specified time window. So the end result is that v3 spends a lot of time increasing the brightness of pixels just because it didn't have the good sense to prevent the pixel increases in the first place. But the upside of this is that it's now much faster. To process that one minute video above, v2 took about 6 minutes, and v3 took about 45 seconds.</p><p>But all of this turned out to not be so much of a problem. v4 looks better than all 3 other versions, and it's faster to boot, clocking in at around 35 seconds, solidly faster than real time, though not <i>quite</i> fast enough to be able to process the same video at 60fps. But that's okay, there's more to be done.</p><p>It's easy to say what v1, v2, and v3's "deal" was, but it's a little harder with v4. One of the starting priciples I had with v4 was that I didn't want the same kinds of problems v3 had (obviously). In particular, I felt that it was silly that a program proportedly for photosensitive people on average made pixels <i>brighter</i>. Additionally, v3 sort of grew into its real-time status, but v4 was born into it, and the pieces that make up v4 were chosen <i>because</i> they could be done in real time.</p><p>I don't have much more to say about videos with no flashing in them. But for your enjoyment, here are a couple other examples.</p><p><iframe style="max-width: 100%" width="1191" height="497" src="https://www.youtube.com/embed/SfsCgFujlKk" title="split screen brick" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></p><p><iframe style="max-width:100%" width="1191" height="670" src="https://www.youtube.com/embed/51QdrxePpaM" title="split screen matrix" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></p><h3 class="section_heading">Flashing examples</h3><p>Some of the older versions didn't work nearly as well as later ones, so watch the following at your own peril. Like I mentioned before, the v1 build is super buggy, and I couldn't get this clip to work. So the top left and right are v2 and v3 respectively, and the bottom half is v4.</p><p><iframe style="max-width:100%" width="1191" height="497" src="https://www.youtube.com/embed/y5uLQqD8MdQ" title="split screen flash guy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></p><p>The first bit I want to talk about is this sequence.</p><p><figure><img src="incred_first_flash_downscaled.png" style="align-self: center; max-width:100%"><figcaption>From left to right: original frame, v2, v3, v4. Click <a href="incred_first_flash_raw.png">here</a> for a higher-res version. Warning: 25MB.</figcaption></figure></p><p>Frame 6 is a good example of a full-screen momentary flash, one of the types of flashes that Nopelepsy tries to remove. Whether or not the lightning bolt on the other frames needed to get killed as well is maybe up for debate. But the end result of all the versions is the removal of both.</p><p>Frame 6 v2 left a little too much blue around the edges of the frame. I believe this was actually a bug in v2's code: this part of the cleaning stage represents pixels as with a luminance channel and a chroma plane, and I didn't rescale the chroma values when I clamped the luminance one, resulting in a more saturated color than it should have been. For reference, frame 6 v4 is what should have happened: a slight reduction in saturation matching the drop in saturation of the original image, but otherwise holding the luminance values pretty much constant.</p><p>Also, while frames 2-5 v2 had the right idea killing the while from that lightning bolt, it left a lot of very saturated blues. That's not a great thing, since rapidly changing saturated reds and blues can be especially hard on people. As usual, v4 did it better, killing the whites and the blues before and after the full-screen flash.</p><p>One thing against v4 is that on frames 7 and 8, it still very clearly looks like the two figures in the center of the screen are still standing there, when in the original video they'd already ran away. This kind of things can be confusing when watching for the first time, but as far as I know it's a trade-off sort of thing. While the flash is going on, something has to be displayed, and just cutting to another image right after the flash is done is effectively <i>creating my own flash!</i> So some amount of smoothing has to be done, and I think the 2-3 frames that it lasted here is reasonable.</p><p>One of the tricks about v4 (and v3) is the saturation, I'm sure you noticed by now. v3 and v4 both desaturate the video by 50% before anything else. This is pretty apparent when put side-by-side with the desaturated version, but it turns out to not be that big of a deal when you're just watching the movie regularly. And since the colors aren't as vibrant, there's not as much need to clamp colors all the time. Less false positives, less true negatives. It's just better all around.</p><p>When I made v3, I could have sworn it looked better, honest. Frame 6 v3 is an example of what I mentioned above about riding an increase in luminance and the refusing to decrease. You might be able to make out what's happening on the screen by the outlines, the only crisp features on the frame. I made those for v3 specifically because it would have been impossible to watch otherwise. v4 inherited them to some extent, though they have been nerfed.</p><p>Here's another:</p><p><figure><img src="incred_repeat_flash_downscaled.png" style="align-self: center; max-width:100%"><figcaption>Click <a href="incred_repeat_flash_raw.png">here</a> for a higher-res version. Warning: 20MB.</figcaption></figure></p><p>This is an example of a localized, irregular repeating flash coming from that guy's right hand.</p><p>Lol I don't know why I keep showing v3 in these comparisons. v3's idea, as always, is something along the lines of "well there can't be a flash if the whole screen is white!" Truely brilliant.</p><p>For v2 and v4, there's not much more to add. v2 has the same problem with the saturated blues around the whites needing to get killed, and v4 kills them correctly. You can sort of see v4 incorrectly easing the white back in around the guy's hand near the final frames, since that little bit in the center is staying consistantly bright. Whether or not that's correct could be debated, but I say that's something that still needs working on.</p><p>And you know what? Here's a non-flashing still, because to hell with section headings.</p><p><figure><img src="incred_still_frame_downscaled.png" style="align-self: center; max-width:100%"><figcaption>From the top down: original, v2, v3, v4. Click <a href="incred_still_frame.png">here</a> for a higher-res version. Warning: 2MB.</figcaption></figure></p><p>Here we see that v2, while decent at killing flashes, isn't so good at keeping artifacts out of non-flashing sequences. Here, the camera wobble did it in.</p><p>The artifact on v4 over the baby's left eye, and some of the artifacts on their shirts, are from previous flashes that v4 is still, possibly overly cautiously, easing up on.</p><p>For v3, the outlines are really doing the heavy lifting for the frame, I suppose now you see why I put them in. Also, in case you thought v3 was just hard to watch, v3 is actually <i>particulary</i> hard to watch in situations like this, where you have a light-colored moving object on a dark background.</p><h3 class="section_heading">Lessons</h3><p>I could (and probably should, at some point soon) go on and analyze more clips. But I'm cutting it short here for now to talk about overall lessons.</p><p>1. Optimizing compilers aren't that great, honestly. There are two voices in my head, one saying "write code that's optimizable by a computer, anything else is a huge waste of time," and the other one responds saying "yeah, sure, I'll do that when my optimizer can actually optimize my loops."</p><p>Pretty much every loop in Nopelepsy is written with AVX2 intrinsics, and I don't think it could have been written any other way. Clang just seems to fragile. Wondering if inserting an extra <code class="codeinline">if</code> into my loop would mysteriously make the loop run 20x slower is too much of a load on my mind. Especially since that <code class="codeinline">if</code>, 9 times out of 10, is trivial to turn into SIMD code by hand. It's annoying and tiring to do wrote translations of <code class="codeinline">a - b</code> into <code class="codeinline">_mm256_sub_epu8(a, b)</code> and <code class="codeinline">if (a == b)</code> into <code class="codeinline">_mm256_cmpeq_epi8(a, b)</code> when it seems that a computer <i>should</i> be capable of doing this, but sadly that's just not the case. You have to code things by hand.</p><p>2. On the other hand, there is one piece of conventional wisdom that does sometimes have a positive effect on optimization: short functions. I had written off the whole "prefer short functions" advice back in middle school, but it turns out that <i>sometimes</i> they do help the optimizer. Those peeps and LLVM know how to do peephole optimization, apparently. It was, of course, an aliasing thing. However, the speedups aren't as much as they would be if I had just hand-written the SIMD loops myself, and I don't want a tiny little function for every single little loop in my program either, so the point is moot. But hey, I was wrong about this and it was surprising!</p><p>3. Nopelepsy has a number of stages that happen in order, and for a while there was a motion detection stage. If you look closely at the videos, you might be able to see it bugging out in v3! But every stage that can fail needs to either have a backup plan, or a needs failure to not be that big of a deal. For the motion detection, when it bugs out, it's fine for the results to be used in the detection phase, but NOT when it comes to choosing which value the pixels need to get clamped to. This prevents errors from the motion detector from becoming a big deal.</p><p>4. When I started on v4, I needed a new base to build off of, one that could take me farther than v3 could. It took a while, but I found a good, solid base. And then I got it in my head that this one stage had to be done a certain way, and I lost quite a bit of time chasing that dead end. I had someting that worked, I should have stopped to think "can I do something similar to what I want with something I <i>already know works?</i>" For a lot of things I do that sort of question doesn't seem to be valuable. But that part of Nopelepsy just happens to be fiddly and particular. 19 out of 20 ideas will just result in unwatchable garbage. In an environment like that, when you find something that works you should just keep doing that thing.</p><p>5. Single thread performance is really good, actually. It's not hard at all to process large buffers of data at 20GB/s.</p><p>6. It surprised me just how much faster things got when I threw out OpenCV. Never assume library writers write code better than you can. Always vet your dependancies, if you can.</p><p>7. I spent at least a day at one point trying to make my software texture upscaler really fast, before saying "wtf am I doing" and just doing the upscaling on the GPU, where the frame was immediately going anyways. Sometimes I get wrapped up in the thing, without thinking about the why. Because you can't think about the why all the time, the answer is always "it matters because I care about things like this!" It's circular. It's important to have a second thing you ask yourself though, "is this worth the effort?" Most of the time it's hard to know, but I never seem to ask when it isn't. This is something that can be fixed.</p><p>8. I spent most of Nopelepsy's development with an idea of where I wanted it to be eventually, in terms of quality. And now I'm pretty much there. It's hard to explain, it's like... software can become <i>good?</i> Like, you'd think there would have to be a limit on how good a piece of software can get, within the confines of a specific piece of hardware and stuff. And that there's such a thing as unrealistic expectations. That <i>MY</i> expectations should have been unrealistic. But they weren't, and they pretty much never are. I don't know, it's like some problems have a tiny bit of freedom in their output, and that little freedom releases them from the world of rational and logical analysis that I learned in school, and those programs can get infinitely good with enough work.</p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: culdevu@gmail.com<br><br><span style="color: #aaa">© 2022 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
