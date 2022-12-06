@@ -124,7 +124,7 @@
 			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
 		</div>
 
-		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Using FFmpeg in C</h2><i>Pub. 2022 Dec 5</i><p>Normally I wouldn't have written this, but I was compelled by a post I saw on someone else's blog about the importance of writing down what we learn, even if it's not very good. I'm just that gullible I suppose.</p><p>I've been using FFmpeg as a component of a real-time video processing program for a while now. I am NOT an expert in FFmpeg, or even very well versed in the project as a whole, but I <i>do</i> have a working piece of code that uses it. So there's that. The situation is better now, but when I was first writing my media player I pieced it together from old outdated example code, half-finished gists, and fucking doxygen. So here's a gift from one internet stranger to another: just more of the same.</p><h3 class="section_heading">The basics</h3><p>Video files have a number of different types of data that need to be presented to the user at the same time: the video frames, the audio, and sometimes embedded subtitles. In fact, video files often have multiple different audio streams in them (one for each language), and multiple subtitle streams (normal subtitles, colored subtitles, hearing impaired). The user is in charge of choosing the streams they want to come out of their screens and speakers.</p><p>The obvious way to do this is to just have all of the video frames listed sequentially in the video file, followed by all of the audio samples listed sequentially, on and on for all of the relevant data streams. Then, you would just maintain three or so pointer heads into the file, incrementing them as needed, and do whatever it is you need.</p><p>But no, apparently that's just a little too easy for some people. What actually happens is <i>multiplexing</i>, where the different streams are broken into small packets and interleaved throughout the file. The idea is that you would be able to maintain just a single pointer head into the file and just read each packet one by one and do your thing. We'll come back to that later.</p><p>In all honestly, this decision isn't all that bad. It makes some coding in the future more difficult and error-prone, but it also means that streaming video, or playing video files that aren't finished being written yet and whose total length isn't yet known, starts to look a lot like playing normal video files. This viewpoint is emphasized in the latest video file formats. But I digress.</p><p>Another important point is that the video and audio data streams are, in 100% of situations, going to be compressed. There are many different compression and decompression algorithms, called "codecs", and they should all be considered a black box. Modern video compression is quite complex. The spec for the vp8 codec is [TODO] pages, and that's only the fraction of the bytestream that they bother to explain! The new fancier version, vp9, is [TODO] pages on top of the old spec! The other major video codecs like HVEC or [TODO] aren't much better. Audio codecs are usually much simpler but are still, in my opinion, not worth implementing if your final goal is just to read and write video files. Just don't roll your own.</p><p>So a video file is a bunch of different data streams, broken into packets and interleaved. Okay, so we know how to deal with the contents of the packets: we feed them into the codec and out comes the real data we're trying to read and write. So what about the outer file structure? What does the file format for the stream and packet metadata look like?</p><p>Well like how there are many different codecs, there are many different so called "container" formats. The job of these containers formats is to define all of the data streams, stream metadata, and the packet metadata that comes before the actual packet bytes (that then get immediately passed to a codec, remember). These I think <i>are</i> instructional to try to code yourself. Go ahead, write a matroska parser. I think it's instructional to see the ways that a file format that gets used by billions of people (.mkv and .webm) isn't all that different from something a junior programmer would write. And then you should go back to using FFmpeg.</p><h3 class="section_heading">More terminology!</h3><p>So the situation so far:</p><pre class="codeblock"><code> ------------------------------------------------
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Using FFmpeg in C</h2><i>Pub. 2022 Dec 5</i><p>Normally I wouldn't have written this, but I was compelled by a post I saw on someone else's blog about the importance of writing down what we learn, even if it's not very good. I'm just that gullible I suppose.</p><p>I've been using FFmpeg as a component of a real-time video processing program for a while now. I am NOT an expert in FFmpeg, or even very well versed in the project as a whole, but I <i>do</i> have a working piece of code that uses it. So there's that. The situation is better now, but when I was first writing my media player I pieced it together from old outdated example code, half-finished gists, and fucking doxygen. So here's a gift from one internet stranger to another: just more of the same.</p><h3 class="section_heading">The basics</h3><p>Video files have a number of different types of data that need to be presented to the user at the same time: the video frames, the audio, and sometimes embedded subtitles. In fact, video files often have multiple different audio streams in them (one for each language), and multiple subtitle streams (normal subtitles, colored subtitles, hearing impaired). The user is in charge of choosing the streams they want to come out of their screens and speakers.</p><p>The obvious way to do this is to just have all of the video frames listed sequentially in the video file, followed by all of the audio samples listed sequentially, on and on for all of the relevant data streams. Then, you would just maintain three or so pointer heads into the file, incrementing them as needed, and do whatever it is you need.</p><p>But no, apparently that's just a little too easy for some people. What actually happens is <i>multiplexing</i>, where the different streams are broken into small packets and interleaved throughout the file. The idea is that you would be able to maintain just a single pointer head into the file and just read each packet one by one and do your thing. We'll come back to that later.</p><p>In all honestly, this decision isn't all that bad. It makes some coding in the future more difficult and error-prone, but it also means that streaming video, or playing video files that aren't finished being written yet and whose total length isn't yet known, starts to look a lot like playing normal video files. This viewpoint is emphasized in the latest video file formats. But I digress.</p><p>Another important point is that the video and audio data streams are, in 100% of situations, going to be compressed. There are many different compression and decompression algorithms, called "codecs", and they should all be considered a black box. Modern video compression is quite complex. The spec for the vp8 codec, while short, was famously difficult to write. The new fancier version, vp9, doesn't even have an official spec! The other major video codecs like HVEC or AV1 aren't much better, they keep shoving more stuff in the bitstream. Audio codecs are usually much simpler but are still, in my opinion, not worth implementing if your final goal is just to read and write video files. Just don't roll your own.</p><p>So a video file is a bunch of different data streams, broken into packets and interleaved. Okay, so we know how to deal with the contents of the packets: we feed them into the codec and out comes the real data we're trying to read and write. So what about the outer file structure? What does the file format for the stream and packet metadata look like?</p><p>Well like how there are many different codecs, there are many different so called "container" formats. The job of these containers formats is to define all of the data streams, stream metadata, and the packet metadata that comes before the actual packet bytes (that then get immediately passed to a codec, remember). These I think <i>are</i> instructional to try to code yourself. Go ahead, write a matroska parser. I think it's instructional to see the ways that a file format that gets used by billions of people (.mkv and .webm) isn't all that different from something a junior programmer would write. And then you should go back to using FFmpeg.</p><h3 class="section_heading">More terminology!</h3><p>So the situation so far:</p><pre class="codeblock"><code> ------------------------------------------------
 |       Container                                |
 |  ----------------- -------------- --------     |
 | | Stream metadata | Seeking info | etc... |    |
@@ -132,20 +132,38 @@
 |                                                |
 |  -------------- -------------- --------------  |
 | | Video packet | Audio packet | Audio packet | |
-|  ----------------- -------------- --------     |
+|  ----------------- -------------- -----------  |
 | | Subtitle packet | Video packet | etc... |    |
 |  ----------------- -------------- --------     |
  ------------------------------------------------
-</code></pre><p>Using FFmpeg to read a video file, to open up the container, extract the packets, and decompress the packets takes a little bit of work. Very soon I'm going to be showing you some very heavily annotated code, but at the risk of sounding repetitive I'm going to go over the major steps first.</p><p>First, we need to open the container. In FFmpeg, containers are called "formats", and the relevant struct here is <code class="codeinline">AVFormatContext</code>. You create one by calling <code class="codeinline">avformat_alloc_context()</code>. From here you call <code class="codeinline">avformat_open_input()</code> taking in the filename of the file you want to use.</p><p>Then you go through a few hoops to load the stream data and the codecs for the releavant streams. An <code class="codeinline">AVStream</code> is a struct containing some very basic information about the stream contents. It's mostly used just to populate an <code class="codeinline">AVCodec</code>, a struct that contains a bunch of function pointers to specialized codec functionality. This is, in turn, mostly just used to generate an <code class="codeinline">AVCodecContext</code>, a struct that contains all of the actually useful information about a particular data stream, and is the object you'll be passing around to most functions to do any reading.</p><p>Then it's time to read and decompress the packets. Reading is a packet is pretty simple, <code class="codeinline">av_read_frame()</code>.</p><p>FFmpeg has a synchronous message pump model to do decompression: you send packets to the decompressor and whenever it has a complete segment of data (like a complete video frame or an ADPCM frame) it will give it back when you. The sending happens with <code class="codeinline">avcodec_send_packet()</code>, and you can get a complete segment of data, called a "frame" in FFmpeg parlance, by calling <code class="codeinline">avcodec_receive_frame()</code>.</p><p>One last thing to note: certain data structures in FFmpeg are reference counted, so if used more than once they must be unreferenced manually.</p><p>Here's some code, following the age-old tradition of omitting error handling. Implying that my code <i>does</i> do the appropriate error handling. Yup.</p><pre class="codeblock"><code>av_register_all();
+</code></pre><p>Using FFmpeg to read a video file, to open up the container, extract the packets, and decompress the packets takes a little bit of work. Very soon I'm going to be showing you some very heavily annotated code, but at the risk of sounding repetitive I'm going to go over the major steps first.</p><p>First, we need to open the container. In FFmpeg, containers are called "formats", and the relevant struct here is <code class="codeinline">AVFormatContext</code>. You create one by calling <code class="codeinline">avformat_alloc_context()</code>. From here you call <code class="codeinline">avformat_open_input()</code> taking in the filename of the file you want to use.</p><p>Then you go through a few hoops to load the stream data and the codecs for the releavant streams. An <code class="codeinline">AVStream</code> is a struct containing some very basic information about the stream contents. It's mostly used just to populate an <code class="codeinline">AVCodec</code>, a struct that contains a bunch of function pointers to specialized codec functionality. This is, in turn, mostly just used to generate an <code class="codeinline">AVCodecContext</code>, a struct that contains all of the actually useful information about a particular data stream, and is the object you'll be passing around to most functions to do any reading.</p><p>Then it's time to read and decompress the packets. Reading is a packet is pretty simple, <code class="codeinline">av_read_frame()</code>.</p><p>FFmpeg has a synchronous message pump model to do decompression: you send packets to the decompressor and whenever it has a complete segment of data (like a complete video frame or an ADPCM frame) it will give it back when you. The sending happens with <code class="codeinline">avcodec_send_packet()</code>, and you can get a complete segment of data, called a "frame" in FFmpeg parlance, by calling <code class="codeinline">avcodec_receive_frame()</code>.</p><p>One last thing to note: certain data structures in FFmpeg are reference counted, so if used more than once they must be unreferenced manually.</p><p>Here's some code, following the age-old tradition of omitting error handling. Implying that my code <i>does</i> do the appropriate error handling. Yup.</p><pre class="codeblock"><code>// Depending on what version of FFmpeg you're using, either the compiler will
+// yell at you and try to make you feel bad for calling deprecated functions
+// like this, or it's a required function for the later API calls to not crash.
+// Unfortunately the amount of time between these two versions is only a couple
+// years. With FFmpeg, you'll find this happens a lot. If you care about
+// warnings and being able to compile your code with different library versions,
+// #if guard this line.
+av_register_all();
 
 AVFormatContext *fmt_ctx = avformat_alloc_context();
-
 avformat_open_input(&fmt_ctx, filename, NULL, NULL);
 
-// Now even though you've called `avformat_open_input()`, the function whose sole job it is to open up the file and fill out the fields of the file format's context struct, some of the fields of the file format's context struct are not filled out. So we fill them out with `avformat_find_stream_info()`. And now you're set, all of the streams are available to you!
+// Now even though you've called avformat_open_input(), the function whose
+// sole job it is to open up the file and fill out the fields of the file
+// format's context struct, some of the fields of the file format's context
+// struct are not filled out. So we fill them out with
+// avformat_find_stream_info(). And now you're set, all of the streams are
+// available to you!
 avformat_find_stream_info(fmt_ctx, NULL);
 
-// Er, well, some of the stream metadata, that is. To find all of the metadata for a given data stream, you'll need to get the stream's `codec_id` and pass it to `avcodec_find_decoder()`, then get a codec context by passing the result to `avcodec_alloc_context3()`, and then that just filled out the codec context defaults you have to pass the result of *that* to `avcodec_paramters_to_context()`
+// Er, well, some of the stream metadata, that is. To find all of the metadata
+// for a given data stream, you'll need to get the stream's `codec_id` and pass
+// it to `avcodec_find_decoder()`, then get a codec context by passing the
+// result to `avcodec_alloc_context3()`, and then that just filled out the codec
+// context defaults you have to pass the result of *that* to 
+// avcodec_paramters_to_context()
+
+AVCodecContext *dec_ctx[256];
 
 for (int i = 0; i < fmt_ctx->nb_streams; ++i) {
   AVStream *stream = fmt_ctx->streams[i];
@@ -156,43 +174,78 @@ for (int i = 0; i < fmt_ctx->nb_streams; ++i) {
   avcodec_parameters_to_context(codec_ctx, stream->codecpar);
   
   // ??
-  // I remember having to write this line to fix a bug at some point, but I honestly couldn't tell you what that bug was, or if it's even releavant anymore.
+  // I remember writing this line to fix a bug at some point, but I honestly
+  // couldn't tell you what that bug was, or if it's even releavant anymore.
   codec_ctx->framerate = av_guess_frame_rate(fmt_ctx, stream, NULL);
 
   avcodec_open2(codec_ctx, dec, NULL);
+
+  dec_ctx[i] = codec_ctx;
+
+  // Different stream types are stored at stream->codecpar->codec_type:
+  //   AVMEDIA_TYPE_VIDEO, AVMEDIA_TYPE_AUDIO, or AVMEDIA_TYPE_SUBTITLE
+  // stream->time_base is important, you multiply the packet timestamp by this
+  // value to get the real packet timestamp
+  // Video streams have
+  //   codec_ctx->width, codec_ctx->height, stream->avg_frame_rate
+  // Audio streams have
+  //   codec_ctx->sample_rate, codec_ctx->channels
 }
 
-AVPacket *packet = av_packet_alloc();
-while (1) {
-  int err = av_read_frame(fmt_ctx, packet);
-  if (err < 0) {
-    av_packet_unref(packet);
-    break;
-  }
-  
-  {
-    avcodec_send_packet(dec_ctx, packet);
+{
+  AVPacket *packet = av_packet_alloc();
+  while (1) {
+    int err = av_read_frame(fmt_ctx, packet);
+    if (err < 0) {
+      // This happens on read error, and on EOF
+      av_packet_unref(packet); // Unnecessary but whatever.
+      break;
+    }
+    
+    avcodec_send_packet(dec_ctx[packet->stream_index], packet);
 
     AVFrame *frame = av_frame_alloc();
     int response = 0;
     while (response >= 0) {
-      response = avcodec_receive_frame(dec_ctx, frame);
+      response = avcodec_receive_frame(dec_ctx[packet->stream_index], frame);
+
+      // Common video frame formats, accessed with frame->format, are
+      //   AV_PIX_FMT_YUV420P, AV_PIX_FMT_YUV420P10LE
+      // Most audio frame formats are AV_SAMPLE_FMT_FLTP
+      // More here: https://ffmpeg.org/doxygen/5.1/pixfmt_8h_source.html
+      // Other good fields for video are
+      //   frame->data, frame->width, frame->height, frame->linesize
+      // For audio, we have
+      //   frame->nb_samples, av_get_channel_layout_nb_channels(frame->channel_layout)
+
       av_frame_unref(frame);
     }
     av_frame_free(&frame);
+
+    av_packet_unref(packet);
   }
-  av_packet_unref(packet);
+  av_packet_free(&packet);
 }
-av_packet_free(&packet);
 
-avcodec_send_packet(dec_ctx, 0);
-int response = 0;
-while (response >= 0) {
+// Flushing the decompressor. A silly quirk of these kinds of message-pump
+// models is that they tend to have epilogue loops like this. Technically
+// though you don't have to write an epilogue loop: av_read_frame() and
+// avcodec_send_packet() have intentionally staggered behavior that makes it
+// possible to write it all as a single loop if you write your tests in the
+// correct order. But personally I prefer this.
+for (int i = 0; i < fmt_ctx->nb_streams; ++i) {
+  
+  // Sending a 0 for the packet is the signal to the compressor to flush its
+  // remaining unsent frames.
+  avcodec_send_packet(dec_ctx[i], 0);
+
   AVFrame *frame = av_frame_alloc();
-
-  response = avcodec_receive_frame(dec_ctx, frame);
-
+  int response = 0;
+  while (response >= 0) {
+    response = avcodec_receive_frame(dec_ctx[i], frame);
+    av_frame_unref(frame);
+  }
   av_frame_free(&frame);
 }
-</code></pre><h3 class="section_heading">More relevant information</h3><p>Instead of passing in a filename, you may be tempted by the docs to <code class="codeinline">fopen</code> and <code class="codeinline">fread</code> the file yourself and pass in the bytes by using a feature called AVIO. Don't do it, it's not worth it. At least on the versions I've used it has all kinds of problems, like not being able to reliably open up certain files.</p><p>The docs say that a lot of parameters in the context structs are optional, which is true. But some are more optional than others. For video and audio files, <code class="codeinline">fmt_ctx->duration</code> seems to always be present, but <code class="codeinline">stream->nb_frames</code> is not for certain major containers like webm. I'm sorry, I wish I could list all of the pitfalls like these but I only know what I know.</p><p>For writing files, most of the things are the same, except how most of the things are different. </p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2022 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+</code></pre><h3 class="section_heading">More relevant information</h3><p>Instead of passing in a filename, you may be tempted by the docs to <code class="codeinline">fopen</code> and <code class="codeinline">fread</code> the file yourself and pass in the bytes by using a feature called AVIO. Don't do it, it's not worth it. At least on the versions I've used it has all kinds of problems, like not being able to reliably open up certain files.</p><p>The docs say that a lot of parameters in the context structs are optional, which is true. But some are more optional than others. For video and audio files, <code class="codeinline">fmt_ctx->duration</code> seems to always be present, but <code class="codeinline">stream->nb_frames</code> is not for certain major containers like webm. I'm sorry, I wish I could list all of the pitfalls like these but I only know what I know.</p><p>When I said that the packets are interleaved, notice how I didn't say anything about the ordering. Within a single stream data is ordered correctly, but there's no guarentee that packets from different streams are ordered sequentially, despite potentially appearing sequentially in the file. In fact, it's rarely the case. Depending on the file and the encoder and the phase of the moon, audio packets may be consistantly ahead of the video packets, consistantly behind, or somewhere inbetween. Video is high throughput + high latency, whereas audio is low throughput + low latency. So if you're making a media player or something you're going to have to buffer packets far in advance anyways, at least like a couple seconds worth of data, so this isn't that big of a deal except right after seeking.</p><p>This should go without saying for old libraries like this, but FFmpeg is generally not threadsafe. Have it do its own little thing in its own thread and pipe the results wherever else with a SPMC FIFO.</p><p>For writing files, most of the things are the same, except how most of the things are different. Refer to <a href="https://ffmpeg.org/doxygen/5.1/encode__video_8c_source.html">this example source file</a>.</p><p>As a last note, more and different kinds sources are useful, so here:</p><ul><li>Another nice piece of FFmpeg example code, straight from the docs. The helpfully-name <a href="https://ffmpeg.org/doxygen/5.1/api-band-test_8c_source.html">api-band-test.c</a></li><li>A nice little tutorial that explains FFmpeg in much more detail, with illustrations! <a href="https://github.com/leandromoreira/ffmpeg-libav-tutorial">here</a>.</li></ul></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2022 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
