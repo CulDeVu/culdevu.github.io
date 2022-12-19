@@ -67,7 +67,7 @@ That code snippet also calculates the entropy of entire pixel pairs:
 - pairs entropy squiggles: 6643549
 - pairs entropy pipes: 6353101
 
-This is pretty nice. Doing the same as last time, encoding pairs of bytes and storing them along with the pairs-of-bytes-histogram, isn't *that* bad as of yet, it's still a win. But it won't be when we go up to quads of pixels, since the table is now `256*256*8=524288` bits, or 65KB. The one-dimensional histogram, for reference, was 256B. For quads of pixels, the histogram would be 4GB. We'll get back to that later.
+This is pretty nice. Doing the same as last time, encoding pairs of bytes and storing them along with the pairs-of-bytes-histogram, isn't *that* bad as of yet, it's still a win. But it won't be when we go up to quads of pixels, since the table is now `256*256*8=524288` bits, or 64KB. The one-dimensional histogram, for reference, was 256B. For quads of pixels, the histogram would be 4GB. We'll get back to that later.
 
 But we're not there yet. So what would happen if I just transformed every pixel into the difference between it and its neighbor? That's still a reversable transformation.
 
@@ -126,4 +126,12 @@ printf("entropy: %f %f = %f\n", entropy[0], entropy[1], entropy[0] + entropy[1])
 - pairs separated squiggles: 6727887
 - pairs separated xp_pipes: 6471385
 
-Woahhh. I have to admit, I didn't expect that. I expected the result to be far closer to the original base entropy result. But, thinking about it a little, it makes some sense. I'm taking an input of `1 1 2 2 1 1 2 2` and turning it into `1 0 2 0 1 0 2 0`. The entropy of adjacent pairs doesn't change because there's just as many `1 1`s in the first as there are `1 0`s in the second, etc. But the entropy of the pairs separated is less than the base entropy because we're going from a distribution of `0, 0.5, 0.5` to a distribution of `0.5, 0.25, 0.25`. Reductions of 
+Woahhh. I have to admit, I didn't expect that. I expected the result to be far closer to the original base entropy result. But, thinking about it a little, it makes some sense. Say I'm taking an input of `1 1 2 2 1 1 2 2` and turning it into `1 0 2 0 1 0 2 0`. The entropy of adjacent pairs doesn't change because there's just as many `1 1`s in the first as there are `1 0`s in the second, etc. But the entropy of the pairs separated is less than the base entropy because we're going from an entropy of `4*0.5*log(0.5) + 4*0.5*log(0.5) = 8` to `(2*0.5*log(0.5) + 2*0.5*log(0.5)) + 4*1*log(1) = 4`.
+
+In addition to the entropy win, there's also a win in the amount of histogram bits that will have to go in the file too. As said previously, at 8 bits per bucket of the pixel pairs histogram (at the moment I'm only thinking about storing the histograms uncompressed), we're looking at 64KB. With this method we're looking at a histogram size of 512B.
+
+But the win I'm most interested in is the following: we have a very cheap and expandible method of generating histributions that have decent entropy, and a *lower bound* on the best entropy that this method is able to achieve. Because this pair separation method will never be able to get a lower entropy than the entropy of the pairs themselves, right? So I can know how far away I am from optimal, for an admittedly silly definition of optimal.
+
+Here for the iq image, I'm 110927 bit away, or about 13KB. So what else is to be done?
+
+I wrote a couple brute forcers in an effort to find out.
