@@ -132,6 +132,123 @@ In addition to the entropy win, there's also a win in the amount of histogram bi
 
 But the win I'm most interested in is the following: we have a very cheap and expandible method of generating histributions that have decent entropy, and a *lower bound* on the best entropy that this method is able to achieve. Because this pair separation method will never be able to get a lower entropy than the entropy of the pairs themselves, right? So I can know how far away I am from optimal, for an admittedly silly definition of optimal.
 
-Here for the iq image, I'm 110927 bit away, or about 13KB. So what else is to be done?
+Here for the iq image, I'm 110927 bit away, about 13KB or around one tenth of a bit per pixel. So what else is to be done?
 
-I wrote a couple brute forcers in an effort to find out.
+The classic transformation, `diff[i+0], diff[i+1] -> (diff[i+0] + diff[i+1])/2, (diff[i+0] - diff[i+1])/2` isn't reversable. Correcting this to gives
+
+```
+u8 mid = (data[i+0]>>2) + (data[i+1]>>2) + (data[i+0]&data[i+1]);
+u8 a = (data[i+0] < data[i+1]) ? mid : (mid + 0x80);
+u8 b = data[i+1] - data[i+0];
+data[i+0] = a;
+data[i+1] = b;
+```
+
+, which does a bit worse at 6090994, 6930048, 6749589. I tried another of a similar variety, 
+
+```
+```
+
+which [TODO].
+
+I was curious about what sorts of mappings I had missed. The mapping `data[i+0], data[i+1] -> data[i+0], data[i+0] - data[i+1]` is really simple, are there better ones?
+
+I wrote a brute forcer that runs through all invertable linear maps.
+
+```
+double best_entropy = 100000000;
+for (int a = 0; a < 256; ++a)
+for (int b = 0; b < 256; ++b)
+for (int c = 0; c < 256; ++c)
+for (int d = 0; d < 256; ++d) {
+  u8 det = ((u8)a * (u8)d - (u8)c * (u8)b);
+  if (det%2 == 0) continue;
+  
+  int histo[256][2] = {0};
+  for (int i = 0; i < width*height; i += 2) {
+    u8 out0 = ((u8)a*data[i+0] + (u8)b*data[i+1]);
+    u8 out1 = ((u8)c*data[i+0] + (u8)d*data[i+1]);
+    histo[out0][0] += 1;
+    histo[out1][1] += 1;
+  }
+  double entropy_split[2] = {0};
+  for (int p = 0; p < 2; ++p)
+  for (int i = 0; i < 256; ++i) {
+    if (histo[i][p] > 0) entropy_split[p] += histo[i][p] * -log2((double)histo[i][p] / (width*height/2));
+  }
+  double entropy = entropy_split[0] + entropy_split[1];
+  if (entropy < best_entropy) {
+    best_entropy = entropy;
+    printf("%f\n", best_entropy);
+    printf("%d %d %d %d\n", a, b, c, d);
+  }
+}
+```
+
+I let in run for like an hour before realizing I never set `-O3`, I was just running a debug build. And then a minute later I accidentally killed the process when trying to copy something from the terminal window lmao. It only got to the matrix `[ 0 49; 115 141 ]` before it was killed, and in that time it found the `[ 0 1; 1 -1 ]` matrix from before, and a handful of other matricies whose measured entropy was equal to it up to 6 decimal places.
+
+I tried writing a more general brute forcer, but all it tried to do is something like this:
+
+[image]
+
+Not very helpful.
+
+Just for shits and giggles, I tried the classic orthogonal square wave decomposition `data[i+0], data[i+1] -> data[i+0] + data[i+1], data[i+0] - data[i+1]`. It's not reversible, but who knows? I do, it's 6090554, 6963846, 6775737, not the greatest.
+
+I tried to come up with an enumeration of all the different kinds of mappings that are continuous, but couldn't come up with anything usefully different that what I have.
+
+Let's look at quads now. They're interesting.
+
+So the combinatorics on the size of the histogram for full quads is real real bad. If done like earlier, the histogram would need `2^40` bits. BUT in a 1024x1024 image, there are only `2^18` 2x2 pixel quads, coming out to `2^26` bits or 256KB maximum to store them all. A bit much, but it's good to remember that it's an option.
+
+I measured the entropy of each image's quads:
+
+- quad entropy iq: 4075245
+- quad entropy quiggles: 4549141
+- quad entropy xp_pipes: 4443075
+
+Wow, awesome! These numbers are better than our previously best numbers, the running differences. Of course, this can't be used as-is because of the histogram storage problem. But our trick of finding a good transformation of the bytes and entropy encoding them separately might do the trick.
+
+Trying 
+
+```
+for (int i = 0; i < width*height; i += 4) {
+  data[i+1] = (data[i+1] - data[i]);
+  data[i+2] = (data[i+2] - data[i]);
+  data[i+3] = (data[i+3] - data[i]);
+}
+// base entropy
+int histo[256][4] = {0};
+for (int i = 0; i < width*height; i += 1) {
+  histo[data[i]][i%4] += 1;
+}
+double entropy[4] = {0};
+for (int p = 0; p < 4; ++p)
+for (int i = 0; i < 256; ++i) {
+  if (histo[i][p] > 0) entropy[p] += histo[i][p] * -log2((double)histo[i][p] / (width*height/4));
+}
+printf("entropy: %f %f %f %f = %f\n", entropy[0], entropy[1], entropy[2], entropy[3], entropy[0] + entropy[1] + entropy[2] + entropy[3]);
+```
+
+- quad separated 1 iq: 5139228
+- quad separated 1 squiggles: 6316631
+- quad separated 1 xp_pipes: 6388895
+
+Dissapointing. How about taking one of our known good pair mapping functions and apply them horizontally to both rows, and then vertically to both columns.
+
+```
+for (int y = 0; y < height; y += 2)
+for (int x = 0; x < width; x += 2) {
+  data[(y+0)*width + (x+1)] = (data[(y+0)*width + (x+1)] - data[(y+0)*width + (x+0)]);
+  data[(y+1)*width + (x+1)] = (data[(y+1)*width + (x+1)] - data[(y+1)*width + (x+0)]);
+  
+  data[(y+1)*width + (x+0)] = (data[(y+1)*width + (x+0)] - data[(y+0)*width + (x+0)]);
+  data[(y+1)*width + (x+1)] = (data[(y+1)*width + (x+1)] - data[(y+0)*width + (x+1)]);
+}
+```
+
+- quad separated 2 iq: 5013753
+- quad separated 2 squiggles: 6095857
+- quad separated 2 xp_pipes: 5912341
+
+Okay that's a little better, but honestly I expected a lot more. 
