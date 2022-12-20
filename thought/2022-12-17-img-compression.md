@@ -132,9 +132,9 @@ In addition to the entropy win, there's also a win in the amount of histogram bi
 
 But the win I'm most interested in is the following: we have a very cheap and expandible method of generating histributions that have decent entropy, and a *lower bound* on the best entropy that this method is able to achieve. Because this pair separation method will never be able to get a lower entropy than the entropy of the pairs themselves, right? So I can know how far away I am from optimal, for an admittedly silly definition of optimal.
 
-Here for the iq image, I'm 110927 bit away, about 13KB or around one tenth of a bit per pixel. So what else is to be done?
+Here for the iq image, I'm 110927 bit away, about 13KB or around two tenths of a bit per pixel. So what else is to be done?
 
-The classic transformation, `diff[i+0], diff[i+1] -> (diff[i+0] + diff[i+1])/2, (diff[i+0] - diff[i+1])/2` isn't reversable. Correcting this to gives
+The classic transformation, `diff[i+0], diff[i+1] -> (diff[i+0] + diff[i+1])/2, (diff[i+0] - diff[i+1])/2` isn't reversable. Correcting this gives
 
 ```
 u8 mid = (data[i+0]>>2) + (data[i+1]>>2) + (data[i+0]&data[i+1]);
@@ -147,9 +147,15 @@ data[i+1] = b;
 , which does a bit worse at 6090994, 6930048, 6749589. I tried another of a similar variety, 
 
 ```
+u8 diff = data[i+1] - data[i+0];
+u8 mid = (data[i+0]>>2) + (data[i+1]>>2) + (data[i+0]&data[i+1]);
+u8 a = (diff - 0x7f < 0x80) ? mid : (mid + 0x80);
+u8 b = data[i+1] - data[i+0];
+data[i+0] = a;
+data[i+1] = b;
 ```
 
-which [TODO].
+which performs at at 6003654, 6811173, 6615952. This is cool, it's our first example of something that gives better results only some of the time. I'd show an image of where which pixels are the problematic ones that contribute all of the entropy, but it's obvious that it's the hard edges. 
 
 I was curious about what sorts of mappings I had missed. The mapping `data[i+0], data[i+1] -> data[i+0], data[i+0] - data[i+1]` is really simple, are there better ones?
 
@@ -196,6 +202,10 @@ Not very helpful.
 Just for shits and giggles, I tried the classic orthogonal square wave decomposition `data[i+0], data[i+1] -> data[i+0] + data[i+1], data[i+0] - data[i+1]`. It's not reversible, but who knows? I do, it's 6090554, 6963846, 6775737, not the greatest.
 
 I tried to come up with an enumeration of all the different kinds of mappings that are continuous, but couldn't come up with anything usefully different that what I have.
+
+Future TODO:
+- Another option is to encode every `n` pixels, interpolate between them, and then encode the difference.
+- For the `n = 2` case, I predict that most middle pixels either take on values close to the left neighbor, close to their right neighbor, for close to their middle value. Investigate this.
 
 Let's look at quads now. They're interesting.
 
@@ -251,4 +261,11 @@ for (int x = 0; x < width; x += 2) {
 - quad separated 2 squiggles: 6095857
 - quad separated 2 xp_pipes: 5912341
 
-Okay that's a little better, but honestly I expected a lot more. 
+Okay that's a little better, but honestly I expected a lot more.
+
+Another way of looking at this last transformation is that the top-right and bottom-left are being encoded according to the pairs-separated method, and the bottom-right is being predicted as the value it *would be* if the 2x2 pixel block were a smooth gradient.
+
+Let's see where all of our precious entropy is going:
+
+[image]
+
