@@ -480,6 +480,7 @@ int main()
 	process_post("2016-02-02-microfacet-dummies");
 
 	process_thought("2023-01-08-img-compression");
+	process_thought("2023-01-07-china-bit");
 	process_thought("2022-12-05-ffmpeg");
 	process_thought("2022-05-06-shitty-ps2");
 	process_thought("2021-10-22-mcci");
