@@ -182,6 +182,39 @@ void format_line(FILE *fout, char *line)
 
 			fprintf(fout, "</figcaption></figure></td></tr></table>");
 		}
+		else if (strlen(line) >= 5 && !memcmp(line, "img3(", 5)) // side-by-side image comparison
+		{
+			// NOTE: this should be improved in the future. Currently the images being compared don't go onto separate lines when the window width becomes too small to fit both images.
+			fprintf(fout, "<table><tr style=\"vertical-align:top\">");
+			line += 4;
+
+			for (int i = 0; i < 3; ++i) {
+				fprintf(fout, "<td width=33.333%%><figure><img src=\"");
+				assert(*line == '(');
+				++line;
+
+				while (*line != ')')
+				{
+					fprintf(fout, "%c", *line);
+					++line;
+				}
+				++line;
+				assert(*line == '[');
+				++line;
+				fprintf(fout, "\" style=\"width:100%%\"><figcaption>");
+
+				while (*line != ']')
+				{
+					fprintf(fout, "%c", *line);
+					++line;
+				}
+				++line;
+
+				fprintf(fout, "</figcaption></figure></td>");
+			}
+
+			fprintf(fout, "</tr></table>");
+		}
 		else if (strlen(line) >= 5 && !memcmp(line, "link(", 5)) // links in the form link(link)[bottom text]
 		{
 			fprintf(fout, "<a href=\"");
@@ -446,6 +479,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
+	process_thought("2023-01-08-img-compression");
 	process_thought("2022-12-05-ffmpeg");
 	process_thought("2022-05-06-shitty-ps2");
 	process_thought("2021-10-22-mcci");

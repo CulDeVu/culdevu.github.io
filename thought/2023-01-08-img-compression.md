@@ -1,3 +1,5 @@
+== Image compression
+=== wip
 
 I've written a PNG decoder and a zip DEFLATE decoder on two separate occasions, one of which was used for the PNG decoding. This is to say that I know basically nothing about image compression. 
 
@@ -5,7 +7,7 @@ Starting out, I'm mostly interested in byte-based compression, not bit-based. I'
 
 Here are the 3 images I'm going to be using. I chose to use images I screencap'd from Shadertoy because they're visually interesting 3d scenes that I can be absolutely sure have no lossy compression artifacts already.
 
-[images]
+img3(iq.png)[iq.png](squiggles.png)[squiggles.png](xp_pipes.png)[xp_pipes.png]
 
 For those in the back who have trouble hearing me, I'll speak up.
 
@@ -21,7 +23,7 @@ Which means that, if I was to just concat the pixel histogram with the arithmeti
 
 Here are the histograms:
 
-[images]
+img3(iq_base_histogram.png)[base histogram iq](squiggles_base_histogram.png)[base histogram squiggles](xp_pipes_base_histogram.png)[base histogram xp_pipes]
 
 Now the basis of all of the image and video compression techniques I know about is that pixels nearby are more similar than pixels far away. I wonder how true that is? Let's graph pairs of adjacent pixels.
 
@@ -59,15 +61,11 @@ for (int px = 0; px < 256; ++px) {
 fwrite(out_img, 1, 1024*1024*3, fout);
 ```
 
-[image comparisons]
+img3(iq_pairs_histogram.png)[pairs histogram iq](squiggles_pairs_histogram.png)[pairs histogram squiggles](xp_pipes_pairs_histogram.png)[pairs histogram xp_pipes]
 
 Huh, well that's pretty conclusive, I'd say. The middle and last are hard to see because there are a couple small areas of pixels that are saturated to white. They're fairly small, but there's enough area to them that they totally dominate the histogram. Just for giggles, here's the the same histograms, but where every bin stores that bin's entropy.
 
-[images]
-
-And here's one where it's just plotting the differences between pixels, with 0 centered.
-
-[images]
+img3(iq_pairs_entropy_histogram.png)[pairs entropy histogram iq](squiggles_pairs_entropy_histogram.png)[pairs entropy histogram squiggles](xp_pipes_pairs_entropy_histogram.png)[pairs entropy histogram xp_pipes]
 
 That code snippet also calculates the entropy of entire pixel pairs:
 
@@ -274,13 +272,15 @@ Another way of looking at this last transformation is that the top-right and bot
 
 Let's see where all of our precious entropy is going:
 
-[image]
+imgcmp(squiggles_quad_entropy_0.png)[quad entropy coef 0](squiggles_quad_entropy_1.png)[quad entropy coef 1]
+
+imgcmp(squiggles_quad_entropy_2.png)[quad entropy coef 2](squiggles_quad_entropy_3.png)[quad entropy coef 3]
 
 Of course the entropy of coefficient 1 is high on diagonal and vertical edges, coefficient 2 is high on diagonal and horizontal edges, and coefficient 3 is high on diagonal edges.
 
 For that matter, what would happen if I graphed quad entropy per pixel?
 
-[images]
+img(squiggles_quad_entropy.png)[quad entropy]
 
 Huh. I can't believe I hadn't done this yet. Okay, so I guess the strategy for quad entropy is to lean heavily on areas with solid colors. I guess that makes sense.
 
@@ -292,7 +292,7 @@ I suppose that it might make more sense to measure quad entropy relative to the 
 
 Remember, these numbers aren't necessarily comparible to the previous ones because critical information about each quad of pixels have been removed. To get a comparible number you'd have to add 2017449, 1960355, and [TODO] resp. But you get these images:
 
-[images]
+img3(iq_quad_entropy_rel.png)[quad entropy relative to top-left](squiggles_quad_entropy_rel.png)[quad entropy relative to top-left](xp_pipes_quad_entropy_rel.png)[quad entropy relative to top-left]
 
 All of the brightness scales on these images are the same, measured relative to `log2(1024*1024/4) = 18 bits`. This last set of images is about what I expected. High values on edges and noise, low values on smooth gradient areas.
 
@@ -401,4 +401,17 @@ printf("entropy: %f\n", entropy);
 - quad running difference 2 squiggles: 5334564
 - quad running difference 2 xp_pipes: 5178177
 
-Soooo cloooose! Each is under 2%, and squiggles is under PNG!
+Soooo cloooose! Each is under 2%, and squiggles is just barely under PNG!
+
+TODO: 
+- Investigate 2x3 pixel blocks. A 3x3 pixel block (I think) would have the possibility of doing divisions by two more easily inside of the maps. The pixel quad transformations that I was doing are all trivial to SIMD-ify. An odd pixel square size would be annoying, but only in the horizontal direction. So 2x3 pixel blocks might be fun to play with.
+- Some of the transformations do better in some situations than others. So it might be fun to, for example, find a set of `n` transformations that do well in mutually exclusive and covering situations, and then find the entropy of the choice between them.
+
+# Conclusions
+
+I think there are a lot of conclusions that I can draw from this excersise.
+
+First, a blog post in this style is so stupidly long for the actual information contained.
+
+The whole "compute the entropy of the pixel blocks, and use number as a minimum to aim for" is maybe a little silly but can definately be taken farther than I'm taking it. I suppose I didn't gain as much intuition about entropy as I would have liked because here at the end I'm looking at the whole pixel block entropies and I'm wondering what those number even means.
+
