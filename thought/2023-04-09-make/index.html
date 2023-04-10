@@ -1,0 +1,138 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Making up facts about history</h2><i>Pub. 2023 Apr 9</i><p>The original <code class="codeinline">make</code> was written back in 1976, nearly 50 years ago. It allowed people to declare a <i>pipeline</i> for building their programs. The common case is that users specify the input source files -> output files relationships and the commands that perform that transformation. Then <code class="codeinline">make</code> would look at the timestamps of the input files and output files, and if the last modified date on the input files were newer than the last modified date of the output files that were already on disk, <code class="codeinline">make</code> would know that the output files were out of date and needed to be re-built.</p><p>Make came <i>so</i> close to being great, to simultaneously lifting up the good parts of a pipeline while also burying the bad parts. Consider an alternative version of <code class="codeinline">make</code> where your Makefile looks like</p><pre class="codeblock"><code>gcc -c file2.c -o file2.o
+gcc file1.o file2.o -o executable
+gcc -c file1.c -o file2.o
+</code></pre><p>, where the commands are just listed in whatever order you want, and <code class="codeinline">make</code> would just know which ones to run and in which order, automatically, without having any markup declaring pre-reqs or post-reqs.</p><p>Why didn't it? Well, mostly historical circumstances.</p><p><code class="codeinline">cc</code> (and all of its derivatives, as well as most programs written for the terminal) take in input as files in their argument list. Specifically, filenames. There would have been no good way for <code class="codeinline">make</code> to tell which arguments were files or not, and of those files which were inputs and which were outputs.</p><p>You could imagine an alternate version of unix, where instead of passing in strings, you passed in structured data, like</p><pre class="codeblock"><code>gcc "-c" readonly(file1.c) writeonly(file1.o)
+</code></pre><p>If the syntax were nice enough for Feldman to have just written a parser, and <code class="codeinline">cc</code> would have been able to tell the difference between input and output files by the permissions, then maybe the goal of infering the build pipeline automatically would have felt more doable.</p><p>Or, you could imagine an alternate universe where, instead of taking in filenames, it took in source in its stdin:</p><pre class="codeblock"><code>gcc -c < file1.c > file1.o
+</code></pre><p>, or maybe with an imaginary, less-cursed syntax:</p><pre class="codeblock"><code>file1.c |> gcc -c |> file1.o
+</code></pre><p>This may have been enough structure to be able to infer the pipeline.</p><p>Of course, both of these would necessarily require that the C language were different as well. In C, you're suppose to define dependancies between files _in the .c files themselves_ with #include. So you would have to do something like</p><pre class="codeblock"><code># file1.c has no #include directives. gcc takes in all files as inputs
+# (I guess it has multiple stdin's? idk)
+# and gcc will proceed to compile into file1.o every symbol in all of the input sources
+file1.c header1.h header2.h |> gcc -c |> file1.o
+</code></pre><p>Here in the future-times, I understand these changes are probably not the way to go. It would make source files much less self-contained and make compilcated build-time logic more cumbersome than it already is, for not a whole lot of benefit. In my eyes, the millions-of-c-files model of software is a relic of the past.</p><p>But who knows! There are probably still a lot of domains out there that could benefit from heavy pipelines. And it's been 50 years, lots of time to make improvements.</p><p>Fast-forward 50 years, and what do we have? Some things are slightly better, like Dockerfiles. Most other things are worse, like Jenkins, GH Actions, and Travis CI.</p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2022 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
