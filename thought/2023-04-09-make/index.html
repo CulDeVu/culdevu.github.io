@@ -121,7 +121,7 @@
 			<div><i>Insert tagline here</i></div>
 		</div>
 		<div style="background: #222; color: #fafafa">
-			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a>
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a><a href="/physics/" class="navitem">Physics</a>
 		</div>
 
 		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Making up facts about history</h2><i>Pub. 2023 Apr 9</i><p>The original <code class="codeinline">make</code> was written back in 1976, nearly 50 years ago. It allowed people to declare a <i>pipeline</i> for building their programs. The common case is that users specify the input source files -> output files relationships and the commands that perform that transformation. Then <code class="codeinline">make</code> would look at the timestamps of the input files and output files, and if the last modified date on the input files were newer than the last modified date of the output files that were already on disk, <code class="codeinline">make</code> would know that the output files were out of date and needed to be re-built.</p><p>Make came <i>so</i> close to being great, to simultaneously lifting up the good parts of a pipeline while also burying the bad parts. Consider an alternative version of <code class="codeinline">make</code> where your Makefile looks like</p><pre class="codeblock"><code>gcc -c file2.c -o file2.o
