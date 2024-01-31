@@ -11,6 +11,7 @@
 
 (define page
     (lesson lesson-number 
+        (para "I'd like to start analyzing some simple simulations. I'm a visual person, so I say we start graphing things. But what should we graph?")
 
         sim-loop-code-sm
 
@@ -59,6 +60,9 @@
             )
 
         (para "Not much to say here, except notice the weird kind of diagonal almost-symmetry these graphs have.")
+
+        ; TODO: add something about "I would like to point out, in the moments where the objects feel no force these graphs look like straight lines. That's what happens when an object has a constant velocity. And those straight lines are connected by smooth curves."
+        ; Also, maybe bring up how the bend has different levels of "sharpness"
 
         (heading "velocity / time")
 

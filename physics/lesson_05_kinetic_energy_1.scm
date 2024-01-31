@@ -1,4 +1,4 @@
-(include "test_gen.sch")
+(include "generator.scm")
 
 (define lesson-number 5)
 
@@ -311,6 +311,8 @@
 			'(= (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) k))
 				(+ (mt (ball1 kinetic_energy) k) (mt (ball2 kinetic_energy) k))))
 
+		(heading "3 objects")
+
 		(para "Right. So. Now that we've got that out of the way, the last thing left to talk about is multiple objects. The know that the total kinetic energy of a simulation with two objects is the same before and after a collision. But what happens when three objects all interact at once?")
 
 		(sim-vis sim-multi)
@@ -356,7 +358,7 @@
 		))
 
 (use-modules (ice-9 textual-ports))
-(let ((file (open-output-file (string-append "lessons/" (lesson-html lesson-number)))))
+(let ((file (open-output-file (string-append (lesson-html lesson-number) "/index.html"))))
     (begin
         ; (write-string lesson1 file)
         (put-string file lesson3)
