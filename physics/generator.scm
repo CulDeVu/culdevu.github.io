@@ -145,25 +145,25 @@
         (sqrt (get-sim-object-mass o))))
 
 ; sim-frame object stuff
-#|(define make-sim-frame
+(define make-sim-frame
     (lambda (all-objs time)
         (cons time all-objs)))
-(define get-sim-frame-all-objs
+(define sim-frame-all-objs
     (lambda (sim-frame)
         (cdr sim-frame)))
-(define get-sim-frame-time
+(define sim-frame-time
     (lambda (sim-frame)
-        (car sim-frame)))|#
-(define make-sim-frame
+        (car sim-frame)))
+#|(define make-sim-frame
     (lambda (all-objs time)
         all-objs))
 (define sim-frame-get-all-objs
     (lambda (sim-frame)
-        sim-frame))
+        sim-frame))|#
 
-(define make-sim-empty
-    (lambda ()
-        '()))
+(define make-sim-spawn
+    (lambda (. objs)
+        (list (make-sim-frame objs 0))))
 (define make-sim
     (lambda (new-sim-frame old-sim)
         (cons new-sim-frame old-sim)))
@@ -176,9 +176,15 @@
 (define sim-get-frame-at-time
     (lambda (sim time)
         '()))
+(define sim-get-all-newest-objects
+    (lambda (sim)
+        (sim-frame-all-objs (sim-get-newest-frame sim))))
+(define sim-object
+    (lambda (sim obj-number)
+        (index (sim-get-all-newest-objects sim) obj-number)))
 (define sim-get-num-objects
     (lambda (sim)
-        (length (sim-frame-get-all-objs (sim-get-newest-frame sim)))))
+        (length (sim-frame-all-objs (sim-get-newest-frame sim)))))
 
 (define collision-force
     (lambda (curr other)
@@ -204,8 +210,8 @@
             '()
             (cons (calc-forces-singular (car objs) all-objs) (calc-forces-1 (cdr objs) all-objs)))))
 (define calc-forces
-    (lambda (objs-history)
-        (calc-forces-1 (car objs-history) (car objs-history))))
+    (lambda (all-objs)
+        (calc-forces-1 all-objs all-objs)))
 
 (define advance-sim-1
     (lambda (objs forces dt)
@@ -227,14 +233,14 @@
 
 (define sim
     (lambda (old-sim time)
-        (let ((all-objs (sim-frame-get-all-objs (sim-get-newest-frame old-sim))))
+        (let ((all-objs (sim-frame-all-objs (sim-get-newest-frame old-sim))))
             (if (eq? time sim-max-time)
                 old-sim
                 ; (sim (advance-sim objs (calc-forces objs) DEFAULT-DT) (+ time DEFAULT-DT)))))
-                (sim 
+                (sim
                     (make-sim 
                         (make-sim-frame
-                            (advance-sim-1 all-objs (calc-forces old-sim) DEFAULT-DT)
+                            (advance-sim-1 all-objs (calc-forces all-objs) DEFAULT-DT)
                             (+ time DEFAULT-DT))
                         old-sim) 
                     (+ time DEFAULT-DT))))))
@@ -245,9 +251,9 @@
             objs
             (sim-with-dt (advance-sim objs (calc-forces objs) dt) (+ time dt) dt))))
 
-(define sim-history-get-num-objects
-    (lambda (sim-history)
-        (length (car sim-history))))
+; (define sim-history-get-num-objects
+;     (lambda (sim-history)
+;         (length (car sim-history))))
 
 
 ; (define get-object-param-at-time
@@ -257,50 +263,59 @@
 ;     (lambda (sim-history)
 ;         (let ((times-dt (lambda (x) (inexact (* x dt)))))
 ;             (map times-dt (count-reverse (length sim-history))))))
-(define get-time-2-history
+
+(define get-time-history
     (lambda (sim-history obj-number)
         (let ((times-dt (lambda (x) (inexact (* x DEFAULT-DT)))))
             (map times-dt (count-reverse (length sim-history))))))
+; (define get-time-history
+;     (lambda (sim obj-number)
+;         (if (nil? sim)
+;             '()
+;             (begin (display (length sim)) (display "\n") (cons
+;                 (sim-frame-time (sim-get-newest-frame sim))
+;                 (get-time-history (sim-get-all-older-frames sim) obj-number))))))
+
 (define get-pos-history
-    (lambda (sim-history obj-number)
-        (if (nil? sim-history)
+    (lambda (sim obj-number)
+        (if (nil? sim)
             '()
             (cons
-                (get-sim-object-pos (index (car sim-history) obj-number))
-                (get-pos-history (cdr sim-history) obj-number)))))
+                (get-sim-object-pos (index (sim-get-all-newest-objects sim) obj-number))
+                (get-pos-history (sim-get-all-older-frames sim) obj-number)))))
 (define get-vel-history
-    (lambda (sim-history obj-number)
-        (if (nil? sim-history)
+    (lambda (sim obj-number)
+        (if (nil? sim)
             '()
             (cons
-                (get-sim-object-vel (index (car sim-history) obj-number))
-                (get-vel-history (cdr sim-history) obj-number)))))
+                (get-sim-object-vel (index (sim-get-all-newest-objects sim) obj-number))
+                (get-vel-history (sim-get-all-older-frames sim) obj-number)))))
 (define get-force-history
-    (lambda (sim-history obj-number)
-        (if (nil? (cdr sim-history))
+    (lambda (sim obj-number)
+        (if (nil? (sim-get-all-older-frames sim))
             (list 0)
             (cons
-                ; (get-sim-object-vel (index (car sim-history) obj-number))
+                ; (get-sim-object-vel (index (car sim) obj-number))
                 (let* (
-                    (state-curr (car sim-history))
-                    (state-old (cadr sim-history))
+                    (state-curr (sim-get-all-newest-objects sim))
+                    (state-old (sim-get-all-newest-objects (sim-get-all-older-frames sim)))
                     (vel-curr (get-sim-object-vel (index state-curr obj-number)))
                     (vel-old (get-sim-object-vel (index state-old obj-number)))
                     (mass (get-sim-object-mass (index state-curr obj-number))))
                     (* (/ (- vel-curr vel-old) DEFAULT-DT) mass))
-                (get-force-history (cdr sim-history) obj-number)))))
+                (get-force-history (sim-get-all-older-frames sim) obj-number)))))
 (define get-p-history
-    (lambda (sim-history obj-number)
-        (if (nil? sim-history)
+    (lambda (sim obj-number)
+        (if (nil? sim)
             '()
             (cons
-                (* (get-sim-object-vel (index (car sim-history) obj-number)) (get-sim-object-mass (index (car sim-history) obj-number)))
-                (get-p-history (cdr sim-history) obj-number)))))
+                (* (get-sim-object-vel (sim-object sim obj-number)) (get-sim-object-mass (sim-object sim obj-number)))
+                (get-p-history (sim-get-all-older-frames sim) obj-number)))))
 (define get-ke-history
     (lambda (sim-history obj-number)
         (if (nil? sim-history)
             '()
-            (let ((obj (index (car sim-history) obj-number)))
+            (let ((obj (index (sim-get-all-newest-objects sim-history) obj-number)))
                 (cons
                     (* 0.5 (get-sim-object-vel obj) (get-sim-object-vel obj) (get-sim-object-mass obj))
                     (get-ke-history (cdr sim-history) obj-number))))))
@@ -345,13 +360,13 @@
                 "A" (num3 horiz-right) " " (num3 vert-rad) " 0 0 1 " "0 " (num3 vert-rad)
                 "A" (num3 horiz-left) " " (num3 vert-rad) " 0 0 1 " "0 -" (num3 vert-rad)
                 ))))
-(define sim-vis-ball-dimensions
-    (lambda (objs)
-        (if (nil? objs)
-            '()
-            (cons
-                (list (get-sim-object-rad (car objs)) (get-sim-object-rad (car objs)) (get-sim-object-rad (car objs)))
-                (sim-vis-ball-dimensions (cdr objs))))))
+; (define sim-vis-ball-dimensions
+;     (lambda (objs)
+;         (if (nil? objs)
+;             '()
+;             (cons
+;                 (list (get-sim-object-rad (car objs)) (get-sim-object-rad (car objs)) (get-sim-object-rad (car objs)))
+;                 (sim-vis-ball-dimensions (cdr objs))))))
 (define sim-vis-ball-dimensions-horiz-single-2
     (lambda (curr other)
         (let (
@@ -404,6 +419,9 @@
                 (cons
                     (list rad-vert (car horiz-dim) (cadr horiz-dim))
                     (sim-vis-ball-dimensions-2 (cdr objs) all-objs))))))
+(define sim-vis-ball-dimensions
+    (lambda (sim-frame)
+        (sim-vis-ball-dimensions-2 (sim-frame-all-objs sim-frame) (sim-frame-all-objs sim-frame))))
 
 (define animate-formatted-list
     (lambda (nums)
@@ -433,7 +451,8 @@
                     (animate-formatted-list (downsamp-sm (get-pos-history simulation obj-number)))
                     "\" dur=\"8s\" repeatCount=\"indefinite\" />"
                     "<animate attributeName=\"d\" values=\""
-                    (animate-formatted-list-str (map sim-vis-ball-svg (downsamp-sm (map index (map sim-vis-ball-dimensions-2 simulation simulation) (repeat (length simulation) obj-number)))))
+                    (let ((all-objs (sim-get-all-newest-objects simulation)))
+                        (animate-formatted-list-str (map sim-vis-ball-svg (downsamp-sm (map index (map sim-vis-ball-dimensions simulation) (repeat (length simulation) obj-number))))))
                     "\" dur=\"8s\" repeatCount=\"indefinite\" />"
                     "</path>"
 
@@ -468,7 +487,13 @@
 
                 (single-ball 0)
                 (single-ball 1)
-                (if (eq? (sim-history-get-num-objects simulation) 3)
+                (begin
+                    (display (sim-get-num-objects simulation)) (display "\n")
+                    (display (sim-get-newest-frame simulation)) (display "\n")
+                    (display (sim-frame-all-objs (sim-get-newest-frame simulation))) (display "\n")
+                    (display (length (sim-frame-all-objs (sim-get-newest-frame simulation)))) (display "\n")
+                    "")
+                (if (eq? (sim-get-num-objects simulation) 3)
                     (single-ball 2)
                     "")
 
@@ -573,10 +598,9 @@
             " /><line stroke=\"black\" vector-effect=\"non-scaling-stroke\" "
             "x1=\"0\" y1=\"" (number->string (rect-get-min-y bounding-rect)) "\" x2=\"0\" y2=\"" (number->string (rect-get-max-y bounding-rect)) "\""
             " />"
-            ; "<text x=\"0\" y=\"0\" font-size=\"5%\">hello</text>"
             )))
 (define sim-graphs
-    (lambda (paths)
+    (lambda (paths x-name y-name)
         (let* (
             (bounding-rect (inflate-rect (foldr max-bounding-rect (map get-bounding-rect paths))))
             (width (rect-get-width bounding-rect))
@@ -596,20 +620,35 @@
                 (foldr string-append (map sim-graph-single paths colors))
                 ; (begin (display (length paths)) (display "\n") (display colors) (display "\n") (display paths) (display "\n") "")
                 (foldr string-append (map sim-graph-point paths colors (repeat num-objects (* 0.01 width)) (repeat num-objects (* 0.02 height))))
-                "</g></svg>\n"))))
+                "</g>"
+
+                ; TODO: the sizing thing here is pretty shit. I have no idea what "1%" here is in reference to. But it seems to work...
+                "<text x=\"2\" y=\"1.95\" font-size=\"1%\" text-anchor=\"middle\">" x-name "</text>"
+                "<text x=\"-1\" y=\"0\" text-anchor=\"middle\" dominant-baseline=\"hanging\" font-size=\"1%\" transform=\"rotate(-90)\">" y-name "</text>"
+                "</svg>\n"))))
+(define sim-graph-fun-select-name
+    (lambda (name)
+        (cond
+            ((eq? name get-time-history) "time")
+            ((eq? name get-pos-history) "position")
+            ((eq? name get-vel-history) "velocity")
+            ((eq? name get-force-history) "force")
+            ((eq? name get-p-history) "momentum")
+            ((eq? name get-ke-history) "kinetic energy")
+            )))
 (define sim-graphs-2
-    (lambda (sim-history x-fun y-fun)
+    (lambda (sim x-fun y-fun)
         (let (
-            (num-objects (length (car sim-history)))
+            (num-objects (sim-get-num-objects sim))
             (single-path (lambda (n)
                 (list 
-                    (downsamp-sm (x-fun sim-history n))
-                    (downsamp-sm (y-fun sim-history n))))))
+                    (downsamp-sm (x-fun sim n))
+                    (downsamp-sm (y-fun sim n))))))
             ; (sim-graphs
             ;     (single-path 0)
             ;     (single-path 1))
             ; (begin (display num-objects) (display "\n") (display (length sim-history)) (display "\n") #|(display (car sim-history)) (display "\n")|# (display (count-reverse num-objects)) (display "\n") "")
-            (sim-graphs (map single-path (reverse (count-reverse num-objects))))
+            (sim-graphs (map single-path (reverse (count-reverse num-objects))) (sim-graph-fun-select-name x-fun) (sim-graph-fun-select-name y-fun))
             )))
 (define sim-graphs-2-integral
     (lambda (sim-history x-fun y-fun)
@@ -782,6 +821,8 @@
                 (string-append "<title>Physics with Danno: " (lesson-title lesson-number) "</title>")
                 (string-append "<title>Chapters</title>")
                 )
+            "<script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>"
+            "<script id=\"MathJax-script\" async src=\"https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js\"></script>"
             "</head>"
             "<body style=\"margin-left:auto; margin-right:auto; width: 80ch; font-size: 1.125rem\">"
             "<h1><a href=\"/physics/\">Physics with Danno</a></h1>")))

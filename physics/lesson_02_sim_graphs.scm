@@ -17,7 +17,7 @@
 
         (para "Well there's only a handful of piece of information in this loop.")
 
-        (para "Each object has a mass, but those don't change over the course of the simuation. Clearly, because the simulation loop from a couple slides ago doesn't have a line saying \"mass += something\".")
+        (para "Each object has a mass, but those don't change over the course of the simulation. Clearly, because the simulation loop from a couple slides ago doesn't have a line saying \"mass += something\".")
 
         (para "The quantities that do change are time, the force being felt by each object, each object's position, and each object's velocity. So to start, I suggest that we just graph each of the major variables by every other major variable. There's only 4:")
 

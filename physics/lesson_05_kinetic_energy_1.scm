@@ -3,44 +3,44 @@
 (define lesson-number 5)
 
 (define sim01
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0)) 
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 0)) 
 (define sim02
-    (sim (list (list (make-sim-object 2 1 -2) (make-sim-object 1 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1)) 0))
 (define sim03
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 2 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) 0))
 
 (define sim2x2_vel_1
-	(sim (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0))
+	(sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 0))
 (define sim2x2_vel_2
-	(sim (list (list (make-sim-object 1 2 -2) (make-sim-object 1 0 1))) 0))
+	(sim (make-sim-spawn (make-sim-object 1 2 -2) (make-sim-object 1 0 1)) 0))
 (define sim2x2_vel_3
-	(sim (list (list (make-sim-object 1 3 -2) (make-sim-object 1 0 1))) 0))
+	(sim (make-sim-spawn (make-sim-object 1 3 -2) (make-sim-object 1 0 1)) 0))
 (define sim2x2_vel_4
-	(sim (list (list (make-sim-object 1 4 -2) (make-sim-object 1 0 1))) 0))
+	(sim (make-sim-spawn (make-sim-object 1 4 -2) (make-sim-object 1 0 1)) 0))
 (display "Finished with 2x2 vel\n")
 
 (define sim2x2_mass_1
-	(sim (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0))
+	(sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 0))
 (define sim2x2_mass_2
-	(sim (list (list (make-sim-object 2 1 -2) (make-sim-object 1 0 1))) 0))
+	(sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1)) 0))
 (define sim2x2_mass_3
-	(sim (list (list (make-sim-object 3 1 -2) (make-sim-object 1 0 1))) 0))
+	(sim (make-sim-spawn (make-sim-object 3 1 -2) (make-sim-object 1 0 1)) 0))
 (define sim2x2_mass_4
-	(sim (list (list (make-sim-object 4 1 -2) (make-sim-object 1 0 1))) 0))
+	(sim (make-sim-spawn (make-sim-object 4 1 -2) (make-sim-object 1 0 1)) 0))
 (display "Finished with 2x2 mass\n")
 
 (define sim2x2_mass_alt_1
-	(sim (list (list (make-sim-object 1 1 -3) (make-sim-object 1 0 2))) 0))
+	(sim (make-sim-spawn (make-sim-object 1 1 -3) (make-sim-object 1 0 2)) 0))
 (define sim2x2_mass_alt_2
-	(sim (list (list (make-sim-object 2 1 -3) (make-sim-object 2 0 2))) 0))
+	(sim (make-sim-spawn (make-sim-object 2 1 -3) (make-sim-object 2 0 2)) 0))
 (define sim2x2_mass_alt_3
-	(sim (list (list (make-sim-object 3 1 -3) (make-sim-object 3 0 2))) 0))
+	(sim (make-sim-spawn (make-sim-object 3 1 -3) (make-sim-object 3 0 2)) 0))
 (define sim2x2_mass_alt_4
-	(sim (list (list (make-sim-object 4 1 -3) (make-sim-object 4 0 2))) 0))
+	(sim (make-sim-spawn (make-sim-object 4 1 -3) (make-sim-object 4 0 2)) 0))
 (display "Finished with 2x2 mass\n")
 
 (define sim-multi
-	(sim (list (list (make-sim-object 1 0.75 -3) (make-sim-object 2 0 0) (make-sim-object 2 -1 4))) 0))
+	(sim (make-sim-spawn (make-sim-object 1 0.75 -3) (make-sim-object 2 0 0) (make-sim-object 2 -1 4)) 0))
 
 (define ke-equation-inline (math '(* (/ 1 2) mass (mparen (- (^ final-velocity 2) (^ initial-velocity 2))))))
 
@@ -215,9 +215,9 @@
 		; TODO: give it a name
 
 		(option
-			(sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-2-history get-ke-history))
-			(sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-2-history get-ke-history))
-			(sxs (sim-vis sim03) (sim-graphs-2 sim03 get-time-2-history get-ke-history))
+			(sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-history get-ke-history))
+			(sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-history get-ke-history))
+			(sxs (sim-vis sim03) (sim-graphs-2 sim03 get-time-history get-ke-history))
 			)
 
 		; (para "[kinetic energy definition] Over the course of this series, we're going to come to understand this quantity, and the extensions we're going to make to it, as having something to do with, like, a fundemental limit to an object's ability to exert change on other objects. But! We're not there yet.")

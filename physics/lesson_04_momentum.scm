@@ -4,26 +4,26 @@
 (define lesson-number 4)
 
 (define sim01
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 0))
 (define sim02
-    (sim (list (list (make-sim-object 2 1 -2) (make-sim-object 1 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1)) 0))
 (define sim03
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 2 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) 0))
 
 (define sim-multi
-    (sim (list (list (make-sim-object 1 0.75 -3) (make-sim-object 2 0 0) (make-sim-object 2 -1 4))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 0.75 -3) (make-sim-object 2 0 0) (make-sim-object 2 -1 4)) 0))
 
 (define lesson2
     (lesson lesson-number
         (para "I want to analyze the velocity/time graphs of our simulations.")
 
-        (sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-2-history get-vel-history))
+        (sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-history get-vel-history))
 
         (para "There is another VERY clear line of symmetry here. But it's maybe not super obvious *why* this one is symmetric.")
 
         (para "Before moving on from these three graphs, I want to run another simulation, same situation, but now the left ball has twice as much mass. Remember from before, the role of mass in an interaction with forces is that they respond less to the same force than objects with less mass.")
 
-        (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-2-history get-vel-history))
+        (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-history get-vel-history))
 
         (para "The symmetry is still *kinda* there. It's reminiscent of the reflectional symmetry we had. But not quite. I want to talk about this.")
 
@@ -33,7 +33,7 @@
 
         (para "What I want to draw your attention to is line 2, \"dvel = force / mass * dt\". Rearranging this line gives \"dvel * mass = force * dt\". We know that dt is the same for each timestep and for each object, and we know that at each timestep the force between the objects are equal and opposite in sign. So that means, at each timestep the quantities \"dvel * mass\" are going to be equal and opposite in sign.")
 
-        (sim-graphs-2 sim02 get-time-2-history get-p-history)
+        (sim-graphs-2 sim02 get-time-history get-p-history)
 
         (para "And, sure enough, if I scale the velocity/time graph by each object's mass, the symmetry comes back.")
 
@@ -66,7 +66,7 @@
 
         (para "So that's where the mass * velocity graph's symmetry comes from.")
 
-        (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-2-history get-p-history))
+        (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-history get-p-history))
 
         ; (bmath 
         ;     '(+ (sum k T1 T2 (* (ball1 mass) (mt (ball1 dvel) k))) (sum k T1 T2 (* (ball2 mass) (mt (ball2 dvel) k))))
@@ -76,7 +76,7 @@
         ;     0
         ;     )
 
-        (para "By the way, this quantity, mass * velocity, is important and it has a name: momentum. And this symmetry that you're seeing here also has a name: conservation of momentum.")
+        (para "The labels on these graphs probably gave it away, but this quantity, mass * velocity, is important enough to have a name: momentum. And this symmetry that you're seeing here also has a name: conservation of momentum.")
 
         (bmath
             '(= (- (mt (ball1 momentum) T2) (mt (ball1 momentum) T1)) (- (mt (ball2 momentum) T2) (mt (ball2 momentum) T1)))
@@ -116,7 +116,7 @@
 
         ; (para "[3 balls different masses]Okay, well what about the case when the collisions aren't distinct? What happens when they're all happening at once? Remember what I said earlier about forces adding. The red object is feeling the force of collision from *both* the blue and green objects, whereas the blue and green objects are just feeling the forces from the red one.")
 
-        (sxs (sim-graphs-2 sim-multi get-time-2-history get-vel-history) (sim-graphs-2 sim-multi get-time-2-history get-p-history))
+        (sxs (sim-graphs-2 sim-multi get-time-history get-vel-history) (sim-graphs-2 sim-multi get-time-history get-p-history))
 
         ; (para "And the graphs again. The force/time graph is now all muddied, there's no clear dilineation between the collisions. But, if you look closely, it's still sort of balanced. And that's correct! At every timestamp, every pair of objects share and equal and opposite force. But that also means that the sums of their forces is 0, and that the sums of the forces of all pairs of objects together is also 0! So this force graph should always be balanced around 0.")
 
