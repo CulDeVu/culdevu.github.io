@@ -4,14 +4,14 @@
 (define lesson-number 4)
 
 (define sim01
-    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1))))
 (define sim02
-    (sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1)) 0))
+    (sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1))))
 (define sim03
-    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1))))
 
 (define sim-multi
-    (sim (make-sim-spawn (make-sim-object 1 0.75 -3) (make-sim-object 2 0 0) (make-sim-object 2 -1 4)) 0))
+    (sim (make-sim-spawn (make-sim-object 1 0.75 -3) (make-sim-object 2 0 0) (make-sim-object 2 -1 4))))
 
 (define lesson2
     (lesson lesson-number

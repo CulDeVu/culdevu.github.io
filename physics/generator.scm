@@ -147,7 +147,7 @@
 ; sim-frame object stuff
 (define make-sim-frame
     (lambda (all-objs time)
-        (cons time all-objs)))
+        (cons (inexact time) all-objs)))
 (define sim-frame-all-objs
     (lambda (sim-frame)
         (cdr sim-frame)))
@@ -231,25 +231,25 @@
     (lambda (objs-history forces dt)
         (cons (advance-sim-1 (car objs-history) forces dt) objs-history)))
 
-(define sim
-    (lambda (old-sim time)
-        (let ((all-objs (sim-frame-all-objs (sim-get-newest-frame old-sim))))
-            (if (eq? time sim-max-time)
+(define sim-with-dt
+    (lambda (old-sim dt)
+        (let (
+            (all-objs (sim-frame-all-objs (sim-get-newest-frame old-sim)))
+            (time (sim-frame-time (sim-get-newest-frame old-sim))))
+            (if (> time sim-max-time)
                 old-sim
                 ; (sim (advance-sim objs (calc-forces objs) DEFAULT-DT) (+ time DEFAULT-DT)))))
-                (sim
+                (sim-with-dt
                     (make-sim 
                         (make-sim-frame
-                            (advance-sim-1 all-objs (calc-forces all-objs) DEFAULT-DT)
-                            (+ time DEFAULT-DT))
-                        old-sim) 
-                    (+ time DEFAULT-DT))))))
+                            (advance-sim-1 all-objs (calc-forces all-objs) dt)
+                            (+ time dt))
+                        old-sim)
+                    dt)))))
 
-(define sim-with-dt
-    (lambda (objs time dt)
-        (if (eq? time sim-max-time)
-            objs
-            (sim-with-dt (advance-sim objs (calc-forces objs) dt) (+ time dt) dt))))
+(define sim
+    (lambda (objs)
+        (sim-with-dt objs DEFAULT-DT)))
 
 ; (define sim-history-get-num-objects
 ;     (lambda (sim-history)
@@ -264,10 +264,10 @@
 ;         (let ((times-dt (lambda (x) (inexact (* x dt)))))
 ;             (map times-dt (count-reverse (length sim-history))))))
 
-(define get-time-history
-    (lambda (sim-history obj-number)
-        (let ((times-dt (lambda (x) (inexact (* x DEFAULT-DT)))))
-            (map times-dt (count-reverse (length sim-history))))))
+; (define get-time-history
+;     (lambda (sim-history obj-number)
+;         (let ((times-dt (lambda (x) (inexact (* x DEFAULT-DT)))))
+;             (map times-dt (count-reverse (length sim-history))))))
 ; (define get-time-history
 ;     (lambda (sim obj-number)
 ;         (if (nil? sim)
@@ -275,6 +275,12 @@
 ;             (begin (display (length sim)) (display "\n") (cons
 ;                 (sim-frame-time (sim-get-newest-frame sim))
 ;                 (get-time-history (sim-get-all-older-frames sim) obj-number))))))
+(define get-time-history
+    (lambda (sim obj-number)
+        (map (lambda (frame) (sim-frame-time frame)) sim)))
+; (define get-time-history
+;     (lambda (sim obj-number)
+;         (map (lambda (frame) (get-sim-object-pos (index (sim-frame-all-objs frame) obj-number))) sim)))
 
 (define get-pos-history
     (lambda (sim obj-number)
@@ -319,6 +325,22 @@
                 (cons
                     (* 0.5 (get-sim-object-vel obj) (get-sim-object-vel obj) (get-sim-object-mass obj))
                     (get-ke-history (cdr sim-history) obj-number))))))
+
+
+(define get-pos-at-time
+    (lambda (sim obj-number time)
+        (if (nil? sim)
+            (error "time out of bounds")
+            (if (< (abs (- time (sim-frame-time (sim-get-newest-frame sim)))) 0.00001)
+                (get-sim-object-pos (sim-object sim obj-number))
+                (get-pos-at-time (sim-get-all-older-frames sim) obj-number time)))))
+(define get-ke-at-time
+    (lambda (sim obj-number time)
+        (if (nil? sim)
+            (error "time out of bounds")
+            (if (< (abs (- time (sim-frame-time (sim-get-newest-frame sim)))) 0.00001)
+                (get-sim-object-pos (sim-object sim obj-number))
+                (get-ke-at-time (sim-get-all-older-frames sim) obj-number time)))))
 
 
 
@@ -732,25 +754,25 @@
         (let ((times-dt (lambda (x) (inexact (* x (/ 1 16))))))
             (map times-dt (count-reverse (length sim-history))))))
 (define sim-graphs-integral-dt-leftright
-    (lambda (sim-history x-fun y-fun dt func)
+    (lambda (sim x-fun y-fun func)
         (let (
-            (num-objects (length (car sim-history)))
+            (num-objects (sim-get-num-objects sim))
             (single-path (lambda (n)
                 (list
-                    (reverse (x-fun sim-history n))
-                    (reverse (y-fun sim-history n))))))
-            (begin (display num-objects) (display "\n") (display (length sim-history)) (display "\n") #|(display (car sim-history)) (display "\n")|# (display (count-reverse num-objects)) (display "\n") "")
+                    (reverse (x-fun sim n))
+                    (reverse (y-fun sim n))))))
+            (begin (display num-objects) (display "\n") (display (length sim)) (display "\n") #|(display (car sim)) (display "\n")|# (display (count-reverse num-objects)) (display "\n") "")
             (sim-graphs-leftright (list (cadr (map single-path (reverse (count-reverse num-objects))))) func)
             )))
 (define sim-graphs-integral-dt-left
-    (lambda (sim-history x-fun y-fun dt)
-        (sim-graphs-integral-dt-leftright sim-history x-fun y-fun dt sim-graph-integral-rectangles-left)))
+    (lambda (sim-history x-fun y-fun)
+        (sim-graphs-integral-dt-leftright sim-history x-fun y-fun sim-graph-integral-rectangles-left)))
 (define sim-graphs-integral-dt-right
-    (lambda (sim-history x-fun y-fun dt)
-        (sim-graphs-integral-dt-leftright sim-history x-fun y-fun dt sim-graph-integral-rectangles-right)))
+    (lambda (sim-history x-fun y-fun)
+        (sim-graphs-integral-dt-leftright sim-history x-fun y-fun sim-graph-integral-rectangles-right)))
 (define sim-graphs-integral-dt-double-right
-    (lambda (sim-history x-fun y-fun dt)
-        (sim-graphs-integral-dt-leftright sim-history x-fun y-fun dt sim-graph-integral-rectangles-double-right)))
+    (lambda (sim-history x-fun y-fun)
+        (sim-graphs-integral-dt-leftright sim-history x-fun y-fun sim-graph-integral-rectangles-double-right)))
 
 (define para
     (lambda (. strs)
@@ -932,7 +954,7 @@
                 (apply string-append (interleave (map math2 (cdr expr)) "<mo>=</mo>")))
             ((eq? (car expr) 'lim)
                 ; (string-append (math2 (cadr expr)) "<mo>=</mo>" (math2 (caddr expr))))
-                (apply string-append (interleave (map math2 (cdr expr)) "<munder><mo>→</mo><mrow>dt <mo>→</mo> 0</mrow></munder>")))
+                (apply string-append (interleave (map math2 (cdr expr)) "<munder><mo>→</mo><mrow><mi>dt</mi> <mo>→</mo> <mn>0</mn></mrow></munder>")))
             ((eq? (car expr) 'mparen)
                 (string-append "<mrow><mo>(</mo>" (math2 (cadr expr)) "<mo>)</mo></mrow>"))
             ((eq? (car expr) 'abs)

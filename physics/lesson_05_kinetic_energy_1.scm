@@ -3,44 +3,59 @@
 (define lesson-number 5)
 
 (define sim01
-    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 0)) 
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)))) 
 (define sim02
-    (sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1)) 0))
+    (sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1))))
 (define sim03
-    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1))))
 
 (define sim2x2_vel_1
-	(sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 0))
+	(sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1))))
 (define sim2x2_vel_2
-	(sim (make-sim-spawn (make-sim-object 1 2 -2) (make-sim-object 1 0 1)) 0))
+	(sim (make-sim-spawn (make-sim-object 1 2 -2) (make-sim-object 1 0 1))))
 (define sim2x2_vel_3
-	(sim (make-sim-spawn (make-sim-object 1 3 -2) (make-sim-object 1 0 1)) 0))
+	(sim (make-sim-spawn (make-sim-object 1 3 -2) (make-sim-object 1 0 1))))
 (define sim2x2_vel_4
-	(sim (make-sim-spawn (make-sim-object 1 4 -2) (make-sim-object 1 0 1)) 0))
+	(sim (make-sim-spawn (make-sim-object 1 4 -2) (make-sim-object 1 0 1))))
 (display "Finished with 2x2 vel\n")
 
 (define sim2x2_mass_1
-	(sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 0))
+	(sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1))))
 (define sim2x2_mass_2
-	(sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1)) 0))
+	(sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1))))
 (define sim2x2_mass_3
-	(sim (make-sim-spawn (make-sim-object 3 1 -2) (make-sim-object 1 0 1)) 0))
+	(sim (make-sim-spawn (make-sim-object 3 1 -2) (make-sim-object 1 0 1))))
 (define sim2x2_mass_4
-	(sim (make-sim-spawn (make-sim-object 4 1 -2) (make-sim-object 1 0 1)) 0))
+	(sim (make-sim-spawn (make-sim-object 4 1 -2) (make-sim-object 1 0 1))))
 (display "Finished with 2x2 mass\n")
 
 (define sim2x2_mass_alt_1
-	(sim (make-sim-spawn (make-sim-object 1 1 -3) (make-sim-object 1 0 2)) 0))
+	(sim (make-sim-spawn (make-sim-object 1 1 -3) (make-sim-object 1 0 2))))
 (define sim2x2_mass_alt_2
-	(sim (make-sim-spawn (make-sim-object 2 1 -3) (make-sim-object 2 0 2)) 0))
+	(sim (make-sim-spawn (make-sim-object 2 1 -3) (make-sim-object 2 0 2))))
 (define sim2x2_mass_alt_3
-	(sim (make-sim-spawn (make-sim-object 3 1 -3) (make-sim-object 3 0 2)) 0))
+	(sim (make-sim-spawn (make-sim-object 3 1 -3) (make-sim-object 3 0 2))))
 (define sim2x2_mass_alt_4
-	(sim (make-sim-spawn (make-sim-object 4 1 -3) (make-sim-object 4 0 2)) 0))
+	(sim (make-sim-spawn (make-sim-object 4 1 -3) (make-sim-object 4 0 2))))
 (display "Finished with 2x2 mass\n")
 
 (define sim-multi
-	(sim (make-sim-spawn (make-sim-object 1 0.75 -3) (make-sim-object 2 0 0) (make-sim-object 2 -1 4)) 0))
+	(sim (make-sim-spawn (make-sim-object 1 0.75 -3) (make-sim-object 2 0 0) (make-sim-object 2 -1 4))))
+
+(define sim-dt-1
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) 1))
+(define sim-dt-4
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 4)))
+(define sim-dt-16
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 16)))
+(define sim-dt-32
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 32)))
+(define sim-dt-128
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 128)))
+(define sim-dt-512
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 512)))
+(define sim-dt-2048
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 2048)))
 
 (define ke-equation-inline (math '(* (/ 1 2) mass (mparen (- (^ final-velocity 2) (^ initial-velocity 2))))))
 
@@ -159,27 +174,27 @@
 
 		(para "I'm going to be showing you why why the area of one of these graphs is equal to " ke-equation-inline ". I'll be doing so in 2 two steps. First, I'm going to rewrite the sum in terms of velocities, and then I'm going to show how the sum works out.")
 
-		(para "To calculate the graph's area, we're going to be taking its integral. We're going to be using the right-point-integral formulation for this:")
+		(para "To calculate the graph's area, we're going to be taking its integral. We're going to be using the  double-right-point-integral formulation that I introduced in the calculus chapter for this:")
 
-		(bmath '(sum k T1 T2 (* (mt force (+ k 1)) (mt dpos k))))
+		(bmath '(sum k T1 T2 (* (mt force (+ k dt)) (mt dpos k))))
 
 		(para "So. First off, force and dpos are both closely related to velocity. So maybe by re-writing each item of the sum in terms of velocities, we can simplify a bit.")
 
 		(bmath-eqs
-			'(* (mt force 31) (mt dpos 30))
-			'(* (mparen (* (mt dvel 31) mass (/ 1 dt))) (mparen (* (mt velocity 30) dt)))
-			'(* mass (mt velocity 30) (mt dvel 31))
+			'(* (mt force (+ k dt)) (mt dpos k))
+			'(* (mparen (* (mt dvel (+ k dt)) mass (/ 1 dt))) (mparen (* (mt velocity k) dt)))
+			'(* mass (mt velocity k) (mt dvel (+ k dt)))
 			)
 
-		(para "Here I've pulled out, say, the 30'th item of the integral we're dealing with. First, we can replace the force with mass * dvel / dt. Then we can replace dpos with velocity * dt. So with those two replacements, we see the sum is equal to the sums of mass * velocity * dvel.")
+		(para "Here I've pulled out, say, the k'th item of the integral we're dealing with. First, we can replace the force with mass * dvel / dt. Then we can replace dpos with velocity * dt. So with those two replacements, we see the sum is equal to the sums of mass * velocity * dvel.")
 
 		(para "Now we're going to do a little funny business to take advantage of the relationship between velocity and dvel:")
 
 		(bmath
-			'(* mass (mt velocity 30) (mt dvel 31))
-			'(* (/ 1 2) 2 mass (mt velocity 30) (mt dvel 31))
-			'(* (/ 1 2) mass (mparen (- (^ (mparen (+ (mt velocity 30) (mt dvel 31))) 2) (^ (mt velocity 30) 2) (^ (mt dvel 31) 2))))
-			'(* (/ 1 2) mass (mparen (- (^ (mt velocity 31) 2) (^ (mt velocity 30) 2) (^ (mt dvel 31) 2))))
+			'(* mass (mt velocity k) (mt dvel (+ k dt)))
+			'(* (/ 1 2) 2 mass (mt velocity k) (mt dvel (+ k dt)))
+			'(* (/ 1 2) mass (mparen (- (^ (mparen (+ (mt velocity k) (mt dvel (+ k dt)))) 2) (^ (mt velocity k) 2) (^ (mt dvel (+ k dt)) 2))))
+			'(* (/ 1 2) mass (mparen (- (^ (mt velocity (+ k dt)) 2) (^ (mt velocity k) 2) (^ (mt dvel (+ k dt)) 2))))
 			)
 
 		(para "So we do a bit of algebraic manipulation here. First multiplying and dividing by 2, then completing the square. But then notice that each velocity@k + dvel@k+1 = v@k+1.")
@@ -187,11 +202,15 @@
 		(para "This is a good form to end on, because after replacement a bunch of terms cancel out:") 
 
 		(bmath-eqs
-			'(sum k T1 T2 (* (mt force (+ k 1)) (mt dpos k)))
-			'(sum k T1 T2 (* (/ 1 2) mass (mparen (- (^ (mt velocity (+ k 1)) 2) (^ (mt velocity k) 2) (^ (mt dvel (+ k 1)) 2)))))
-			'(* (/ 1 2) mass (mparen (- (^ velocity@101 2) (^ velocity@1 2) ...))) ; todo: the 100 terms of dvel
-			'(* (/ 1 2) mass (mparen (- (+ ... (^ velocity@30 2) (^ velocity@31 2) (^ velocity@32 2)) (+ ... (^ velocity@29 2) (^ velocity@30 2) (^ velocity@31 2) ...) (mparen dvel))))
-			'(* (/ 1 2) mass (mparen (- (^ (mt velocity (+ T2 1)) 2) (^ (mt velocity T1) 2) (mparen dvel))))
+			'(sum k T1 T2 (* (mt force (+ k dt)) (mt dpos k)))
+			'(sum k T1 T2 (* (/ 1 2) mass (mparen (- (^ (mt velocity (+ k dt)) 2) (^ (mt velocity k) 2) (^ (mt dvel (+ k dt)) 2)))))
+			
+			'(* (/ 1 2) mass (+ (- (mt velocity (+ T2 dt)) (mt velocity T1)) (sum k T1 T2 (^ (mt dvel (+ k dt)) 2))))
+
+
+			; '(* (/ 1 2) mass (mparen (- (^ velocity@101 2) (^ velocity@1 2) ...))) ; todo: the 100 terms of dvel
+			; '(* (/ 1 2) mass (mparen (- (+ ... (^ velocity@30 2) (^ velocity@31 2) (^ velocity@32 2)) (+ ... (^ velocity@29 2) (^ velocity@30 2) (^ velocity@31 2) ...) (mparen dvel))))
+			; '(* (/ 1 2) mass (mparen (- (^ (mt velocity (+ T2 1)) 2) (^ (mt velocity T1) 2) (mparen dvel))))
 			)
 
 		(para "This is *almost* the form we saw earlier. But it has all of these " (math '(^ (mt dvel k) 2)) " terms as well.")
@@ -203,6 +222,25 @@
 		(para "So for the sum of " (math '(+ (^ (mt dvel T1) 2) ... (^ (mt dvel T2) 2))) ", we have 10 times as many samples, but each sample is about 100 times smaller. So the sum of all of these " (math '(^ dvel 2)) " terms reduce by about a factor of 10.")
 
 		(para "The point here is that as you make dt smaller (to make the simulation more accurate), the sum of these " (math '(^ dvel 2)) " terms rapidly become so close to zero that they aren't worth thinking about.") 
+
+		(table
+            (table-row
+                "dt" "position of left ball at t=23.0")
+            (table-row
+                "dt = 1" (number->string (get-ke-at-time sim-dt-1 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+            (table-row
+                "dt = 1/4" (number->string (get-ke-at-time sim-dt-4 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+            (table-row
+                "dt = 1/16" (number->string (get-ke-at-time sim-dt-16 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+            (table-row
+                "dt = 1/32" (number->string (get-ke-at-time sim-dt-32 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+            (table-row
+                "dt = 1/128" (number->string (get-ke-at-time sim-dt-128 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+            (table-row
+                "dt = 1/512" (number->string (get-ke-at-time sim-dt-512 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+            (table-row
+                "dt = 1/2048" (number->string (get-ke-at-time sim-dt-2048 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+            )
 
 		; (para "[ This part is dogshit. Just say that velocities don't change that much with dt, but dvel does. ] So this is *almost* the form we saw earlier. But it also has all of these dvel(i)^2 terms as well. We're going to be using another classic calculus trick here: we're going to say that these dvel(i)^2 terms are \"negligible\", or that they \"go to zero\". Here's the intuition: Say I were to reduce the dt that our simulation used. Say we reduced it by a factor of 10. Well, in that case all of our numbers would be different. But assuming that the forces and velocities and positions won't change that much, our dvel's will get reduced by a factor of 10, because \"dvel = force / mass * dt\". But, reducing the dt would also mean that between any two points in time, there will be 10 times as many samples. So for a sum like this, [these] v(i) * dvel(i+1) terms will add up to about the same. The *10 and /10 will cancel each other out. Also, for [these] dvel(i)^2 terms, there will be 10 times more of them as well. BUT each one will be reduced by a factor of 100. So [these] numbers will get smaller, the smaller our dt gets. And so the argument goes, driving dt lower makes these terms stay about the same, but makes [these] terms closer to zero, without bound. But also, like we discussed in the first video, a smaller dt is \"more correct\". So the argument is that, for small enough dt, the sum of all of [these] terms should be 1/2 * mass * ((final velocity)^2 - (initial velocity)^2), without the dvel^2 terms.")
 

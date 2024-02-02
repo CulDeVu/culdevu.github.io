@@ -3,22 +3,22 @@
 (define lesson-number 3)
 
 (define sim01
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1))))
 
 (define sim-dt-1
-    (sim-with-dt (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0 1))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 1))
 (define sim-dt-4
-    (sim-with-dt (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0 (/ 1 4)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 4)))
 (define sim-dt-16
-    (sim-with-dt (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0 (/ 1 16)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 16)))
 (define sim-dt-32
-    (sim-with-dt (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0 (/ 1 32)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 32)))
 (define sim-dt-128
-    (sim-with-dt (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0 (/ 1 128)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 128)))
 (define sim-dt-512
-    (sim-with-dt (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0 (/ 1 512)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 512)))
 (define sim-dt-2048
-    (sim-with-dt (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0 (/ 1 2048)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 2048)))
 
 (define lesson1
     (lesson lesson-number
@@ -71,21 +71,28 @@
             (sim-vis sim01)
             (table
                 (table-row
-                    "dt" "position of left ball at t=2")
+                    "dt" "position of left ball at t=23.0")
                 (table-row
-                    "dt = 1" (number->string (get-sim-object-pos (car (index sim-dt-1 4)))))
+                    ; "dt = 1" (number->string (get-sim-object-pos (car (index sim-dt-1 4)))))
+                    "dt = 1" (number->string (get-pos-at-time sim-dt-1 0 3.0)))
                 (table-row
-                    "dt=1/4" (number->string (get-sim-object-pos (car (index sim-dt-4 16)))))
+                    ; "dt=1/4" (number->string (get-sim-object-pos (car (index sim-dt-4 16)))))
+                    "dt = 1/4" (number->string (get-pos-at-time sim-dt-4 0 3.0)))
                 (table-row
-                    "dt=1/16" (number->string (get-sim-object-pos (car (index sim-dt-16 32)))))
+                    ; "dt=1/16" (number->string (get-sim-object-pos (car (index sim-dt-16 32)))))
+                    "dt = 1/16" (number->string (get-pos-at-time sim-dt-16 0 3.0)))
                 (table-row
-                    "dt=1/32" (number->string (get-sim-object-pos (car (index sim-dt-32 128)))))
+                    ; "dt=1/32" (number->string (get-sim-object-pos (car (index sim-dt-32 128)))))
+                    "dt = 1/32" (number->string (get-pos-at-time sim-dt-32 0 3.0)))
                 (table-row
-                    "dt=1/128" (number->string (get-sim-object-pos (car (index sim-dt-128 512)))))
+                    ; "dt=1/128" (number->string (get-sim-object-pos (car (index sim-dt-128 512)))))
+                    "dt = 1/128" (number->string (get-pos-at-time sim-dt-128 0 3.0)))
                 (table-row
-                    "dt=1/512" (number->string (get-sim-object-pos (car (index sim-dt-512 2048)))))
+                    ; "dt=1/512" (number->string (get-sim-object-pos (car (index sim-dt-512 2048)))))
+                    "dt = 1/512" (number->string (get-pos-at-time sim-dt-512 0 3.0)))
                 (table-row
-                    "dt=1/2048" (number->string (get-sim-object-pos (car (index sim-dt-2048 8192)))))
+                    ; "dt=1/2048" (number->string (get-sim-object-pos (car (index sim-dt-2048 8192)))))
+                    "dt = 1/2048" (number->string (get-pos-at-time sim-dt-2048 0 3.0)))
                 ))
 
         (para "The other two integrals that I listed above as examples also converge. The conditions for convergence are a bit touchy, but here's the general idea:")
@@ -122,8 +129,8 @@
 
         (para "An important interpretation of integrals is as describing the area under a graph:")
 
-        (sim-graphs-integral-dt-right sim-dt-4 get-time-2-history-temp-4 get-force-history (/ 1 4))
-        (sim-graphs-integral-dt-right sim-dt-16 get-time-2-history-temp-16 get-force-history (/ 1 16))
+        (sim-graphs-integral-dt-right sim-dt-4 get-time-history get-force-history)
+        (sim-graphs-integral-dt-right sim-dt-16 get-time-history get-force-history)
 
         (para "The idea is that you can approximate the area under a graph with a bunch of thin rectangles and adding up their area, and it can be made more accurate by making the rectangles thinner. Again, if you don't get this, there are other places online that will teach you calculus.")
 
@@ -131,19 +138,19 @@
 
         (para "Another thing you learn in a calculus class is that other formulations, like the midpoint or trapezoidal formulations, will also converge to the same value. Here's the left-point formulation:")
         
-        (sim-graphs-integral-dt-left sim-dt-16 get-time-2-history-temp-16 get-force-history (/ 1 16))
+        (sim-graphs-integral-dt-left sim-dt-16 get-time-history get-force-history)
 
         (para "This corresponds to the integral:")
 
-        (bmath '(sum k T1 T2 (* (mt quantity k) (mt dother-quantity (+ k 1)))))
+        (bmath '(sum k T1 T2 (* (mt quantity k) (mt dother-quantity (+ k dt)))))
 
         (para "Something that's rarely taught in school is that it's perfectly fine to offset in the other direction:")
 
-        (sim-graphs-integral-dt-double-right sim-dt-16 get-time-2-history-temp-16 get-force-history (/ 1 16))
+        (sim-graphs-integral-dt-double-right sim-dt-16 get-time-history get-force-history)
 
         (para "Which corresponds to the integral:")
 
-        (bmath '(sum k T1 T2 (* (mt quantity (+ k 1)) (mt dother-quantity k))))
+        (bmath '(sum k T1 T2 (* (mt quantity (+ k dt)) (mt dother-quantity k))))
 
         (para "I'm not sure if this one has a name. But we'll be using it in a couple lessons, so I guess I'll call this one the double-right-point formulation. It's sort of offset from the actual graph by a little bit, but as dt get smaller the difference converges to 0.")
         ))
