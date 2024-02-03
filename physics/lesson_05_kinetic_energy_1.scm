@@ -43,19 +43,23 @@
 	(sim (make-sim-spawn (make-sim-object 1 0.75 -3) (make-sim-object 2 0 0) (make-sim-object 2 -1 4))))
 
 (define sim-dt-1
-    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) 1))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) 1))
 (define sim-dt-4
-    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 4)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 4)))
 (define sim-dt-16
-    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 16)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 16)))
 (define sim-dt-32
-    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 32)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 32)))
 (define sim-dt-128
-    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 128)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 128)))
 (define sim-dt-512
-    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 512)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 512)))
 (define sim-dt-2048
-    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1)) (/ 1 2048)))
+    (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 2048)))
+(display (get-vel-history sim-dt-4 0))
+(display "\n")
+(display (get-force-history sim-dt-4 0))
+(display "\n")
 
 (define ke-equation-inline (math '(* (/ 1 2) mass (mparen (- (^ final-velocity 2) (^ initial-velocity 2))))))
 
@@ -227,19 +231,19 @@
             (table-row
                 "dt" "position of left ball at t=23.0")
             (table-row
-                "dt = 1" (number->string (get-ke-at-time sim-dt-1 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+                "dt = 1" (number->string (- (get-ke-at-time sim-dt-1 0 8.0) (get-ke-at-time sim-dt-1 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
             (table-row
-                "dt = 1/4" (number->string (get-ke-at-time sim-dt-4 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+                "dt = 1/4" (number->string (- (get-ke-at-time sim-dt-4 0 8.0) (get-ke-at-time sim-dt-4 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
             (table-row
-                "dt = 1/16" (number->string (get-ke-at-time sim-dt-16 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+                "dt = 1/16" (number->string (- (get-ke-at-time sim-dt-16 0 8.0) (get-ke-at-time sim-dt-16 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
             (table-row
-                "dt = 1/32" (number->string (get-ke-at-time sim-dt-32 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+                "dt = 1/32" (number->string (- (get-ke-at-time sim-dt-32 0 8.0) (get-ke-at-time sim-dt-32 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
             (table-row
-                "dt = 1/128" (number->string (get-ke-at-time sim-dt-128 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+                "dt = 1/128" (number->string (- (get-ke-at-time sim-dt-128 0 8.0) (get-ke-at-time sim-dt-128 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
             (table-row
-                "dt = 1/512" (number->string (get-ke-at-time sim-dt-512 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+                "dt = 1/512" (number->string (- (get-ke-at-time sim-dt-512 0 8.0) (get-ke-at-time sim-dt-512 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
             (table-row
-                "dt = 1/2048" (number->string (get-ke-at-time sim-dt-2048 0 3.0)) (number->string (get-pos-at-time sim-dt-1 0 3.0)))
+                "dt = 1/2048" (number->string (- (get-ke-at-time sim-dt-2048 0 8.0) (get-ke-at-time sim-dt-2048 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
             )
 
 		; (para "[ This part is dogshit. Just say that velocities don't change that much with dt, but dvel does. ] So this is *almost* the form we saw earlier. But it also has all of these dvel(i)^2 terms as well. We're going to be using another classic calculus trick here: we're going to say that these dvel(i)^2 terms are \"negligible\", or that they \"go to zero\". Here's the intuition: Say I were to reduce the dt that our simulation used. Say we reduced it by a factor of 10. Well, in that case all of our numbers would be different. But assuming that the forces and velocities and positions won't change that much, our dvel's will get reduced by a factor of 10, because \"dvel = force / mass * dt\". But, reducing the dt would also mean that between any two points in time, there will be 10 times as many samples. So for a sum like this, [these] v(i) * dvel(i+1) terms will add up to about the same. The *10 and /10 will cancel each other out. Also, for [these] dvel(i)^2 terms, there will be 10 times more of them as well. BUT each one will be reduced by a factor of 100. So [these] numbers will get smaller, the smaller our dt gets. And so the argument goes, driving dt lower makes these terms stay about the same, but makes [these] terms closer to zero, without bound. But also, like we discussed in the first video, a smaller dt is \"more correct\". So the argument is that, for small enough dt, the sum of all of [these] terms should be 1/2 * mass * ((final velocity)^2 - (initial velocity)^2), without the dvel^2 terms.")

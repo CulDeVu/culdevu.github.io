@@ -301,14 +301,18 @@
         (if (nil? (sim-get-all-older-frames sim))
             (list 0)
             (cons
-                ; (get-sim-object-vel (index (car sim) obj-number))
                 (let* (
+                    (frame-curr (sim-get-newest-frame sim))
+                    (frame-old (sim-get-newest-frame (sim-get-all-older-frames sim)))
                     (state-curr (sim-get-all-newest-objects sim))
                     (state-old (sim-get-all-newest-objects (sim-get-all-older-frames sim)))
                     (vel-curr (get-sim-object-vel (index state-curr obj-number)))
                     (vel-old (get-sim-object-vel (index state-old obj-number)))
+                    (time-curr (sim-frame-time frame-curr))
+                    (time-old (sim-frame-time frame-old))
+                    (dt (- time-curr time-old))
                     (mass (get-sim-object-mass (index state-curr obj-number))))
-                    (* (/ (- vel-curr vel-old) DEFAULT-DT) mass))
+                    (* (/ (- vel-curr vel-old) dt) mass))
                 (get-force-history (sim-get-all-older-frames sim) obj-number)))))
 (define get-p-history
     (lambda (sim obj-number)
@@ -327,6 +331,25 @@
                     (get-ke-history (cdr sim-history) obj-number))))))
 
 
+(define get-sim-object-force
+    (lambda (frame-prv frame-next obj-number)
+        (let* (
+            (obj-prv (index (sim-frame-all-objs frame-prv) obj-number))
+            (obj-next (index (sim-frame-all-objs frame-next) obj-number))
+            (vel-prv (get-sim-object-vel obj-prv))
+            (vel-next (get-sim-object-vel obj-next))
+            (mass (get-sim-object-mass obj-prv))
+            (dt (- (sim-frame-time frame-next) (sim-frame-time frame-prv))))
+            (begin (display vel-prv) (display " ") (display vel-next) (display "\n") (* (/ (- vel-next vel-prv) dt) mass)))))
+(define get-sim-object-dpos
+    (lambda (frame-prv frame-next obj-number)
+        (let* (
+            (obj-prv (index (sim-frame-all-objs frame-prv) obj-number))
+            (obj-next (index (sim-frame-all-objs frame-next) obj-number))
+            (pos-prv (get-sim-object-pos obj-prv))
+            (pos-next (get-sim-object-pos obj-next)))
+            (- pos-next pos-prv))))
+
 (define get-pos-at-time
     (lambda (sim obj-number time)
         (if (nil? sim)
@@ -338,9 +361,36 @@
     (lambda (sim obj-number time)
         (if (nil? sim)
             (error "time out of bounds")
-            (if (< (abs (- time (sim-frame-time (sim-get-newest-frame sim)))) 0.00001)
-                (get-sim-object-pos (sim-object sim obj-number))
-                (get-ke-at-time (sim-get-all-older-frames sim) obj-number time)))))
+            (let* (
+                (frame (sim-get-newest-frame sim))
+                (obj (index (sim-frame-all-objs frame) obj-number))
+                (mass (get-sim-object-mass obj))
+                (vel (get-sim-object-vel obj)))
+                (if (< (abs (- time (sim-frame-time frame))) 0.00001)
+                    (* 0.5 mass vel vel)
+                    (get-ke-at-time (sim-get-all-older-frames sim) obj-number time))))))
+; (define get-integral-force-dpos-at-time
+;     (lambda (sim obj-number time)
+;         (if (nil? (cdr sim))
+;             0
+;             (let* (
+;                 (frame (sim-get-newest-frame sim))
+;                 (frame-prv (sim-get-newest-frame (sim-get-all-older-frames sim)))
+;                 (obj (index (sim-frame-all-objs frame) obj-number))
+;                 (force (get-sim-object-force frame-prv frame obj-number)))
+;                 (+ 
+;                     (* (get-sim-object-force frame-prv frame obj-number) (get-sim-object-dpos frame-prv frame obj-number))
+;                     (get-integral-force-dpos-at-time (sim-get-all-older-frames sim) obj-number time))))))
+(define get-integral-helper
+    (lambda (xs ys)
+        (if (nil? (cdr xs))
+            0
+            (+
+                (begin (display (car ys)) (display " ") (display (car xs)) (display " ") (display (cadr xs)) (display " ") (display "\n") (* (car ys) (- (cadr xs) (car xs))))
+                (get-integral-helper (cdr xs) (cdr ys))))))
+(define get-integral-force-dpos-at-time
+    (lambda (sim obj-number time)
+        (get-integral-helper (get-pos-history sim obj-number) (get-force-history sim obj-number))))
 
 
 
