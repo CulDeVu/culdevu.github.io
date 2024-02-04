@@ -12,6 +12,16 @@
             '()
             (cons a (repeat (- num 1) a)))))
 
+; Applies args to a list of funcs, one at a time
+; (mapall (func1 func2) a b) -> ((func1 a b) (func2 a b))
+(define mapall
+    (lambda (funcs . args)
+        (if (nil? funcs)
+            '()
+            (cons
+                (apply (car funcs) args)
+                (apply mapall (cons (cdr funcs) args))))))
+
 (define inexact
     (lambda (x) 
         (exact->inexact x)))
@@ -114,6 +124,9 @@
 (define pow
     (lambda (x n)
         (foldr * (repeat n x))))
+(define square
+    (lambda (x)
+        (pow x 2)))
 
 (define downsamp-sm
     (lambda (x)
@@ -340,7 +353,7 @@
             (vel-next (get-sim-object-vel obj-next))
             (mass (get-sim-object-mass obj-prv))
             (dt (- (sim-frame-time frame-next) (sim-frame-time frame-prv))))
-            (begin (display vel-prv) (display " ") (display vel-next) (display "\n") (* (/ (- vel-next vel-prv) dt) mass)))))
+            (* (/ (- vel-next vel-prv) dt) mass))))
 (define get-sim-object-dpos
     (lambda (frame-prv frame-next obj-number)
         (let* (
@@ -381,16 +394,33 @@
 ;                 (+ 
 ;                     (* (get-sim-object-force frame-prv frame obj-number) (get-sim-object-dpos frame-prv frame obj-number))
 ;                     (get-integral-force-dpos-at-time (sim-get-all-older-frames sim) obj-number time))))))
-(define get-integral-helper
-    (lambda (xs ys)
-        (if (nil? (cdr xs))
-            0
-            (+
-                (begin (display (car ys)) (display " ") (display (car xs)) (display " ") (display (cadr xs)) (display " ") (display "\n") (* (car ys) (- (cadr xs) (car xs))))
-                (get-integral-helper (cdr xs) (cdr ys))))))
-(define get-integral-force-dpos-at-time
-    (lambda (sim obj-number time)
-        (get-integral-helper (get-pos-history sim obj-number) (get-force-history sim obj-number))))
+
+; (define get-integral-helper
+;     (lambda (xs ys)
+;         (if (nil? (cdr xs))
+;             0
+;             (+
+;                 (begin (display (car ys)) (display " ") (display (car xs)) (display " ") (display (cadr xs)) (display " ") (display (length xs)) (display "\n") (* (car ys) (- (cadr xs) (car xs))))
+;                 (get-integral-helper (cdr xs) (cdr ys))))))
+
+; Will return a list that is one less than the source list
+(define history-to-dhistory
+    (lambda (l)
+        (if (nil? (cdr l))
+            '()
+            (cons
+                (- (cadr l) (car l))
+                (history-to-dhistory (cdr l))))))
+
+; NOTE: does not actually calculate force*dpos integral
+; TODO: really need to clean this shit up.
+(define get-integral-dvel-2
+    (lambda (sim obj-number)
+        (let* (
+            (vel-history (reverse (get-vel-history sim obj-number)))
+            (dvel (history-to-dhistory vel-history)))
+            (apply + (map square dvel)))))
+        ; (get-integral-helper (get-pos-history sim obj-number) (get-force-history sim obj-number))))
 
 
 
@@ -409,6 +439,7 @@
 
 
 (define svg-colors (list "red" "green" "blue"))
+(define svg-integral-colors (list "rgba(255,0,0,0.5)" "rgba(0,255,0,0.5)" "rgba(0,0,255,0.5)"))
 ; (define get-sim-history-colors
 ;     (lambda (sim-history)
 ;         (if (eq? (length (car sim-history)) 2)
@@ -559,12 +590,12 @@
 
                 (single-ball 0)
                 (single-ball 1)
-                (begin
-                    (display (sim-get-num-objects simulation)) (display "\n")
-                    (display (sim-get-newest-frame simulation)) (display "\n")
-                    (display (sim-frame-all-objs (sim-get-newest-frame simulation))) (display "\n")
-                    (display (length (sim-frame-all-objs (sim-get-newest-frame simulation)))) (display "\n")
-                    "")
+                ; (begin
+                ;     (display (sim-get-num-objects simulation)) (display "\n")
+                ;     (display (sim-get-newest-frame simulation)) (display "\n")
+                ;     (display (sim-frame-all-objs (sim-get-newest-frame simulation))) (display "\n")
+                ;     (display (length (sim-frame-all-objs (sim-get-newest-frame simulation)))) (display "\n")
+                ;     "")
                 (if (eq? (sim-get-num-objects simulation) 3)
                     (single-ball 2)
                     "")
@@ -618,6 +649,8 @@
                 (+ (rect-get-max-x rect) (* w 0.125))
                 (+ (rect-get-max-y rect) (* h 0.125))
                 ))))
+
+
 (define svg-path-linelist-formatted-list
     (lambda (xs ys)
         (if (nil? xs)
@@ -625,17 +658,17 @@
             (string-append
                 "L " (num3 (car xs)) " " (num3 (car ys)) " "
                 (svg-path-linelist-formatted-list (cdr xs) (cdr ys))))))
-(define sim-graph
-    (lambda (xs ys)
-        (string-append
-            "<svg viewBox=\"-4 -3 16 12\">"
-            "<path fill=\"none\" stroke=\"black\" stroke-width=\"0.1\" d=\""
-            "M " (number->string (car xs)) " " (number->string (car ys)) " "
-            (svg-path-linelist-formatted-list (cdr xs) (cdr ys))
-            "\" />"
-            "</svg>")))
+(define sim-graph-single-integral
+    (lambda (xys color fill-color)
+        (let ((xs (car xys)) (ys (cadr xys)))
+            (string-append
+                "<path fill=\"" fill-color "\" stroke=\"" color "\" vector-effect=\"non-scaling-stroke\" stroke-width=\"3\" d=\""
+                "M " (num3 (car xs)) " " (num3 (car ys)) " "
+                ; (begin (display ys) (display "\n") "")
+                (svg-path-linelist-formatted-list (cdr xs) (cdr ys))
+                "\" />"))))
 (define sim-graph-single
-    (lambda (xys color)
+    (lambda (xys color fill-color)
         (let ((xs (car xys)) (ys (cadr xys)))
             (string-append
                 "<path fill=\"none\" stroke=\"" color "\" vector-effect=\"non-scaling-stroke\" stroke-width=\"3\" d=\""
@@ -672,14 +705,16 @@
             " />"
             )))
 (define sim-graphs
-    (lambda (paths x-name y-name)
+    (lambda (paths x-name y-name graph-single-func)
         (let* (
             (bounding-rect (inflate-rect (foldr max-bounding-rect (map get-bounding-rect paths))))
             (width (rect-get-width bounding-rect))
             (height (rect-get-height bounding-rect))
             (num-objects (length paths))
-            (colors (list-truncate svg-colors num-objects)))
+            (colors (list-truncate svg-colors num-objects))
+            (fill-colors (list-truncate svg-integral-colors num-objects)))
             (string-append
+                ; TODO: why is the viewbox 4x2 ? Why not 2x1 ?
                 "<svg style=\"border: 1px solid black\" viewBox=\"0 0 4 2\">"
                 "<g transform=\"matrix("
                 (number->string (/ 4 width)) ","
@@ -689,7 +724,7 @@
                 (number->string (* 2 (/ (rect-get-max-y bounding-rect) height))) ")\">"
 
                 (render-axes bounding-rect)
-                (foldr string-append (map sim-graph-single paths colors))
+                (foldr string-append (map graph-single-func paths colors fill-colors))
                 ; (begin (display (length paths)) (display "\n") (display colors) (display "\n") (display paths) (display "\n") "")
                 (foldr string-append (map sim-graph-point paths colors (repeat num-objects (* 0.01 width)) (repeat num-objects (* 0.02 height))))
                 "</g>"
@@ -716,15 +751,47 @@
                 (list 
                     (downsamp-sm (x-fun sim n))
                     (downsamp-sm (y-fun sim n))))))
-            ; (sim-graphs
-            ;     (single-path 0)
-            ;     (single-path 1))
-            ; (begin (display num-objects) (display "\n") (display (length sim-history)) (display "\n") #|(display (car sim-history)) (display "\n")|# (display (count-reverse num-objects)) (display "\n") "")
-            (sim-graphs (map single-path (reverse (count-reverse num-objects))) (sim-graph-fun-select-name x-fun) (sim-graph-fun-select-name y-fun))
+            (sim-graphs (map single-path (reverse (count-reverse num-objects))) (sim-graph-fun-select-name x-fun) (sim-graph-fun-select-name y-fun) sim-graph-single)
             )))
+
+
 (define sim-graphs-2-integral
-    (lambda (sim-history x-fun y-fun)
-        (sim-graphs-2 sim-history x-fun y-fun)))
+    (lambda (sim x-fun y-fun)
+        (let (
+            (num-objects (sim-get-num-objects sim))
+            (single-path (lambda (n)
+                (list 
+                    (downsamp-sm (x-fun sim n))
+                    (downsamp-sm (y-fun sim n))))))
+            (sim-graphs (map single-path (reverse (count-reverse num-objects))) (sim-graph-fun-select-name x-fun) (sim-graph-fun-select-name y-fun) sim-graph-single-integral)
+            )))
+#|(define sim-graph-axes
+    (lambda (sim x-fun y-fun)
+        (let* (
+            (bounding-rect (inflate-rect (foldr max-bounding-rect (map get-bounding-rect paths)))))
+            (string-append
+                "<line stroke=\"black\" vector-effect=\"non-scaling-stroke\" "
+                "x1=\"" (number->string (rect-get-min-x bounding-rect)) "\" y1=\"0\" x2=\"" (number->string (rect-get-max-x bounding-rect)) "\" y2=\"0\""
+                " /><line stroke=\"black\" vector-effect=\"non-scaling-stroke\" "
+                "x1=\"0\" y1=\"" (number->string (rect-get-min-y bounding-rect)) "\" x2=\"0\" y2=\"" (number->string (rect-get-max-y bounding-rect)) "\""
+                " />"
+                )
+            )))
+(define sim-graph-proto
+    (lambda (sim x-fun y-fun . drawing-funcs)
+        (string-append
+            "<svg style=\"border: 1px solid black\" viewBox=\"0 0 2 1\">"
+            (foldr string-append (mapall drawing-funcs sim x-fun y-fun))
+            "</svg>")))
+(define sim-graphs-2-integral
+    (lambda (sim x-fun y-fun)
+        (sim-graph-proto
+            sim x-fun y-fun
+            sim-graph-axes
+            sim-graph-labels
+            sim-graph-area
+            sim-graph-path
+            sim-graph-integral-numbers)))|#
 
 
 (define pair-up
@@ -744,34 +811,34 @@
 ;             "<rect x=\"" (num3 (car x-pair)) "\" y=\"0\" width=\"" (num3 (- (cadr x-pair) (car x-pair))) "\" height=\"" (num3 (cadr y-pair)) "\" fill=\"none\" stroke=\"" color "\" vector-effect=\"non-scaling-stroke\" />")))
 
 (define sim-graph-integral-rectangles-left
-    (lambda (xs ys color)
+    (lambda (xs ys color fill-color)
         (if (nil? (cdr xs))
             ""
             (string-append
-                (string-append "<rect x=\"" (num3 (car xs)) "\" y=\"0\" width=\"" (num3 (- (cadr xs) (car xs))) "\" height=\"" (num3 (car ys)) "\" fill=\"none\" stroke=\"" color "\" vector-effect=\"non-scaling-stroke\" />")
-                (sim-graph-integral-rectangles-left (cdr xs) (cdr ys) color)))))
+                (string-append "<rect x=\"" (num3 (car xs)) "\" y=\"0\" width=\"" (num3 (- (cadr xs) (car xs))) "\" height=\"" (num3 (car ys)) "\" fill=\"" fill-color "\" stroke=\"" color "\" vector-effect=\"non-scaling-stroke\" />")
+                (sim-graph-integral-rectangles-left (cdr xs) (cdr ys) color fill-color)))))
 (define sim-graph-integral-rectangles-right
-    (lambda (xs ys color)
+    (lambda (xs ys color fill-color)
         (if (nil? (cdr xs))
             ""
             (string-append
-                (string-append "<rect x=\"" (num3 (car xs)) "\" y=\"0\" width=\"" (num3 (- (cadr xs) (car xs))) "\" height=\"" (num3 (cadr ys)) "\" fill=\"none\" stroke=\"" color "\" vector-effect=\"non-scaling-stroke\" />")
-                (sim-graph-integral-rectangles-right (cdr xs) (cdr ys) color)))))
+                (string-append "<rect x=\"" (num3 (car xs)) "\" y=\"0\" width=\"" (num3 (- (cadr xs) (car xs))) "\" height=\"" (num3 (cadr ys)) "\" fill=\"" fill-color "\" stroke=\"" color "\" vector-effect=\"non-scaling-stroke\" />")
+                (sim-graph-integral-rectangles-right (cdr xs) (cdr ys) color fill-color)))))
 (define sim-graph-integral-rectangles-double-right
-    (lambda (xs ys color)
+    (lambda (xs ys color fill-color)
         (if (nil? (cddr xs))
             ""
             (string-append
-                (string-append "<rect x=\"" (num3 (car xs)) "\" y=\"0\" width=\"" (num3 (- (cadr xs) (car xs))) "\" height=\"" (num3 (caddr ys)) "\" fill=\"none\" stroke=\"" color "\" vector-effect=\"non-scaling-stroke\" />")
-                (sim-graph-integral-rectangles-double-right (cdr xs) (cdr ys) color)))))
+                (string-append "<rect x=\"" (num3 (car xs)) "\" y=\"0\" width=\"" (num3 (- (cadr xs) (car xs))) "\" height=\"" (num3 (caddr ys)) "\" fill=\"" fill-color "\" stroke=\"" color "\" vector-effect=\"non-scaling-stroke\" />")
+                (sim-graph-integral-rectangles-double-right (cdr xs) (cdr ys) color fill-color)))))
 (define sim-graph-integral-rectangles
-    (lambda (xys color func)
+    (lambda (xys color fill-color func)
         (let ((xs (car xys)) (ys (cadr xys)))
             (string-append
                 ; "<rect x=\"\" y\"\" width=\"\" height\"\" />"
                 ; (begin (display (length (pair-up xs))) (display "\n") (display (pair-up (list 0 1 2 3 4))) (display "\n") (display (length xs)) (display "\n") (display (length ys)) (display "\n") "")
                 ; (foldr string-append (map func (pair-up xs) (pair-up ys) (repeat (length xs) color)))
-                (func xs ys color)
+                (func xs ys color fill-color)
                 ))))
 (define sim-graphs-leftright
     (lambda (paths func)
@@ -780,7 +847,8 @@
             (width (rect-get-width bounding-rect))
             (height (rect-get-height bounding-rect))
             (num-objects (length paths))
-            (colors (list-truncate svg-colors num-objects)))
+            (colors (list-truncate svg-colors num-objects))
+            (fill-colors (list-truncate svg-integral-colors num-objects)))
             (string-append
                 "<svg style=\"border: 1px solid black\" viewBox=\"0 0 4 2\">"
                 "<g transform=\"matrix("
@@ -791,8 +859,8 @@
                 (number->string (* 2 (/ (rect-get-max-y bounding-rect) height))) ")\">"
 
                 (render-axes bounding-rect)
-                (foldr string-append (map sim-graph-integral-rectangles paths colors (repeat (length colors) func)))
-                (foldr string-append (map sim-graph-single paths colors))
+                (foldr string-append (map sim-graph-integral-rectangles paths colors fill-colors (repeat (length colors) func)))
+                (foldr string-append (map sim-graph-single paths colors fill-colors))
                 ; (begin (display (length paths)) (display "\n") (display colors) (display "\n") (display paths) (display "\n") "")
                 "</g></svg>\n"))))
 (define get-time-2-history-temp-4 ; TODO: remove this
@@ -811,7 +879,7 @@
                 (list
                     (reverse (x-fun sim n))
                     (reverse (y-fun sim n))))))
-            (begin (display num-objects) (display "\n") (display (length sim)) (display "\n") #|(display (car sim)) (display "\n")|# (display (count-reverse num-objects)) (display "\n") "")
+            ; (begin (display num-objects) (display "\n") (display (length sim)) (display "\n") #|(display (car sim)) (display "\n")|# (display (count-reverse num-objects)) (display "\n") "")
             (sim-graphs-leftright (list (cadr (map single-path (reverse (count-reverse num-objects))))) func)
             )))
 (define sim-graphs-integral-dt-left

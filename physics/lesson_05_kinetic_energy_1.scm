@@ -58,10 +58,18 @@
     (sim-with-dt (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1)) (/ 1 2048)))
 (display (get-vel-history sim-dt-4 0))
 (display "\n")
-(display (get-force-history sim-dt-4 0))
+; (display (get-force-history sim-dt-4 0))
+(display (- (get-ke-at-time sim2x2_mass_alt_2 0 8.0) (get-ke-at-time sim2x2_mass_alt_2 0 0.0)))
 (display "\n")
 
 (define ke-equation-inline (math '(* (/ 1 2) mass (mparen (- (^ final-velocity 2) (^ initial-velocity 2))))))
+
+(define area-list-single
+	(lambda (x)
+		(string-append "(<span style=\"color:" (car svg-colors) "\">" (num3 x) "</span>,<span style=\"color:" (cadr svg-colors) "\">" (num3 x) "</span>)")))
+(define area-list
+	(lambda (. args)
+		(foldr string-append (interleave (map area-list-single args) ", "))))
 
 (define lesson3
 	(lesson lesson-number
@@ -77,9 +85,9 @@
 
 		; (para "[flip back for a second] Actually, it's interesting that basically all of the graphs we've seen so far of this simulation are symmetric, right? I mean the one we're currently looking at, the one where the two objects are of equal mass. If you think about it this particular simulation is *itself* symmetric. Right? We saw last time that the velocity graphs are perfectly symmetric. We never actually explained that, but what it means that whatever velocity the left object starts with, the right object will end with. So if you were to flip the whole simulation around horizontally, and replay it in reverse, it would be exactly the same. Which is pretty cool.")
 
-		(para "Okay, so It's symmetric, big deal. Most of the graphs we've looked at for this simulation are symmetric. Also, one is positive while the other is negative, of course. And they attain the same max force at the same time, just with opposite signs.")
+		(para "Okay, so It's symmetric, big deal. Most of the graphs we've looked at for this particular simulation are symmetric. Also, one is positive while the other is negative, of course. And they attain the same max force at the same time, just with opposite signs.")
 
-		(para "Additionally, both graphs have the same \"width\" and the same \"height.\" Well obviously they do, they're symmetric. But if you think about it, the \"width\" of the graph, the distance on the x-axis that isn't 0, is showing the distance each object travels during the collision. And both objects will travel the same distance during the collision. At the moment when their collision starts, they'll be barely touching, so their centers will be (left ball's radius) + (right ball's radius) away from each other. But at the moment when their collision ends, they'll be barely touching as well. So therefore, they'll both have traveled the same distance.")
+		(para "Additionally, both graphs have the same \"width\" and the same \"height.\" Well obviously they do, they're symmetric. But if you think about it, the \"width\" of the graph, the amount of the x-axis that isn't 0, is showing the distance each object travels during the collision. And both objects will travel the same distance during the collision. At the moment when their collision starts, they'll be barely touching, so their centers will be (left ball's radius) + (right ball's radius) away from each other. But at the moment when their collision ends, they'll be barely touching as well. So therefore, they'll both have traveled the same distance.")
 
 		(para "Let's make it more interesting. Here's another sim that we've seen before, the one where the left object has twice the mass.")
 
@@ -117,6 +125,8 @@
 			(sxs (sim-vis sim03) (sim-graphs-2-integral sim03 get-pos-history get-force-history))
 			)
 
+		(para "From top to bottom, the areas are " (area-list 0.5 1.0 0.5))
+
 		; (para "How would that work? Well, if you've taken a calculus course, you know all about this. The simulation only provides values at a number of discrete points on this graph, and nothing inbetween. So to take the approximate area of this graph I'll take each data point and associate with it a rectangle with its height as the y-value and its width as the distance between adjacent data points. And so the area of the graph is the sum of all of these rectangles.")
 
 		; (para "[calc refresher] If you need a refresher, there's like a hundred billion sites on the internet that will teach calculus, just go find one. But to cover the important point quickly,")
@@ -134,35 +144,43 @@
 		(para "Well, now that we have numbers that we can drive against, we can do some simulations. It might be tempting to look at the effects of mass first, but actually let's look at the effects of the initial velocity first.")
 
 		(option
-			(sxs (sim-vis sim2x2_vel_1) (sim-graphs-2 sim2x2_vel_1 get-pos-history get-force-history))
-			(sxs (sim-vis sim2x2_vel_2) (sim-graphs-2 sim2x2_vel_2 get-pos-history get-force-history))
-			(sxs (sim-vis sim2x2_vel_3) (sim-graphs-2 sim2x2_vel_3 get-pos-history get-force-history))
-			(sxs (sim-vis sim2x2_vel_4) (sim-graphs-2 sim2x2_vel_4 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_vel_1) (sim-graphs-2-integral sim2x2_vel_1 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_vel_2) (sim-graphs-2-integral sim2x2_vel_2 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_vel_3) (sim-graphs-2-integral sim2x2_vel_3 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_vel_4) (sim-graphs-2-integral sim2x2_vel_4 get-pos-history get-force-history))
 			)
+
+		(para "From top to bottom, the areas are " (area-list 0.5 2 4.5 8))
 
 		(para "Here, we have 4 simulations. In each, the left and right objects have the same mass, and the right object starts with 0 velocity, but the left object starts with different velocity in each.")
 
 		(para "And on the right are the graphs of their areas. Maybe it's hard to tell, but these numbers are scaling *quadratically*. 0.5 is half of 1^2, 2 is half of 2^2, 4.5 is half of 3^2, 8 is half of 4^2. So it looks like the graph areas scale quadratically with the initial velocity of the left ball. That's interesting.")
 
+		(para "Okay now let's try varying the masses. The right object has a velocity of 0 and a mass of 1. The left object has a velocity of +1, but different masses.")
+
 		(option
-			(sxs (sim-vis sim2x2_mass_1) (sim-graphs-2 sim2x2_mass_1 get-pos-history get-force-history))
-			(sxs (sim-vis sim2x2_mass_2) (sim-graphs-2 sim2x2_mass_2 get-pos-history get-force-history))
-			(sxs (sim-vis sim2x2_mass_3) (sim-graphs-2 sim2x2_mass_3 get-pos-history get-force-history))
-			(sxs (sim-vis sim2x2_mass_4) (sim-graphs-2 sim2x2_mass_4 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_mass_1) (sim-graphs-2-integral sim2x2_mass_1 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_mass_2) (sim-graphs-2-integral sim2x2_mass_2 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_mass_3) (sim-graphs-2-integral sim2x2_mass_3 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_mass_4) (sim-graphs-2-integral sim2x2_mass_4 get-pos-history get-force-history))
 			)
 
-		(para "Okay now let's try varying the masses. The right object has a velocity of 0 and a mass of 1. The left object has a velocity of +1, but different masses.")
+		(para "From top to bottom, the areas are " (area-list 0.5 0.889 1.125 1.280))
 
 		(para "And when we look at the areas... huh. Okay that one's maybe not as obvious. Now we could run a bunch more simulations and graph the relationship, but I want to try something else first real quick.")
 
-		(option
-			(sxs (sim-vis sim2x2_mass_alt_1) (sim-graphs-2 sim2x2_mass_alt_1 get-pos-history get-force-history))
-			(sxs (sim-vis sim2x2_mass_alt_2) (sim-graphs-2 sim2x2_mass_alt_2 get-pos-history get-force-history))
-			(sxs (sim-vis sim2x2_mass_alt_3) (sim-graphs-2 sim2x2_mass_alt_3 get-pos-history get-force-history))
-			(sxs (sim-vis sim2x2_mass_alt_4) (sim-graphs-2 sim2x2_mass_alt_4 get-pos-history get-force-history))
-			) 
+		(para "In this one, the masses are matched for both objects:")
 
-		(para "In this one, the masses are matched for both objects. Aaaaand... Okay, there we go, that's something. So it looks like the force/position graph areas scale linearly with mass, when both objects have the same mass.")
+		(option
+			(sxs (sim-vis sim2x2_mass_alt_1) (sim-graphs-2-integral sim2x2_mass_alt_1 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_mass_alt_2) (sim-graphs-2-integral sim2x2_mass_alt_2 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_mass_alt_3) (sim-graphs-2-integral sim2x2_mass_alt_3 get-pos-history get-force-history))
+			(sxs (sim-vis sim2x2_mass_alt_4) (sim-graphs-2-integral sim2x2_mass_alt_4 get-pos-history get-force-history))
+			)
+
+		(para "From top to bottom, the areas are " (area-list 0.5 1 1.5 2))
+
+		(para "Aaaaand... Okay, there we go, that's something. So it looks like the force/position graph areas scale linearly with mass, when both objects have the same mass.")
 
 		(para "Okay, I won't lead you on anymore. The issue with the middle set of graphs, the reason that it didn't scale linearly, is because when varying the left masses, another important quantity ended up inadvertently changing as well: the end velocities!")
 
@@ -201,7 +219,7 @@
 			'(* (/ 1 2) mass (mparen (- (^ (mt velocity (+ k dt)) 2) (^ (mt velocity k) 2) (^ (mt dvel (+ k dt)) 2))))
 			)
 
-		(para "So we do a bit of algebraic manipulation here. First multiplying and dividing by 2, then completing the square. But then notice that each velocity@k + dvel@k+1 = v@k+1.")
+		(para "So we do a bit of algebraic manipulation here. First multiplying and dividing by 2, then completing the square. But then notice that each " (math '(= (+ (mt velocity k) (mt dvel (+ k dt))) (mt velocity (+ k dt)))) ".")
 
 		(para "This is a good form to end on, because after replacement a bunch of terms cancel out:") 
 
@@ -209,7 +227,7 @@
 			'(sum k T1 T2 (* (mt force (+ k dt)) (mt dpos k)))
 			'(sum k T1 T2 (* (/ 1 2) mass (mparen (- (^ (mt velocity (+ k dt)) 2) (^ (mt velocity k) 2) (^ (mt dvel (+ k dt)) 2)))))
 			
-			'(* (/ 1 2) mass (+ (- (mt velocity (+ T2 dt)) (mt velocity T1)) (sum k T1 T2 (^ (mt dvel (+ k dt)) 2))))
+			'(* (/ 1 2) mass (- (- (mt velocity (+ T2 dt)) (mt velocity T1)) (sum k T1 T2 (^ (mt dvel (+ k dt)) 2))))
 
 
 			; '(* (/ 1 2) mass (mparen (- (^ velocity@101 2) (^ velocity@1 2) ...))) ; todo: the 100 terms of dvel
@@ -225,32 +243,34 @@
 
 		(para "So for the sum of " (math '(+ (^ (mt dvel T1) 2) ... (^ (mt dvel T2) 2))) ", we have 10 times as many samples, but each sample is about 100 times smaller. So the sum of all of these " (math '(^ dvel 2)) " terms reduce by about a factor of 10.")
 
-		(para "The point here is that as you make dt smaller (to make the simulation more accurate), the sum of these " (math '(^ dvel 2)) " terms rapidly become so close to zero that they aren't worth thinking about.") 
+		(para "The point here is that as you make dt smaller (to make the simulation more accurate), the sum of these " (math '(^ dvel 2)) " terms rapidly become so close to zero that they aren't worth thinking about.")
 
 		(table
             (table-row
-                "dt" "position of left ball at t=23.0")
+                "dt" (math '(* (/ 1 2) mass (mparen (- (^ (mt velocity 8.0) 2) (^ (mt velocity 0.0) 2))))) (math '(sum k 0.0 (- 8.0 dt) (^ (mt dvel (+ k dt)) 2))))
             (table-row
-                "dt = 1" (number->string (- (get-ke-at-time sim-dt-1 0 8.0) (get-ke-at-time sim-dt-1 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
+                "dt = 1" (number->string (- (get-ke-at-time sim-dt-1 0 8.0) (get-ke-at-time sim-dt-1 0 0.0))) (number->string (get-integral-dvel-2 sim-dt-1 0)))
             (table-row
-                "dt = 1/4" (number->string (- (get-ke-at-time sim-dt-4 0 8.0) (get-ke-at-time sim-dt-4 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
+                "dt = 1/4" (number->string (- (get-ke-at-time sim-dt-4 0 8.0) (get-ke-at-time sim-dt-4 0 0.0))) (number->string (get-integral-dvel-2 sim-dt-4 0)))
             (table-row
-                "dt = 1/16" (number->string (- (get-ke-at-time sim-dt-16 0 8.0) (get-ke-at-time sim-dt-16 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
+                "dt = 1/16" (number->string (- (get-ke-at-time sim-dt-16 0 8.0) (get-ke-at-time sim-dt-16 0 0.0))) (number->string (get-integral-dvel-2 sim-dt-16 0)))
             (table-row
-                "dt = 1/32" (number->string (- (get-ke-at-time sim-dt-32 0 8.0) (get-ke-at-time sim-dt-32 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
+                "dt = 1/32" (number->string (- (get-ke-at-time sim-dt-32 0 8.0) (get-ke-at-time sim-dt-32 0 0.0))) (number->string (get-integral-dvel-2 sim-dt-32 0)))
             (table-row
-                "dt = 1/128" (number->string (- (get-ke-at-time sim-dt-128 0 8.0) (get-ke-at-time sim-dt-128 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
+                "dt = 1/128" (number->string (- (get-ke-at-time sim-dt-128 0 8.0) (get-ke-at-time sim-dt-128 0 0.0))) (number->string (get-integral-dvel-2 sim-dt-128 0)))
             (table-row
-                "dt = 1/512" (number->string (- (get-ke-at-time sim-dt-512 0 8.0) (get-ke-at-time sim-dt-512 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
+                "dt = 1/512" (number->string (- (get-ke-at-time sim-dt-512 0 8.0) (get-ke-at-time sim-dt-512 0 0.0))) (number->string (get-integral-dvel-2 sim-dt-512 0)))
             (table-row
-                "dt = 1/2048" (number->string (- (get-ke-at-time sim-dt-2048 0 8.0) (get-ke-at-time sim-dt-2048 0 0.0))) (number->string (get-integral-force-dpos-at-time sim-dt-1 0 8.0)))
+                "dt = 1/2048" (number->string (- (get-ke-at-time sim-dt-2048 0 8.0) (get-ke-at-time sim-dt-2048 0 0.0))) (number->string (get-integral-dvel-2 sim-dt-2048 0)))
             )
+
+		(para "This table is based on the equal mass simulation that we've seen so many times already, but ran with different dt's.")
 
 		; (para "[ This part is dogshit. Just say that velocities don't change that much with dt, but dvel does. ] So this is *almost* the form we saw earlier. But it also has all of these dvel(i)^2 terms as well. We're going to be using another classic calculus trick here: we're going to say that these dvel(i)^2 terms are \"negligible\", or that they \"go to zero\". Here's the intuition: Say I were to reduce the dt that our simulation used. Say we reduced it by a factor of 10. Well, in that case all of our numbers would be different. But assuming that the forces and velocities and positions won't change that much, our dvel's will get reduced by a factor of 10, because \"dvel = force / mass * dt\". But, reducing the dt would also mean that between any two points in time, there will be 10 times as many samples. So for a sum like this, [these] v(i) * dvel(i+1) terms will add up to about the same. The *10 and /10 will cancel each other out. Also, for [these] dvel(i)^2 terms, there will be 10 times more of them as well. BUT each one will be reduced by a factor of 100. So [these] numbers will get smaller, the smaller our dt gets. And so the argument goes, driving dt lower makes these terms stay about the same, but makes [these] terms closer to zero, without bound. But also, like we discussed in the first video, a smaller dt is \"more correct\". So the argument is that, for small enough dt, the sum of all of [these] terms should be 1/2 * mass * ((final velocity)^2 - (initial velocity)^2), without the dvel^2 terms.")
 
 		; (para "Okay. So that was a bit complicated, but it wasn't *that* much. That was the entire derivation.")
 
-		(para "The last thing to mention is the \"T2+1\" bit. It's true that " (math '(* (/ 1 2) mass (mparen (- (^ (mt velocity (+ T2 1)) 2) (^ (mt velocity T1) 2))))) " doesn't quite match the expression " ke-equation-inline " that we had before. Here we're going to make one more little approximation: if you reduce dt by a factor of 10, dvel will also shrink by about a factor of 10, and so velocity@k is about equal to velocity@k+1. This is an approximation that should be handled with care, but in this case it should be fine.")
+		(para "The last thing to mention is the \"T2+1\" bit. It's true that " (math '(* (/ 1 2) mass (mparen (- (^ (mt velocity (+ T2 1)) 2) (^ (mt velocity T1) 2))))) " doesn't quite match the expression " ke-equation-inline " that we had before. Here we're going to make one more little approximation: if you reduce dt by a factor of 10, dvel will also shrink by about a factor of 10, and so " (math '(mt velocity k)) " is about equal to " (math '(mt velocity (+ k dt))) ". This is an approximation that should be handled with care, but in this case it should be fine.")
 
 		(para "So to conclude, the sum of " (math '(* force dx)) " over every timestamp between times T1 and T2 converges to " (math '(* (/ 1 2) mass (mparen (- (^ (mt velocity T2) 2) (^ (mt velocity T1) 2))))) " as we make our dt smaller.")
 
@@ -286,7 +306,7 @@
 			'(* (ball1 force) (fun d (- (ball1 pos) (ball2 pos))))
 			)
 
-		(para "This is interesting. d(quantity)@k is the difference between quantity@k+1 and quantity@k. And due to commutitivity, the sum of differences is the difference of sums: ")
+		(para "This is interesting. " (math '(mt (fun d quantity) k)) " is the difference between " (math '(mt quantity (+ k dt))) " and " (math '(mt quantity k)) ". And due to commutitivity, the sum of differences is the difference of sums: ")
 
 		(bmath '(= (- da db) (- (mparen (- a2 a1)) (mparen (- b2 b1))) (- (mparen (- a2 b2)) (mparen (- a1 b1))) (fun d (- a b))))
 
@@ -359,7 +379,7 @@
 
 		(sim-vis sim-multi)
 
-		(sim-graphs-2 sim-multi get-pos-history get-force-history) 
+		(sim-graphs-2-integral sim-multi get-pos-history get-force-history) 
 
 		(bmath
 			'(+ (* (ball1 force) (ball1 dpos)) (* (ball2 force) (ball2 dpos)) (* (ball3 force) (ball3 dpos)))

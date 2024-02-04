@@ -12,6 +12,11 @@
 
 		(apply string-append (map single-chapter-html (list 0 1 2 3)))
 
+		(para "Changelog:")
+
+		(ulist
+			"")
+
 		physics-with-danno-html-footer))
 
 (use-modules (ice-9 textual-ports))
