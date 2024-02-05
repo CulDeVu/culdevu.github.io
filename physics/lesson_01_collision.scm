@@ -4,7 +4,7 @@
 (define lesson-number 1)
 
 (define sim01
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1))))
 
 (define lesson1
     (lesson lesson-number
@@ -42,6 +42,10 @@
         ; (para "I admit, this is a little odd. Some of you may even see this as \"clever\", because it takes two different cases (the left and right case) and handles them both with the same expression. Some may see this as \"beutiful\" or \"elegant\", because this way of writing down the force doesn't have to differentiate the two different cases (left and right). It treats both exactly the same, which lines up with people's intuition that physics should act the same for both you and me. But some other people will probably see this as \"unclear\" and \"confusing\". For those last people, well I'm sorry. These lectures are just going to be like this. But also, \"confusing\" is often a function of familiarity. The more you see tricks like this, the more comfortable you may become.")
 
         ; (para "So! That's the collision force. And here it is in action. Ahh.")
+
+        (para "Changelog:")
+        (ulist
+            "2024 Jan 30: Initial publish")
 
         ))
 ; (display lesson1)

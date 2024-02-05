@@ -57,7 +57,7 @@
 
         (para "We've seen this last integral already, actually. This is just lines 4 and 5 of the simulation loop above! An object's position is just the sum of the velocity at each timestamp, times dt:")
 
-        (bmath '(= (mt position T2) (+ (mt position (- T1 1)) (sum k T1 T2 (* (mt velocity k) dt)))))
+        (bmath '(= (mt position T2) (+ (mt position (- T1 dt)) (sum k T1 T2 (* (mt velocity k) dt)))))
 
         (para "There are a few things to know about integrals.")
 
@@ -153,6 +153,11 @@
         (bmath '(sum k T1 T2 (* (mt quantity (+ k dt)) (mt dother-quantity k))))
 
         (para "I'm not sure if this one has a name. But we'll be using it in a couple lessons, so I guess I'll call this one the double-right-point formulation. It's sort of offset from the actual graph by a little bit, but as dt get smaller the difference converges to 0.")
+
+        (para "Changelog:")
+        (ulist
+            "2024 Jan 30: Initial publish"
+            "2024 Feb 4: Fixed some subscripts, added a table illustrating convergence")
         ))
 
 (use-modules (ice-9 textual-ports))

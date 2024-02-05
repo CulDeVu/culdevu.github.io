@@ -1099,9 +1099,17 @@
 (define bmath
     (lambda (. exprs)
         (string-append "<math display=\"block\"><mtable>" (apply string-append (map bmath2 exprs)) "</mtable></math>")))
+
+(define bmath-eqs2
+    (lambda (expr)
+        (string-append "<mtr><mtd><mo>=</mo></mtd><mtd>" (math2 expr) "</mtd></mtr>")))
 (define bmath-eqs
     (lambda (. exprs)
-        (apply bmath exprs)))
+        (string-append "<math display=\"block\"><mtable columnalign=\"right left\">"
+            "<mtr><mtd></mtd><mtd>" (math2 (car exprs)) "</mtd></mtr>"
+            (apply string-append (map bmath-eqs2 (cdr exprs)))
+            "</mtable></math>")))
+        ; (apply bmath exprs)))
 
 (define sim-loop-code-sm
     (code

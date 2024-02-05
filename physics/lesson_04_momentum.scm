@@ -76,7 +76,11 @@
         ;     0
         ;     )
 
-        (para "The labels on these graphs probably gave it away, but this quantity, mass * velocity, is important enough to have a name: momentum. And this symmetry that you're seeing here also has a name: conservation of momentum.")
+        (para "The labels on these graphs probably gave it away, but this quantity, mass * velocity, is important enough to have a name: momentum.")
+
+        (bmath '(= momentum (* mass velocity)))
+
+        (para "And this symmetry that you're seeing here also has a name: conservation of momentum.")
 
         (bmath
             '(= (- (mt (ball1 momentum) T2) (mt (ball1 momentum) T1)) (- (mt (ball2 momentum) T2) (mt (ball2 momentum) T1)))
@@ -130,7 +134,7 @@
 
         (para "Well, it all comes down to our simulation rules. It's still (and always) the case that \"dvel * mass = force * dt\". And forces are still (and always) equal and opposite. But now that we have more than 2 objects, we get to see forces adding. The force that the middle ball experiences is a positive force from its interaction with the left object, and a negative one from its interaction with right.")
 
-        (bmath 
+        (bmath-eqs
             '(sum k T1 T2 (+ (* (ball1 mass) (mt (ball1 dvel) k)) (* (ball2 mass) (mt (ball2 dvel) k)) (* (ball3 mass) (mt (ball3 dvel) k))))
             '(sum k T1 T2 (+ (* (mt (ball1 force) k) dt) (* (mt (ball2 force) k) dt) (* (mt (ball3 force) k) dt)))
             '(sum k T1 T2 (+ (* (mt (ball1 force) k) dt) (* (+ (- (mt (ball1 force) k)) (- (mt (ball3 force) k))) dt) (* (mt (ball3 force) k) dt)))
@@ -150,6 +154,11 @@
         ; (para "Before we end I want to mention one last thing. I don't what you to get the impression that the stuff we talked about just applies to our collision force. After introducing it, I never really brought it up again, and the derivation of conservation of momentum doesn't rely on any of its properties. As long as your forces are always equal and opposite, which they should be, conservation of momentum always works. So to demonstrate, I cooked up a very strange looking collision force, something really wacky that has no basis in reality. And you can see how the velocity graph has a strange shape. But still, the momentum symmetry is still there. If you were to scale the [color] graph by 2, cooresponding to the ratio of their masses, they'd be symmetric. So conservation of momentum is working here, too.")
 
         (para "So yeah. That's momentum. We'll come back to this eventually, a couple times. Momentum is a really important concept, one of those things that, throughout physics you never really get away from.")
+
+        (para "Changelog:")
+        (ulist
+            "2024 Feb 4: Initial publish")
+
         ))
 
 (use-modules (ice-9 textual-ports))

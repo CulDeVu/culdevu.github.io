@@ -3,11 +3,11 @@
 (define lesson-number 2)
 
 (define sim01
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1))))
 (define sim02
-    (sim (list (list (make-sim-object 2 1 -2) (make-sim-object 1 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1))))
 (define sim03
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 2 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1))))
 
 (define page
     (lesson lesson-number 
@@ -40,9 +40,9 @@
         (heading "force / time")
 
         (option
-            (sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-2-history get-force-history))
-            (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-2-history get-force-history))
-            (sxs (sim-vis sim03) (sim-graphs-2 sim03 get-time-2-history get-force-history))
+            (sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-history get-force-history))
+            (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-history get-force-history))
+            (sxs (sim-vis sim03) (sim-graphs-2 sim03 get-time-history get-force-history))
             )
 
         (para "First up is force/time. Notice how, in all 3, the graphs for the left and right ball have perfect vertical symmetry. Hopefully that should make sense: at every timestep forces are always equal and opposite. At any given timestamp, whatever force the right object feels, the left feels but negative.")
@@ -54,9 +54,9 @@
         (heading "position / time")
 
         (option
-            (sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-2-history get-pos-history))
-            (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-2-history get-pos-history))
-            (sxs (sim-vis sim03) (sim-graphs-2 sim03 get-time-2-history get-pos-history))
+            (sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-history get-pos-history))
+            (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-history get-pos-history))
+            (sxs (sim-vis sim03) (sim-graphs-2 sim03 get-time-history get-pos-history))
             )
 
         (para "Not much to say here, except notice the weird kind of diagonal almost-symmetry these graphs have.")
@@ -67,9 +67,9 @@
         (heading "velocity / time")
 
         (option
-            (sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-2-history get-vel-history))
-            (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-2-history get-vel-history))
-            (sxs (sim-vis sim03) (sim-graphs-2 sim03 get-time-2-history get-vel-history))
+            (sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-history get-vel-history))
+            (sxs (sim-vis sim02) (sim-graphs-2 sim02 get-time-history get-vel-history))
+            (sxs (sim-vis sim03) (sim-graphs-2 sim03 get-time-history get-vel-history))
             )
 
         (para "We're going to be talking about this one extensively very soon, so I'll hold off on this one.")
@@ -105,6 +105,10 @@
             )
 
         (para "Not much to say, except cool almost-symmetry.")
+
+        (para "Changelog:")
+        (ulist
+            "2024 Jan 30: Initial publish")
         
         ))
 

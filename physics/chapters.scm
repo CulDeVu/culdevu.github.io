@@ -10,12 +10,12 @@
 
 		"<h2>Chapters:</h2>"
 
-		(apply string-append (map single-chapter-html (list 0 1 2 3)))
+		(apply string-append (map single-chapter-html (list 0 1 2 3 4 5)))
 
-		(para "Changelog:")
-
+		(para "General changelog:")
 		(ulist
-			"")
+			"2024 Jan 30: Add chapters 0 through 3"
+			"2024 Feb 4: Add chapters 4 and 5, add labels to all of the graph axes, changed subscript times to be more consistent")
 
 		physics-with-danno-html-footer))
 

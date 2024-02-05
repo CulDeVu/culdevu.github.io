@@ -212,7 +212,7 @@
 
 		(para "Now we're going to do a little funny business to take advantage of the relationship between velocity and dvel:")
 
-		(bmath
+		(bmath-eqs
 			'(* mass (mt velocity k) (mt dvel (+ k dt)))
 			'(* (/ 1 2) 2 mass (mt velocity k) (mt dvel (+ k dt)))
 			'(* (/ 1 2) mass (mparen (- (^ (mparen (+ (mt velocity k) (mt dvel (+ k dt)))) 2) (^ (mt velocity k) 2) (^ (mt dvel (+ k dt)) 2))))
@@ -270,11 +270,15 @@
 
 		; (para "Okay. So that was a bit complicated, but it wasn't *that* much. That was the entire derivation.")
 
-		(para "The last thing to mention is the \"T2+1\" bit. It's true that " (math '(* (/ 1 2) mass (mparen (- (^ (mt velocity (+ T2 1)) 2) (^ (mt velocity T1) 2))))) " doesn't quite match the expression " ke-equation-inline " that we had before. Here we're going to make one more little approximation: if you reduce dt by a factor of 10, dvel will also shrink by about a factor of 10, and so " (math '(mt velocity k)) " is about equal to " (math '(mt velocity (+ k dt))) ". This is an approximation that should be handled with care, but in this case it should be fine.")
+		(para "The last thing to mention is the \"T2+dt\" bit. It's true that " (math '(* (/ 1 2) mass (mparen (- (^ (mt velocity (+ T2 dt)) 2) (^ (mt velocity T1) 2))))) " doesn't quite match the expression " ke-equation-inline " that we had before. Here we're going to make one more little approximation: if you reduce dt by a factor of 10, dvel will also shrink by about a factor of 10, and so " (math '(mt velocity k)) " is about equal to " (math '(mt velocity (+ k dt))) ". This is an approximation that should be handled with care, but in this case it should be fine.")
 
-		(para "So to conclude, the sum of " (math '(* force dx)) " over every timestamp between times T1 and T2 converges to " (math '(* (/ 1 2) mass (mparen (- (^ (mt velocity T2) 2) (^ (mt velocity T1) 2))))) " as we make our dt smaller.")
+		(para "So to conclude, the sum of " (math '(* force dpos)) " over every timestamp between times T1 and T2 converges to " (math '(* (/ 1 2) mass (mparen (- (^ (mt velocity T2) 2) (^ (mt velocity T1) 2))))) " as we make our dt smaller.")
 
 		; TODO: give it a name
+
+		(para "This situation is starting to mirror the situation from last chapter. In the last chapter, we found out that mass * (final-velocity - initial-velocity) has an important symmetry property, and we used that to come up with mass * velocity as a quantity of interest. And now we have " ke-equation-inline ". So now we're going to name:")
+
+		(bmath '(= kinetic_energy (* (/ 1 2) mass (^ velocity 2))))
 
 		(option
 			(sxs (sim-vis sim01) (sim-graphs-2 sim01 get-time-history get-ke-history))
@@ -288,9 +292,9 @@
 
 		(heading "Conservation of kinetic energy")
 
-		(para "We can see from the graph here that this quantity is *not* symmetric, but by the end of the collision they do seem to end up balancing out.")
+		(para "We can see above that the kinetic energy graphs are *not* symmetric, but by the end of the collision they do seem to end up balancing out.")
 
-		(para "But I still have to explain why that would be true. Why the force/position graphs would have equal and opposite area. It's certainly not obvious, at least not obvious to me, why these two expressions *should* be equal.")
+		(para "But I still have to explain why that would be true. Because the difference of kinetic energies is the same as the integral of force/position, this is equivalent to asking why the force/position graphs would have equal and opposite area. It's certainly not obvious, at least not obvious to me, why these two graphs *should* be equal.")
 
 		(para "So we're going to try to show that the two force/position have equal and opposite areas. Last time, we saw that the sum of momentums are equal to 0 at every timestamp. But that won't work here.  The areas are only equal when taken over the *entire* collision.")
 
@@ -300,13 +304,13 @@
 
 		(para "So we have here our two force * dpos. The forces are equal and opposite.")
 
-		(bmath 
+		(bmath-eqs
 			'(+ (* (ball1 force) (ball1 dpos)) (* (ball2 force) (ball2 dpos)))
 			'(* (ball1 force) (mparen (- (ball1 dpos) (ball2 dpos))))
 			'(* (ball1 force) (fun d (- (ball1 pos) (ball2 pos))))
 			)
 
-		(para "This is interesting. " (math '(mt (fun d quantity) k)) " is the difference between " (math '(mt quantity (+ k dt))) " and " (math '(mt quantity k)) ". And due to commutitivity, the sum of differences is the difference of sums: ")
+		(para "This is interesting. " (math '(mt (fun d quantity) k)) " is the difference between " (math '(mt quantity (+ k dt))) " and " (math '(mt quantity k)) ". And due to commutativity, the sum of differences is the difference of sums: ")
 
 		(bmath '(= (- da db) (- (mparen (- a2 a1)) (mparen (- b2 b1))) (- (mparen (- a2 b2)) (mparen (- a1 b1))) (fun d (- a b))))
 
@@ -322,7 +326,7 @@
 
 		(para "That's the key to it, but there's another observation that we need to make first. That is, about the particular force that we've been using. Remember, it was itself a function of the distance between the two objects. So if we were to go out on a limb and assume that our collision function has to be a function of the difference in positions, we could re-write it like this.")
 
-		(bmath
+		(bmath-eqs
 			'(* (ball1 force) (fun d (- (ball1 pos) (ball2 pos))))
 			'(* (fun collision_force (- (ball1 pos) (ball2 pos))) (fun d (- (ball1 pos) (ball2 pos))))
 			)
@@ -331,7 +335,7 @@
 
 		(para "Now that we have this:")
 
-		(bmath
+		(bmath-eqs
 			'(sum k T1 T2 (* (ball1 (mt force k)) (fun d (- (ball1 (mt pos k)) (ball2 (mt pos k))))))
 			'(sum k T1 T2 (* (fun collision_force (mt (mparen (- (ball1 pos) (ball2 pos))) k)) (mt (fun d (- (ball1 pos) (ball2 pos))) k)))
 			)
@@ -356,12 +360,14 @@
 
 		(para "But because we're able to write it this way, we do know that it does have an antiderivative that is a function *only of* " (math '(- (ball1 pos) (ball2 pos))) ". Just to give it a name, I'm going to call it graph_antiderivative().")
 
-		(bmath
+		(bmath-eqs
 			'(sum k T1 T2 (* (fun collision_force (mt (mparen (- (ball1 pos) (ball2 pos))) k)) (mt (fun d (- (ball1 pos) (ball2 pos))) k)))
 			'(- (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T2)) (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T1)))
 			)
 
 		(para "But here's the trick! Remember from a couple minutes ago, when I was explaining that the base of the force/position graphs were the same width? I told you that, at the moment when the balls first touch, they'll be (blue radius + red radius) apart, and at the moment they separate, they'll also be (blue radius + red radius) apart. So if T1 and T2 are taken to be the very start and very end of the collision, " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T1)) " and " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T2)) " are the same! And so therefore, " (math '(- (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T2)) (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T1)))) " is going to be 0!")
+
+		(para "This also explains why the integrals are only equal for the *entire* collision: when T1 and T2 are taken to be some other range, " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T1)) " and " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T2)) " aren't equal, and so when you apply graph_antiderivative() to them and subtract, the value isn't guaranteed to be zero!")
 
 		(para "And if you extend T1 to be sometime before the start of the collision, well it's not feeling any forces, is it? So it adds 0 to the final result. Same with extending T2 to be sometime after the collision ends.")
 
@@ -381,7 +387,7 @@
 
 		(sim-graphs-2-integral sim-multi get-pos-history get-force-history) 
 
-		(bmath
+		(bmath-eqs
 			'(+ (* (ball1 force) (ball1 dpos)) (* (ball2 force) (ball2 dpos)) (* (ball3 force) (ball3 dpos)))
 			'(+ (* (ball1 force) (ball1 dpos)) (* (mparen (- 0 (ball3 force) (ball1 force))) (ball2 dpos)) (* (ball3 force) (ball3 dpos)))
 			'(+ (* (ball1 force) (mparen (- (ball1 dpos) (ball2 dpos)))) (* (ball3 force) (mparen (- (ball3 dpos) (ball2 dpos)))))
@@ -389,7 +395,7 @@
 
 		(para "Well, it goes pretty much the same. Here, we have 3 \"force * dpos\" terms, but the middle one's force equal and opposite to the sum of the forces on the left and right. So we can split them up and now both the left and right have a copy the dpos from the middle. And from here we just do it all again, getting \"force * d(pos - pos)\", it's just that each side has two separate versions of \"pos - pos\". Each side doesn't depend on the other. When we write the result of the sum using their antiderivatives, it's the same function, just two different \"pos - pos\"'s.")
 
-		(bmath 
+		(bmath-eqs
 			'(sum k T1 T2 (+ (* (ball1 force) (- (ball1 dpos) (ball2 dpos))) (* (ball3 force) (mparen (- (ball3 dpos) (ball2 dpos))))))
 			'(+ (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) k)) (fun graph_antiderivative (mt (mparen (- (ball3 pos) (ball2 pos))) k)))
 			)
@@ -416,6 +422,10 @@
 		(para "So yeah. That's kinetic energy.")
 
 		(para "And hey, I think we've covered a lot of ground these last couple lessons. We started with the base rules of physics, the rules that describe the little micro-movements that happen to individual objects over micro-durations of time. We then derived from them some rules about the macro-movement of entire simulations over macro-durations of time. And I think that's kinda cool.")
+
+		(para "Changelog:")
+        (ulist
+            "2024 Feb 4: Initial publish")
 
 		))
 

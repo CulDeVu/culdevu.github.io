@@ -3,11 +3,11 @@
 (define lesson-number 0)
 
 (define sim01
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 1 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 1 0 1))))
 (define sim02
-    (sim (list (list (make-sim-object 2 1 -2) (make-sim-object 1 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 2 1 -2) (make-sim-object 1 0 1))))
 (define sim03
-    (sim (list (list (make-sim-object 1 1 -2) (make-sim-object 2 0 1))) 0))
+    (sim (make-sim-spawn (make-sim-object 1 1 -2) (make-sim-object 2 0 1))))
 
 (define page
     (lesson lesson-number
@@ -120,6 +120,10 @@
         (sim-vis sim03)
 
         (para "Here a similar thing happens. The two balls are feeling equal and opposite forces, but the right ball, due to its larger mass, reacts slower. So the left ball ends up slowing, stopping, and actually reversing direction before the right ball speeds up enough to move out of the way.")
+
+        (para "Changelog:")
+        (ulist
+            "2024 Jan 30: Initial publish")
 
         ))
 
