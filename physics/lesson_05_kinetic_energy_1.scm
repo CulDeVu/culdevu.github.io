@@ -59,14 +59,14 @@
 (display (get-vel-history sim-dt-4 0))
 (display "\n")
 ; (display (get-force-history sim-dt-4 0))
-(display (- (get-ke-at-time sim2x2_mass_alt_2 0 8.0) (get-ke-at-time sim2x2_mass_alt_2 0 0.0)))
+(display (- (get-ke-at-time sim03 0 8.0) (get-ke-at-time sim03 0 0.0)))
 (display "\n")
 
 (define ke-equation-inline (math '(* (/ 1 2) mass (mparen (- (^ final-velocity 2) (^ initial-velocity 2))))))
 
 (define area-list-single
 	(lambda (x)
-		(string-append "(<span style=\"color:" (car svg-colors) "\">" (num3 x) "</span>,<span style=\"color:" (cadr svg-colors) "\">" (num3 x) "</span>)")))
+		(string-append "(<span style=\"color:" (car svg-colors) "\">-" (num3 x) "</span>,<span style=\"color:" (cadr svg-colors) "\">" (num3 x) "</span>)")))
 (define area-list
 	(lambda (. args)
 		(foldr string-append (interleave (map area-list-single args) ", "))))
@@ -125,7 +125,7 @@
 			(sxs (sim-vis sim03) (sim-graphs-2-integral sim03 get-pos-history get-force-history))
 			)
 
-		(para "From top to bottom, the areas are " (area-list 0.5 1.0 0.5))
+		(para "From top to bottom, the areas are " (area-list 0.5 0.888 0.444))
 
 		; (para "How would that work? Well, if you've taken a calculus course, you know all about this. The simulation only provides values at a number of discrete points on this graph, and nothing inbetween. So to take the approximate area of this graph I'll take each data point and associate with it a rectangle with its height as the y-value and its width as the distance between adjacent data points. And so the area of the graph is the sum of all of these rectangles.")
 
@@ -188,7 +188,7 @@
 
 		(bmath '(* (/ 1 2) mass (mparen (- (^ final-velocity 2) (^ initial-velocity 2)))))
 
-		(para "So two things about this. First is that this is pretty different from the momentum derivation from last time. In the first video, each object has the same " (math '(* mass (mparen (- final-velocity initial-velocity)))) " between any two points in time. Here, each object has the same differences in... well the quantity 1/2 * mass * ((final velocity)^2 - (initial velocity)^2). So linear in mass, and also in this other weird term. And we don't know this for sure as of yet, but these quantities are only equal when the final and initial velocities are taken after and before the collision.")
+		(para "So two things about this. First is that this is pretty different from the momentum derivation from last time. In the last chapter, each object has the same " (math '(* mass (mparen (- final-velocity initial-velocity)))) " between any two points in time. Here, each object has the same differences in... well the quantity " ke-equation-inline ". So linear in mass, and also in this other weird term. And we don't know this for sure as of yet, but these quantities are only equal when the final and initial velocities are taken after and before the collision.")
 
 		(para "The other thing to note about this is... well, look at this form. If you remember your calculus, this should be screaming at you. But to be concrete, let's finally work it out from our simulation loop.") 
 
@@ -298,7 +298,7 @@
 
 		(para "So we're going to try to show that the two force/position have equal and opposite areas. Last time, we saw that the sum of momentums are equal to 0 at every timestamp. But that won't work here.  The areas are only equal when taken over the *entire* collision.")
 
-		(para "This time we're going to go with the left-point formulation of the kinetic energy sum. We're start by looking at each individual timestamp, and then see what happens.")
+		(para "This time we're going to go with the right-point formulation of the kinetic energy sum. We're start by looking at each individual timestamp, and then see what happens.")
 
 		(bmath '(+ (* (ball1 force) (ball1 dpos)) (* (ball2 force) (ball2 dpos))))
 
@@ -365,7 +365,7 @@
 			'(- (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T2)) (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T1)))
 			)
 
-		(para "But here's the trick! Remember from a couple minutes ago, when I was explaining that the base of the force/position graphs were the same width? I told you that, at the moment when the balls first touch, they'll be (blue radius + red radius) apart, and at the moment they separate, they'll also be (blue radius + red radius) apart. So if T1 and T2 are taken to be the very start and very end of the collision, " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T1)) " and " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T2)) " are the same! And so therefore, " (math '(- (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T2)) (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T1)))) " is going to be 0!")
+		(para "But here's the trick! Remember from a couple minutes ago, when I was explaining that the base of the force/position graphs were the same width? I told you that, at the moment when the balls first touch, they'll be (left ball's radius + right ball's radius) apart, and at the moment they separate, they'll also be (left ball's radius + right ball's radius) apart. So if T1 and T2 are taken to be the very start and very end of the collision, " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T1)) " and " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T2)) " are the same! And so therefore, " (math '(- (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T2)) (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) T1)))) " is going to be 0!")
 
 		(para "This also explains why the integrals are only equal for the *entire* collision: when T1 and T2 are taken to be some other range, " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T1)) " and " (math '(mt (mparen (- (ball1 pos) (ball2 pos))) T2)) " aren't equal, and so when you apply graph_antiderivative() to them and subtract, the value isn't guaranteed to be zero!")
 
@@ -379,9 +379,17 @@
 			'(= (fun graph_antiderivative (mt (mparen (- (ball1 pos) (ball2 pos))) k))
 				(+ (mt (ball1 kinetic_energy) k) (mt (ball2 kinetic_energy) k))))
 
+		(para ", and so therefore, if T1 and T2 are taken before and after the collision, respectively,")
+
+		(bmath
+			'(= (+ (mt (ball1 kinetic_energy) T1) (mt (ball2 kinetic_energy) T1))
+				(+ (mt (ball1 kinetic_energy) T2) (mt (ball2 kinetic_energy) T2))))
+
+		(bmath )
+
 		(heading "3 objects")
 
-		(para "Right. So. Now that we've got that out of the way, the last thing left to talk about is multiple objects. The know that the total kinetic energy of a simulation with two objects is the same before and after a collision. But what happens when three objects all interact at once?")
+		(para "Right. So. Now that we've got that out of the way, the last thing left to talk about is multiple objects. We know that the total kinetic energy of a simulation with two objects is the same before and after a collision. But what happens when three objects all interact at once?")
 
 		(sim-vis sim-multi)
 
@@ -425,7 +433,8 @@
 
 		(para "Changelog:")
         (ulist
-            "2024 Feb 4: Initial publish")
+            "2024 Feb 4: Initial publish"
+            "2024 Feb 7: Fix typos and errors")
 
 		))
 

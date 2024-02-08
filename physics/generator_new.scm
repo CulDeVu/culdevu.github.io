@@ -1,7 +1,4 @@
 
-(define DEFAULT-DT (/ 1 2048))
-(define sim-max-time 8)
-
 (define caddddr
     (lambda (x)
         (car (cdr (cdr (cdr (cdr x)))))))
@@ -131,12 +128,73 @@
 (define downsamp-sm
     (lambda (x)
         (reverse (take-every-nth x 128 0))))
+(define downsamp-sm-2
+    (lambda (x)
+        (take-every-nth x 128 0)))
 
 (define list-truncate
     (lambda (l n)
         (if (eq? n 0)
             '()
             (cons (car l) (list-truncate (cdr l) (- n 1))))))
+
+
+(define DEFAULT-DT (inexact (/ 1 2048)))
+(define sim-max-time 8)
+
+; vec shit
+(define vec
+    (lambda (x y)
+        (list 'vec x y)))
+(define vec?
+    (lambda (v)
+        (if (list? v)
+            (eq? (car v) 'vec)
+            #f)))
+(define vec-x
+    (lambda (v)
+        (if (vec? v)
+            (cadr v)
+            (error "Argument of vec-x must be a vec"))))
+(define vec-y
+    (lambda (v)
+        (if (vec? v)
+            (caddr v)
+            (error "Argument of vec-y must be a vec"))))
+
+(define vec+
+    (lambda (. args)
+        (vec
+            (apply + (map vec-x args))
+            (apply + (map vec-y args)))))
+(define vec-
+    (lambda (. args)
+        (vec
+            (apply - (map vec-x args))
+            (apply - (map vec-y args)))))
+(define vec*
+    (lambda (. args)
+        (if (nil? (cdr args))
+            (car args)
+            (let (
+                (a (car args))
+                (b (apply vec* (cdr args))))
+                (cond
+                    ((and (vec? a) (not (vec? b)))
+                        (vec (* (vec-x a) b) (* (vec-y a) b)))
+                    ((and (not (vec? a)) (vec? b))
+                        (vec (* a (vec-x b)) (* a (vec-y b))))
+                    (#t (error "Cannot multiply vectors")))))))
+(define vec/
+    (lambda (v . args)
+        (if (vec? v)
+            (vec
+                (/ (vec-x v) (apply * args))
+                (/ (vec-y v) (apply * args)))
+            (error "First argument of vec/ needs to be a vec"))))
+(define vec-abs
+    (lambda (v)
+        (inexact (sqrt (+ (* (vec-x v) (vec-x v)) (* (vec-y v) (vec-y v)))))))
 
 ; (define transpose
 ;   (lambda (mat)
@@ -207,16 +265,16 @@
                 (curr-rad (get-sim-object-rad curr))
                 (other-pos (get-sim-object-pos other))
                 (other-rad (get-sim-object-rad other))
-                (pos-diff (/ (- curr-pos other-pos) (+ curr-rad other-rad))))
-            (if (or (eq? curr-pos other-pos) (>= (abs (- other-pos curr-pos)) (+ curr-rad other-rad)))
-                0
+                (pos-diff (vec/ (vec- curr-pos other-pos) (+ curr-rad other-rad))))
+            (if (or (eq? curr-pos other-pos) (>= (vec-abs (vec- other-pos curr-pos)) (+ curr-rad other-rad)))
+                (vec 0 0)
                 ; (/ 1 (- curr-pos other-pos))
                 ; (/ 0.0833333 (pow pos-diff 5))
-                (* (- (/ 0.125 (pow (abs pos-diff) 5)) 0.125) (/ pos-diff (abs pos-diff)))
+                (vec* (- (/ 0.125 (pow (vec-abs pos-diff) 5)) 0.125) (vec/ pos-diff (vec-abs pos-diff)))
                 ))))
 (define calc-forces-singular
     (lambda (obj all-objs)
-        (apply + (map collision-force (repeat (length all-objs) obj) all-objs))))
+        (apply vec+ (map collision-force (repeat (length all-objs) obj) all-objs))))
 (define calc-forces-1
     (lambda (objs all-objs)
         (if (nil? objs)
@@ -235,10 +293,10 @@
                     (obj (car objs))
                     (force' (car forces))
                     (mass (get-sim-object-mass obj))
-                    (dvel' (* (/ force' mass) dt))
-                    (vel' (inexact (+ (get-sim-object-vel obj) dvel')))
-                    (dpos' (* vel' dt))
-                    (pos' (inexact (+ (get-sim-object-pos obj) dpos'))))
+                    (dvel' (vec* (vec/ force' mass) dt))
+                    (vel' (vec+ (get-sim-object-vel obj) dvel'))
+                    (dpos' (vec* vel' dt))
+                    (pos' (vec+ (get-sim-object-pos obj) dpos')))
                 (cons (make-sim-object mass vel' pos') (advance-sim-1 (cdr objs) (cdr forces) dt))))))
 (define advance-sim
     (lambda (objs-history forces dt)
@@ -302,13 +360,16 @@
             (cons
                 (get-sim-object-pos (index (sim-get-all-newest-objects sim) obj-number))
                 (get-pos-history (sim-get-all-older-frames sim) obj-number)))))
+; (define get-vel-history
+;     (lambda (sim obj-number)
+;         (if (nil? sim)
+;             '()
+;             (cons
+;                 (get-sim-object-vel (index (sim-get-all-newest-objects sim) obj-number))
+;                 (get-vel-history (sim-get-all-older-frames sim) obj-number)))))
 (define get-vel-history
     (lambda (sim obj-number)
-        (if (nil? sim)
-            '()
-            (cons
-                (get-sim-object-vel (index (sim-get-all-newest-objects sim) obj-number))
-                (get-vel-history (sim-get-all-older-frames sim) obj-number)))))
+        (reverse (map get-sim-object-vel (map index (map sim-frame-all-objs sim) (repeat (length sim) obj-number))))))
 (define get-force-history
     (lambda (sim obj-number)
         (if (nil? (sim-get-all-older-frames sim))
@@ -447,29 +508,30 @@
 ;             (error "unsupported number of objects in sim"))))
 
 
+; TODO: bring this back
+; (define sim-vis-ball-svg
+;     (lambda (dimensions)
+;         (let (
+;             (vert-rad (car dimensions))
+;             (horiz-left (cadr dimensions))
+;             (horiz-right (caddr dimensions)))
+;             (string-append
+;                 "M" "0 -" (num3 vert-rad)
+;                 "A" (num3 horiz-right) " " (num3 vert-rad) " 0 0 1 " "0 " (num3 vert-rad)
+;                 "A" (num3 horiz-left) " " (num3 vert-rad) " 0 0 1 " "0 -" (num3 vert-rad)
+;                 ))))
 (define sim-vis-ball-svg
-    (lambda (dimensions)
+    (lambda (rad)
         (let (
-            (vert-rad (car dimensions))
-            (horiz-left (cadr dimensions))
-            (horiz-right (caddr dimensions)))
+            (vert-rad rad)
+            (horiz-left rad)
+            (horiz-right rad))
             (string-append
-                ; "M" (num3 horiz-right) " 0"
-                ; "A" (num3 horiz-right) " " (num3 vert-rad) " 0 0 1 " (number->string 0) " " (num3 vert-rad)
-                ; "A" (num3 horiz-left) " " (num3 vert-rad) " 0 0 1 -" (num3 horiz-left) " " (number->string 0)
-                ; "A" (num3 horiz-left) " " (num3 vert-rad) " 0 0 1 " (number->string 0) " -" (num3 vert-rad)
-                ; "A" (num3 horiz-right) " " (num3 vert-rad) " 0 0 1 " (num3 horiz-right) " " (number->string 0)
                 "M" "0 -" (num3 vert-rad)
                 "A" (num3 horiz-right) " " (num3 vert-rad) " 0 0 1 " "0 " (num3 vert-rad)
                 "A" (num3 horiz-left) " " (num3 vert-rad) " 0 0 1 " "0 -" (num3 vert-rad)
                 ))))
-; (define sim-vis-ball-dimensions
-;     (lambda (objs)
-;         (if (nil? objs)
-;             '()
-;             (cons
-;                 (list (get-sim-object-rad (car objs)) (get-sim-object-rad (car objs)) (get-sim-object-rad (car objs)))
-;                 (sim-vis-ball-dimensions (cdr objs))))))
+
 (define sim-vis-ball-dimensions-horiz-single-2
     (lambda (curr other)
         (let (
@@ -481,10 +543,10 @@
                 (if (> midpt 0)
                     (min (get-sim-object-rad curr) midpt)
                     (get-sim-object-rad curr))))))
-(display 
-    (sim-vis-ball-dimensions-horiz-single-2
-        (make-sim-object 1 0 0)
-        (make-sim-object 1 0 0.5)))
+; (display 
+;     (sim-vis-ball-dimensions-horiz-single-2
+;         (make-sim-object 1 0 0)
+;         (make-sim-object 1 0 0.5)))
 (define merge-smallest-ball-dimension
     (lambda (curr other)
         (list
@@ -542,6 +604,14 @@
                 (car items)
                 ";"
                 (animate-formatted-list-str (cdr items))))))
+(define animate-formatted-list-vec
+    (lambda (items)
+        (if (nil? (cdr items))
+            (string-append (num3 (vec-x (car items))) " " (num3 (vec-y (car items))))
+            (string-append
+                (num3 (vec-x (car items))) " " (num3 (vec-y (car items)))
+                ";"
+                (animate-formatted-list-vec (cdr items))))))
 (define sim-vis
     (lambda (simulation)
         (let (
@@ -551,17 +621,19 @@
                     ; TODO: crosshair center
                     "<path fill=\"" (index svg-colors obj-number) "\">"
                     "<animateTransform attributeName=\"transform\" type=\"translate\" values=\""
-                    (animate-formatted-list (downsamp-sm (get-pos-history simulation obj-number)))
+                    (animate-formatted-list-vec (downsamp-sm (get-pos-history simulation obj-number)))
                     "\" dur=\"8s\" repeatCount=\"indefinite\" />"
                     "<animate attributeName=\"d\" values=\""
                     (let ((all-objs (sim-get-all-newest-objects simulation)))
-                        (animate-formatted-list-str (map sim-vis-ball-svg (downsamp-sm (map index (map sim-vis-ball-dimensions simulation) (repeat (length simulation) obj-number))))))
+                        ; TODO: bring this back
+                        ; (animate-formatted-list-str (map sim-vis-ball-svg (downsamp-sm (map index (map sim-vis-ball-dimensions simulation) (repeat (length simulation) obj-number))))))
+                        (animate-formatted-list-str (map sim-vis-ball-svg (downsamp-sm (map get-sim-object-rad (map index (map sim-frame-all-objs simulation) (repeat (length simulation) obj-number)))))))
                     "\" dur=\"8s\" repeatCount=\"indefinite\" />"
                     "</path>"
 
                     "<path fill=\"none\" stroke=\"black\" vector-effect=\"non-scaling-stroke\" stroke-width=\"2\" d=\"M0 -0.25L0 0.25M-0.25 0L0.25 0\">"
                     "<animateTransform attributeName=\"transform\" type=\"translate\" values=\""
-                    (animate-formatted-list (downsamp-sm (get-pos-history simulation obj-number)))
+                    (animate-formatted-list-vec (downsamp-sm (get-pos-history simulation obj-number)))
                     "\" dur=\"8s\" repeatCount=\"indefinite\" />"
                     "</path>"))))
             (string-append
@@ -633,6 +705,13 @@
                 (apply min ys)
                 (apply max xs)
                 (apply max ys)))))
+(define get-bounding-rect-2
+    (lambda (xs ys)
+        (list
+            (apply min xs)
+            (apply min ys)
+            (apply max xs)
+            (apply max ys))))
 (define max-bounding-rect
     (lambda (rect1 rect2)
         (list
@@ -755,27 +834,62 @@
             )))
 
 
-(define sim-graphs-2-integral
-    (lambda (sim x-fun y-fun)
-        (let (
-            (num-objects (sim-get-num-objects sim))
-            (single-path (lambda (n)
-                (list 
-                    (downsamp-sm (x-fun sim n))
-                    (downsamp-sm (y-fun sim n))))))
-            (sim-graphs (map single-path (reverse (count-reverse num-objects))) (sim-graph-fun-select-name x-fun) (sim-graph-fun-select-name y-fun) sim-graph-single-integral)
-            )))
-#|(define sim-graph-axes
+; (define sim-graphs-2-integral
+;     (lambda (sim x-fun y-fun)
+;         (let (
+;             (num-objects (sim-get-num-objects sim))
+;             (single-path (lambda (n)
+;                 (list 
+;                     (downsamp-sm (x-fun sim n))
+;                     (downsamp-sm (y-fun sim n))))))
+;             (sim-graphs (map single-path (reverse (count-reverse num-objects))) (sim-graph-fun-select-name x-fun) (sim-graph-fun-select-name y-fun) sim-graph-single-integral)
+;             )))
+(define svg-bounding-rect
+    (lambda (r inner)
+        (string-append
+            "<g transform=\"matrix("
+            (number->string (/ 2 (rect-get-width r))) ","
+            "0,0,"
+            (number->string (/ -1 (rect-get-height r))) ","
+            (number->string (* 2 (/ (- (rect-get-min-x r)) (rect-get-width r)))) ","
+            (number->string (* 1 (/ (rect-get-max-y r) (rect-get-height r)))) ")\">"
+            inner
+            "</g>")))
+(define sim-graph-axes
     (lambda (sim x-fun y-fun)
         (let* (
-            (bounding-rect (inflate-rect (foldr max-bounding-rect (map get-bounding-rect paths)))))
-            (string-append
-                "<line stroke=\"black\" vector-effect=\"non-scaling-stroke\" "
-                "x1=\"" (number->string (rect-get-min-x bounding-rect)) "\" y1=\"0\" x2=\"" (number->string (rect-get-max-x bounding-rect)) "\" y2=\"0\""
-                " /><line stroke=\"black\" vector-effect=\"non-scaling-stroke\" "
-                "x1=\"0\" y1=\"" (number->string (rect-get-min-y bounding-rect)) "\" x2=\"0\" y2=\"" (number->string (rect-get-max-y bounding-rect)) "\""
-                " />"
-                )
+            (xs (downsamp-sm-2 (x-fun sim 0)))
+            (ys (downsamp-sm-2 (y-fun sim 0)))
+            (bounding-rect (inflate-rect (get-bounding-rect-2 (map vec-x ys) (map vec-y ys)))))
+            (svg-bounding-rect
+                bounding-rect
+                (string-append
+                    "<line stroke=\"black\" vector-effect=\"non-scaling-stroke\" "
+                    "x1=\"" (number->string (rect-get-min-x bounding-rect)) "\" y1=\"0\" x2=\"" (number->string (rect-get-max-x bounding-rect)) "\" y2=\"0\""
+                    " />"
+                    "<line stroke=\"black\" vector-effect=\"non-scaling-stroke\" "
+                    "x1=\"0\" y1=\"" (number->string (rect-get-min-y bounding-rect)) "\" x2=\"0\" y2=\"" (number->string (rect-get-max-y bounding-rect)) "\""
+                    " />"))
+            )))
+(define sim-graph-path
+    (lambda (sim x-fun y-fun)
+        (let* (
+            (xs (downsamp-sm-2 (x-fun sim 0)))
+            (ys (downsamp-sm-2 (y-fun sim 0)))
+            (bounding-rect (inflate-rect (get-bounding-rect-2 (map vec-x ys) (map vec-y ys)))))
+            (svg-bounding-rect
+                bounding-rect
+                (sim-graph-single (list (map vec-x ys) (map vec-y ys)) (car svg-colors) "none"))
+            )))
+(define sim-graph-point-2
+    (lambda (sim x-fun y-fun)
+        (let* (
+            (xs (downsamp-sm-2 (x-fun sim 0)))
+            (ys (downsamp-sm-2 (y-fun sim 0)))
+            (bounding-rect (inflate-rect (get-bounding-rect-2 (map vec-x ys) (map vec-y ys)))))
+            (svg-bounding-rect
+                bounding-rect
+                (sim-graph-point (list (map vec-x ys) (map vec-y ys)) (car svg-colors) (* 0.01 (rect-get-width bounding-rect)) (* 0.02 (rect-get-height bounding-rect))))
             )))
 (define sim-graph-proto
     (lambda (sim x-fun y-fun . drawing-funcs)
@@ -783,15 +897,16 @@
             "<svg style=\"border: 1px solid black\" viewBox=\"0 0 2 1\">"
             (foldr string-append (mapall drawing-funcs sim x-fun y-fun))
             "</svg>")))
-(define sim-graphs-2-integral
+(define sim-graph
     (lambda (sim x-fun y-fun)
         (sim-graph-proto
             sim x-fun y-fun
             sim-graph-axes
-            sim-graph-labels
-            sim-graph-area
+            ; sim-graph-labels
+            ; sim-graph-area
             sim-graph-path
-            sim-graph-integral-numbers)))|#
+            sim-graph-point-2
+            )))
 
 
 (define pair-up
@@ -943,6 +1058,7 @@
     ("Calculus primer" "chapter_03_calculus")
     ("Momentum" "chapter_04_momentum")
     ("Kinetic Energy" "chapter_05_kinetic_energy")
+    ("2 dimensions" "chapter_06_2d")
     ))
 (define lesson-title
     (lambda (number)

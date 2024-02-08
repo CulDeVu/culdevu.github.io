@@ -71,7 +71,7 @@
             (sim-vis sim01)
             (table
                 (table-row
-                    "dt" "position of left ball at t=23.0")
+                    "dt" "position of left ball at t=3.0")
                 (table-row
                     ; "dt = 1" (number->string (get-sim-object-pos (car (index sim-dt-1 4)))))
                     "dt = 1" (number->string (get-pos-at-time sim-dt-1 0 3.0)))
@@ -99,8 +99,12 @@
 
         (ulist
             "Your typical math operations, like +, *, sqrt and such on convergent quantities are themselves convergent."
-            "The \"integrand\", the non-d-term, itself needs to be convergent, and needs to stay finite for the duration of the integral (believe it or not this can be an issue). "
-            "The \"differential\", the d-term, needs to get arbitrarily small as dt gets brought closer to 0. Given any threshold, there needs to be a value of dt that causes all of the differentials to fall under the threshold. A differential of a quantity that is itself the result of an integral automatically satisfies this condition.")
+            (string-append
+                "For an integral to be convergent:"
+                (ulist
+                    "The \"integrand\", the non-d-term, itself needs to be convergent, and needs to stay finite for the duration of the integral (believe it or not this can be an issue). "
+                    "The \"differential\", the d-term, needs to get arbitrarily small as dt gets brought closer to 0. Given any threshold, there needs to be a value of dt that causes all of the differentials to fall under the threshold. A differential of a quantity that is itself the result of an integral automatically satisfies this condition."
+                    "The time range must be finite.")))
 
         (para "There's some more subtlety to it, but this should be good enough for us. If you're interested in learning more, the subject is usually called \"Real Analysis\" or some variant of \"Modern Calculus\" in textbooks and college courses.")
 
@@ -157,7 +161,8 @@
         (para "Changelog:")
         (ulist
             "2024 Jan 30: Initial publish"
-            "2024 Feb 4: Fixed some subscripts, added a table illustrating convergence")
+            "2024 Feb 4: Fixed some subscripts, added a table illustrating convergence"
+            "2024 Feb 7: Fixed typo, added a bit more to the list of condititions for convergence")
         ))
 
 (use-modules (ice-9 textual-ports))
