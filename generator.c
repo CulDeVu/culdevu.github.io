@@ -479,6 +479,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
+	process_thought("2024-04-13-lisp-machine");
 	process_thought("2023-09-06-logarithms");
 	process_thought("2023-04-09-make");
 	process_thought("2023-01-08-img-compression");

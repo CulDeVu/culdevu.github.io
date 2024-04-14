@@ -1,0 +1,128 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a><a href="/physics/" class="navitem">Physics</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Lisp machine simulator</h2><i>Pub. 2024 Apr 13</i><h3 class="section_heading">history</h3><h3 class="section_heading">The plan</h3><p>I want to build one. An actual factual lisp machine. Is that not the coolest idea ever?</p><p>I was, of course, hugely inspired by all the people on Youtube and hackaday.io and the homebrew computer webring, as well as all the other people I've been able to find who make homebrew computers. I know this was a big thing back in the 80s, and it seems like there's been an explosion in recent years. Though it's hard to know without more research. The websites and blogs of the people who would have been doing this sort of thing back in the late 90s and mid 2000s would be mostly gone. The internet really is the largest force for information destruction ever created :(</p><p>Anyways, </p><p>...</p><p>It's a large undertaking, but it goes something like this:</p><ul><li>Phase 1: some simulators. I've written a couple so far to get my bearings. The most recent one (listed in full at the bottom of the post) simulates just the computer portion. In other words, just the part that executes instructions, no external hardware. It simulates the computer on the scale of clock signals and control lines, bus lines, and latches. So not quite logic gates, but close enough that I'm pretty confident that this design works.</li><li>Phase 2a: some software. Notably a compiler and some software for interacting with hardware. I'm still a bit split on where I want to go with this.</li><li>Phase 2b: the build. Self-explanatory.</li><li>Phase 3: ???</li></ul><p>...</p><p>It's going to get tedious calling it "my computer" over and over, so let's give it a temporary name. Let's call it "SM-1" for "scheme machine 1".</p><h3 class="section_heading">Design</h3><p>The broad design borrows from LISP-81 in that the whole computer is set up like a state machine. On the large scale, the computer walks the instruction graph one cons cell at a time and permute the machine's state. For example, an <code class="codeinline">if</code> node will change the <code class="codeinline">state</code> register to <code class="codeinline">doing-if</code>. If the computer encounters a <code class="codeinline">0</code> when the state register is set to <code class="codeinline">doing-if</code>, the state register will then change to <code class="codeinline">doing-if-skip</code>. And so on.</p><p>That's about where the similarities end. Mine uses a much less compact instruction encoding, much much less instructions, a single-layered microcode design, and a simplified bus model. </p><h4>Instruction Encoding</h3><h4>Architecture Overview</h3><p>The SM-1 of:</p><ul><li>An address bus that can be written to. Has width ADDR-WIDTH.</li><li>A data bus of that can be read from and written to. Has width CONS-WIDTH.</li><li>RAM, ROM, external devices behind a simple memory map.</li><li>A microcode ROM, with [todo]</li><li>8 registers: instr, stack, accumulator, state, temp, envt, mem-addr, head</li></ul><h4>Registers and Bus Design</h3><ul><li>instr: holds the currently executing instruction. CONS-WIDTH.</li><li>stack: holds the head of the call stack. Is CONS-WIDTH. Could be ADDR width, since I never have much need of the value during normal execution, but I use it during the GC for the extra space.</li><li>accumulator: holds intermediate data for whatever stack frame we're in. This could be like the running sum of a <code class="codeinline">+</code> instruction, or storing the address of the instructions of a closure while collecting arguments, etc. CONS-WIDTH</li><li>state: holds the machine's state. Used for answering questions like "I have a instr register holding the integer 5. What am I doing with it?". CONS-WIDTH</li><li>temp: for intermediate calculations. The original idea was that, while the other registers have important meanings that persist through multiple instructions, the temp register would be some extra space that could be used <i>during</i> the execution of an instruction. But then it turned out I only ever really used it during the GC.</li><li>envt: holds the calling environment. So you might access the calling function's argument by <code class="codeinline">(car envt)</code>. By far the worst and weakest part of the design, but definately not too hard to change. CONS-WIDTH</li><li>mem-addr: whatever is in this register is getting emitted onto the memory bus. ADDR-WIDTH</li><li>head: the top of the heap. Very poorly named. ADDR-WIDTH</li></ul><ul><li>micro-index</li><li>micro-state</li><li>micro-mem-overflow</li><li>micro-index</li></ul><h4>Microcode</h3><h4>Garbage Collection</h3><h4>Chips</h3><h3 class="section_heading">source</h3></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2024 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
