@@ -82,11 +82,6 @@ All of the registers are connected to the data bus, but the mem-addr is also con
 
 These descriptions of the register uses change during garbage collection.
 
-- micro-index
-- micro-state
-- micro-mem-overflow
-- micro-index
-
 The data bus is organized like a cons cell, with some lines being thought of as the "type" portion, the "val" portion, and the "cdr" portion.
 
 There are actually two data busses: the write bus and read bus. They're connected by some swizzling circuitry:
@@ -102,13 +97,44 @@ The original idea for this is that you can read entire cons cells from memory in
 
 The contents of instr-type, instr-val, state-val, and a few other things are packed into an address and looked up in the microcode-address ROM once every macrocycle. Then, every microcycle that address is incremented and looked up in the microcode ROM. One output bit per control line.
 
+The address fed into the microcode-address ROM is formed from:
+
+- instr-type, the first however-many-bits it takes to encode a fundemental type (3 currently)
+- instr-val, but only enough bits to encode a full type (5 currently)
+- state-val (5 currently, but likely to change)
+- 1 bit for "are the rest of the bits in instr-val zero?"
+- 1 bit for "is instr-cdr 0?"
+- 1 bit for "is head overflowed?"
+
+The total here comes out to 16 bits, to be stored in a 64kb ROM no room at all to spare. I'm not a big fan of having no room, but I guess it is what it is for right now.
+
+I haven't tallied up the amount of space the microinstructions will take up. Lots and lots of bit patterns apply to the same set of microinstructions, but some microinstruction expansions are pretty big. I wouldn't be surprised if it came out to be over 1000 microinstructions total to store in the ROM. Very manageable number.
+
+At the end of each macrocycle, the state of instr-type, instr-val, state-val, and the other 1-bit calculations are snapshotted and stored into a couple dedicated microcode registers. This is so that the set of instructions that we're following doesn't change out from under us as we're executing and permuting the CPU state. At the end of each microcycle the stored microcode address is incremented, until it recieves the "latch microcode registers", in which case it resets to 0.
+
 ## Garbage Collection
 
 One of the worst parts of the design.
 
 If you look at the list of instructions, you'll see there's no "set!" or equivalent instruction; all computation is pure. If memory is allocated linearly upwards, that means that any addresses stored in a cons cell in the heap must be a smaller address than itself. This makes garbage collection pretty simple.
 
-It's done in two phases: a downward phase and marks and deletes garbage memory, and an upward phase that compacts.
+The GC is automatic: when it reaches the top of memory it stops the world and does its thing, and then returns to the state it was in before it started. There's currently no way to trigger a GC in userspace, but that's not a design decision or anything. It'd be very easy to add a builtin function `gc`, just haven't done it.
+
+GC is done in four phases: an init phase, a downward phase and marks and deletes garbage memory, an upward phase that compacts, and a cleanup phase.
+
+The init phase pushes all of the registers onto the heap, and sets their gc `mark` bits.
+
+The downward phase walks the heap downards. If a cell is marked, it marks the cells its pointing to, and then unmarks itself. If a cell is not marked, it's replaced with an `empty` cell. At the end of this phase, all memory is unmarked, there are no `reloc` cells left, and there is no unreachable memory left in the heap.
+
+The upward phase walks the heap upwards. It maintains two pointers, a low and a high. The low pointer searches for an `empty` cell and the high pointer searches for a non-`empty` cell to move to the low location, with the constraint that low pointer < high pointer. When a pair is found, the contents of the high pointer gets copied into the low pointer, and a `reloc` cell is put in its place notifying all cells further up the heap that it has moved. Before doing the move though, the contents of the high pointer are checked to see if *it* is pointing to any `reloc` cells, and rewrites them. At the end of this phase, the low pointer points to what will become the new `head`, there are no `empty` cells below the low pointer, and no non-`reloc` cells are pointing to a `reloc` cell. There are, however, still some `reloc` cells scattered around the heap that take up space and will get deleted in the next GC.
+
+The cleanup phase recovers the registers it wrote into heap, and then continues, the CPU now in the same logical state it was before the GC started.
+
+There are no GC-specific registers, though there is a couple GC-specific circuits. One detects if the `head` register overflows the top water line (set about 15 addresses down from the actual top of memory), but then changes its behavior to detecting if `head` is at the top of memory in the upward phase. 
+
+There is also a dedicated `gc-reloc` circuit that computes `(if (= temp-type node-type-reloc) temp-val temp-cdr)`, which is used in the upwards phase to rewrite addresses if they point to a reloc. Otherwise, the microcode became way to unwieldy for me to write. The inclusion of this circuit really makes me question the decision to lean so heavily into the state-machine design. Like, the whole point of the state-machine design is to make it easy to handle function-call-heavy instruction graphs and conditional logic. But I now have dedicated circuitry to doing conditional logic, so...
+
+The upwards phase leaves a lot to be desired. Its purpose is to compact memory so that `head` can be in a lower than it was before GC started. But the upwards phase ends up inserting tons of `reloc` junk in the heap that have to be compacted around. Those `reloc` cells will be deleted on the next GC, and new cells will move into them, but that will itself leave more `reloc` cells behind. The actual effect of the upwards phase, as it's written here, is to create "bubbles" that rise to the top of the heap over the course of several GCs.
 
 ## Chips
 
