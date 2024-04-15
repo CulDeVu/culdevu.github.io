@@ -42,6 +42,33 @@ The SM-1 of:
 - A microcode ROM, with [todo]
 - 8 registers: instr, stack, accumulator, state, temp, envt, mem-addr, head
 
+The timing is broken up into macrocycles, microcycles, and nanocycles. Typically one instruction from the instruction graph is consumed every macrocycle. Each macrocycle will consist of many microcycles, one for each microinstruction stored in the microcode ROM for a given state. Each microcycle is 4 nanocycles.
+
+I may have gone a bit overboard with the clock. I got really anal about signal integrety. What happens when, for a brief moment, two parts of the CPU see different clock states (spooky circuits)? What happens when a latch triggers but the data isn't there yet?
+
+The nanocycle timing I came up with works under the principles that, during a single nanocycle, signals should become stable (no rising edge detectors), and if two adjacent nanocycles overlap a bit it's okay. So we have this:
+[todo: a diagram]
+
+The write nanocycle lets registers and external memory write to the bus(ses). The read cycle lets them read. The two microinstruction cycles are for controlling the microcode ROM.
+
+- Each read/write nanocycle is separated a bit, so the data bus can't thrash.
+- The two microcode nanocycles are a bit silly. It's so that there can be a 2-layer latch for the microcode state. That's needed because, if either the read or write nanocycle overlaps with the latching of the microcode lookup address (described later), the CPU can end up executing a mixture of two different microinstructions.
+- This timing is very easy to do, just a single clock downsample by 2 and a few gates.
+
+Which components are doing the reading and writing this microcycle is governed by the microcode ROM. The CPU state is packed into an address and fed into the microcode ROM. One bit of output per control line.
+
+My count so far of the control lines:
+- 6 for each full CONS-WIDTH register: a read and write signal for each type, val, and cdr parts of the register.
+- 2 for each ADDR-WIDTH register.
+- 7 for bus swizzling.
+- 1 for each bit of concrete work circuitry (add circuit, nand circuit, etc).
+- 2 for read/write from memory.
+- a couple for the microcode circuitry?
+
+So some number in the 50s probably. Large, but manageable. It's also very wasteful (e.g. you can't write the type and val portions of a register and also activate the type->val swizzle, as that would thrash the bus) but I'm not concerned about that right now.
+
+All of the registers are connected to the data bus, but the mem-addr is also connected to the memory bus.
+
 ## Registers and Bus Design
 
 - instr: holds the currently executing instruction. CONS-WIDTH.
@@ -53,14 +80,35 @@ The SM-1 of:
 - mem-addr: whatever is in this register is getting emitted onto the memory bus. ADDR-WIDTH
 - head: the top of the heap. Very poorly named. ADDR-WIDTH
 
+These descriptions of the register uses change during garbage collection.
+
 - micro-index
 - micro-state
 - micro-mem-overflow
 - micro-index
 
+The data bus is organized like a cons cell, with some lines being thought of as the "type" portion, the "val" portion, and the "cdr" portion.
+
+There are actually two data busses: the write bus and read bus. They're connected by some swizzling circuitry:
+- type->type, type->val
+- val->type, val->val, val->cdr
+- cdr->val, cdr->cdr
+
+This swizzling isn't accessible from userspace, it's controlled by the microinstructions.
+
+The original idea for this is that you can read entire cons cells from memory in a single microinstruction, and that during normal computation many crossing writes and reads could be done at the same time on the one bus. But one big power that this design has, the ability for multiple registers to read from the same bus line, I think only ever gets used once in the whole microcode.
+
 ## Microcode
 
+The contents of instr-type, instr-val, state-val, and a few other things are packed into an address and looked up in the microcode-address ROM once every macrocycle. Then, every microcycle that address is incremented and looked up in the microcode ROM. One output bit per control line.
+
 ## Garbage Collection
+
+One of the worst parts of the design.
+
+If you look at the list of instructions, you'll see there's no "set!" or equivalent instruction; all computation is pure. If memory is allocated linearly upwards, that means that any addresses stored in a cons cell in the heap must be a smaller address than itself. This makes garbage collection pretty simple.
+
+It's done in two phases: a downward phase and marks and deletes garbage memory, and an upward phase that compacts.
 
 ## Chips
 
