@@ -32,6 +32,43 @@ That's about where the similarities end. Mine uses a much less compact instructi
 
 ## Instruction Encoding
 
+Memory is organized, of course, as cons cells. Instructions and data are organized in big trees, and the instructions are walked in depth-first order. Some registers, and the data bus both are able to hold a full cons cell.
+
+It's funny, I'm still fuzzy on some of the details. But this is the current plan:
+
+[picture]
+[picture of lisp-79?]
+
+Each cell has a type, value, and cdr pointing to the next cell.
+
+The type is self explanatory. There needs to be enough types to represent all of the fundemental operations that the computer is capable of, and hopefully enough room for lot of use-defined types as well. The current list of fundemental types looks like:
+
+3 constant-like types:
+- nil: the terminating item of a list. Eventually, all lists end in one of these. See later discussion of pure functional memory.
+- int
+- builtin-function: its value is one of a list of builtin operations the computer can do. So like `add`, `car`, `nand`, `zero?`, etc.
+
+3 list-like types:
+- list
+- call: an address to another list somewhere. Will push the CPU stack and put the CPU in a state where its expecting the next node to be a builtin-function or a closure
+- closure: prodecure and environment
+
+2 types needed for gc:
+- reloc: a marker left in memory saying "the item that was here has been moved to this other location"
+- empty: an empty cell, as opposed to a cell that has some other type of item in it.
+
+The first slot in memory, at memory location zero, sits a nil element. This is so that lists can terminate with a cdr of `0`, instead of a whole new nil cell for each.
+
+Which comes out to 8, or 3 bits. Not great, since it's already a little bloated and I don't even have a symbol type yet!
+
+The most obvious possible changes to look into are: removing nil (nil is just a list whose value points to 0), and removing empty (empty could just be a nil with a cdr of 0? Because anything that's pointing to a nil with a cdr of 0 could just as easily have been pointing to location 0. The problem is that the GC would have to detect that, and I don't have any more free registers to stick that kind of info into. I may have to add a new control line...). That would give an extra 2 slots to work with and still be 3 bits, which would be nice.
+
+Due to the constraints of the microcode ROM, I'm thinking I may have to restrict types to be... just 5 bits. Much much lower than I was hoping. If I could relax that constraint, I could concievably go up to like 10 bits (or higher??). I'm not sure, so I'll be calling this size TYPE-WIDTH.
+
+The values are bigger. They need to be able to hold addresses as well as regular old integers and characters and the like. Of those, I suspect address sizes are going to be larger. Depending on the decision on TYPE-WIDTH, the ADDR-WIDTH could be 20 to 24 bits.
+
+The cdr term is simple enough: it's an address of size ADDR-WIDTH. It points to the next cell in the linked list.
+
 ## Architecture Overview
 
 The SM-1 of:
@@ -137,5 +174,15 @@ There is also a dedicated `gc-reloc` circuit that computes `(if (= temp-type nod
 The upwards phase leaves a lot to be desired. Its purpose is to compact memory so that `head` can be in a lower than it was before GC started. But the upwards phase ends up inserting tons of `reloc` junk in the heap that have to be compacted around. Those `reloc` cells will be deleted on the next GC, and new cells will move into them, but that will itself leave more `reloc` cells behind. The actual effect of the upwards phase, as it's written here, is to create "bubbles" that rise to the top of the heap over the course of several GCs.
 
 ## Chips
+
+The heap memory will be implemented as a bunch of parallel banks each holding part of a cons cell.
+
+[picture]
+
+For example, if we use 52-bit cons cells, we might be looking at 7 8-bit SRAM chips that each hold 8 bits of the cell. This makes things much nicer, since memory accesses can be a single read/write macrocycle.
+
+The same thing will happen with the microinstruction ROM. This makes it more annoying to write ROMs, but I'll just have to deal with it.
+
+The rest will be pretty straightforward. Lots of tristate buffers, lots of latches, lots of logic gates.
 
 # source
