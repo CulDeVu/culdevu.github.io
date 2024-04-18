@@ -3,6 +3,39 @@
 
 # history
 
+LISP Machine progress report:
+Alan Bawden: went on to get his PhD at MIT, with Gerald Sussman as his advisor. His last publication was in 2008, but he seems to still be kicking around, at least as of 2019.
+Richard Greenblatt: went on to found Lisp Machines Inc to sell the CADR machines.
+Jack Holloway: co-founded Symbolics, of which much ink has been spilt. After that died, he started a company doing phone line stuff. He last year of Parkinsons.
+Thomas Knight: went on to work on a number of very impressive things in the fields of supercomputing and biology. I had never heard of the term "adiabatic computing" before, very cool. He co-founded Ginkgo Bioworks, and seems to be doing very well.
+David Moon: became a big contributor to Common Lisp. Is still around, still doing some programming  language work.
+Daniel Weinreb: co-founded Symbolics. After that, he bounced around for a while writing LISP at a couple different companies. He died in 2012 at age 55 from cancer.
+
+Storage Management in LISP-based microprocessor
+Guy Lewis Steele Jr: what can't be said about him? emacs, common lisp, hacker culture, java, etc. He's still doing computer research do this day.
+Gerald Jay Sussman: 
+
+LAMBDA: The ultimate opcode
+Guy Lewis Steele Jr
+Gerald Jay Sussman
+
+scheme-79 authors:
+Jack Holloway
+Guy Lewis Steele Jr
+Gerald Jay Sussman
+Alan Bell: I haven't been able to find anything about him in the intervening years. On a forum about a year ago someone popped up who seems to match, his mind seems to be going: https://www.quora.com/profile/Dr-Alan-Bell-PhD
+
+CADR authors:
+Thomas F Knight Jr
+David A Moon
+Jack Holloway
+Guy L Steele Jr
+
+Scheme-86 authors:
+Andrew A Berlin: has worked on a very wide range of subfields over the years, started lots of companies. Seems like a cool dude.
+Henry M Wu: did some hardware design, and then left the industry and now owns some hotels and restaurants
+
+
 # The plan
 
 I want to build one. An actual factual lisp machine. Is that not the coolest idea ever?
