@@ -6,9 +6,9 @@
 LISP Machine progress report:
 Alan Bawden: went on to get his PhD at MIT, with Gerald Sussman as his advisor. His last publication was in 2008, but he seems to still be kicking around, at least as of 2019.
 Richard Greenblatt: went on to found Lisp Machines Inc to sell the CADR machines.
-Jack Holloway: co-founded Symbolics, of which much ink has been spilt. After that died, he started a company doing phone line stuff. He last year of Parkinsons.
+Jack Holloway: co-founded Symbolics, of which much ink has been spilt. After that died, he started a company doing phone line stuff. He died last year of Parkinsons.
 Thomas Knight: went on to work on a number of very impressive things in the fields of supercomputing and biology. I had never heard of the term "adiabatic computing" before, very cool. He co-founded Ginkgo Bioworks, and seems to be doing very well.
-David Moon: became a big contributor to Common Lisp. Is still around, still doing some programming  language work.
+David Moon: became a big contributor to Common Lisp. Is still around, still doing some programming language research.
 Daniel Weinreb: co-founded Symbolics. After that, he bounced around for a while writing LISP at a couple different companies. He died in 2012 at age 55 from cancer.
 
 Storage Management in LISP-based microprocessor
@@ -42,9 +42,7 @@ I want to build one. An actual factual lisp machine. Is that not the coolest ide
 
 I was, of course, hugely inspired by all the people on Youtube and hackaday.io and the homebrew computer webring, as well as all the other people I've been able to find who make homebrew computers. I know this was a big thing back in the 80s, and it seems like there's been an explosion in recent years. Though it's hard to know without more research. The websites and blogs of the people who would have been doing this sort of thing back in the late 90s and mid 2000s would be mostly gone. The internet really is the largest force for information destruction ever created :(
 
-Anyways, 
-
-...
+Anyways, I've been wanting to do a homebrew computer project for a while. I've played with Z80s and such, but it's not quite the right scratch for the itch I have. The ultimate goal, I think, is to have something that can take the place of an Arduino: a computer for small prototyping projects, but one that can be live-coded on-machine and doesn't need a compiler toolchain.
 
 It's a large undertaking, but it goes something like this:
 
@@ -53,15 +51,17 @@ It's a large undertaking, but it goes something like this:
 - Phase 2b: the build. Self-explanatory.
 - Phase 3: ???
 
-...
+I've decided that phase 1 is done. It's not actually, there's some functionality that I know it still required to implement, but those are all simple. The big thing that I was worried about, the garbage collector, has been completed.
 
 It's going to get tedious calling it "my computer" over and over, so let's give it a temporary name. Let's call it "SM-1" for "scheme machine 1".
 
 # Design
 
-The broad design borrows from LISP-81 in that the whole computer is set up like a state machine. On the large scale, the computer walks the instruction graph one cons cell at a time and permute the machine's state. For example, an `if` node will change the `state` register to `doing-if`. If the computer encounters a `0` when the state register is set to `doing-if`, the state register will then change to `doing-if-skip`. And so on.
+The broad design borrows from LISP-79 in that the whole computer is set up like a state machine. On the large scale, the computer walks the instruction graph one cons cell at a time and permute the machine's state. For example, an `if` node will change the `state` register to `doing-if`. If the computer encounters a `0` when the state register is set to `doing-if`, the state register will then change to `doing-if-skip`. And so on.
 
-That's about where the similarities end. Mine uses a much less compact instruction encoding, much much less instructions, a single-layered microcode design, and a simplified bus model. 
+There are some differences though. Mine uses a much less compact instruction encoding, much less instructions, a single-layered microcode design, no interupts, different cons cell encoding, and a simplified bus model. So, you know, besides those.
+
+My design certainly feels like one of the niave designs that Sussman et al talk about in "LAMBDA: The Ultimate Opcode" before they describe their better design. The lack of features, the obvious basic improvements. My microcode is hand-written and my chips hand-routed, and not even the output of an embeded DSL compiler. God, so lame. Oh well.
 
 ## Instruction Encoding
 
@@ -72,7 +72,7 @@ It's funny, I'm still fuzzy on some of the details. But this is the current plan
 [picture]
 [picture of lisp-79?]
 
-Each cell has a type, value, and cdr pointing to the next cell.
+Each cell has a type, value, and cdr pointing to the next cell. There are much better encodings, but this makes it easier to write the microcode.
 
 The type is self explanatory. There needs to be enough types to represent all of the fundemental operations that the computer is capable of, and hopefully enough room for lot of use-defined types as well. The current list of fundemental types looks like:
 
@@ -94,9 +94,11 @@ The first slot in memory, at memory location zero, sits a nil element. This is s
 
 Which comes out to 8, or 3 bits. Not great, since it's already a little bloated and I don't even have a symbol type yet!
 
-The most obvious possible changes to look into are: removing nil (nil is just a list whose value points to 0), and removing empty (empty could just be a nil with a cdr of 0? Because anything that's pointing to a nil with a cdr of 0 could just as easily have been pointing to location 0. The problem is that the GC would have to detect that, and I don't have any more free registers to stick that kind of info into. I may have to add a new control line...). That would give an extra 2 slots to work with and still be 3 bits, which would be nice.
+The most obvious possible changes to look into are: removing nil (nil is just a list whose value points to 0), and removing empty (empty could just be a nil with a cdr of 0? Because anything that's pointing to a nil with a cdr of 0 could just as easily have been pointing to location 0. The problem is that the GC would have to detect that, and I don't have any more free registers to stick that kind of info into. I may have to add a new control line...). That would give an extra 2 slots to work with and still be 3 bits, which would be nice. One of those will definately need to be a port type, and it'll be nice to have one extra.
 
-Due to the constraints of the microcode ROM, I'm thinking I may have to restrict types to be... just 5 bits. Much much lower than I was hoping. If I could relax that constraint, I could concievably go up to like 10 bits (or higher??). I'm not sure, so I'll be calling this size TYPE-WIDTH.
+The original idea was that the lower 3 bits (or however many it turns out to be) would be the "fundamental" part of the type which it can decay to, and the rest of the bits can be used as you please. I don't think this is a good idea. It's probably just better to have a single bit that tells the GC if it's a list-like or a constant-type.
+
+Due to the constraints of the microcode ROM, I'm thinking I may have to restrict types to be... just 5 bits. Much much lower than I was hoping. If I could relax that constraint, I could concievably go up to like 10 bits (or higher?). I'm not sure, so I'll be calling this size TYPE-WIDTH.
 
 The values are bigger. They need to be able to hold addresses as well as regular old integers and characters and the like. Of those, I suspect address sizes are going to be larger. Depending on the decision on TYPE-WIDTH, the ADDR-WIDTH could be 20 to 24 bits.
 
