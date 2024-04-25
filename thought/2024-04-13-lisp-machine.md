@@ -34,6 +34,7 @@ Years later, after when things started to go downhill for the two companies, ano
 As far as I can tell, the history of the true lisp machine, one that interprets cons cells in silicon, pretty much ended in the 1980s.
 
 A bit about the authors:
+
 - Alan Bawden: went on to get his PhD at MIT, with Gerald Sussman as his advisor. His last publication was in 2008, but he seems to still be kicking around, at least as of 2019.
 - Richard Greenblatt: went on to found Lisp Machines Inc to sell the CADR machines.
 - Jack Holloway: co-founded Symbolics, of which much ink has been spilt. After that died, he started a company doing phone line stuff. He died last year of Parkinsons.
