@@ -3,38 +3,48 @@
 
 # history
 
-LISP Machine progress report:
-Alan Bawden: went on to get his PhD at MIT, with Gerald Sussman as his advisor. His last publication was in 2008, but he seems to still be kicking around, at least as of 2019.
-Richard Greenblatt: went on to found Lisp Machines Inc to sell the CADR machines.
-Jack Holloway: co-founded Symbolics, of which much ink has been spilt. After that died, he started a company doing phone line stuff. He died last year of Parkinsons.
-Thomas Knight: went on to work on a number of very impressive things in the fields of supercomputing and biology. I had never heard of the term "adiabatic computing" before, very cool. He co-founded Ginkgo Bioworks, and seems to be doing very well.
-David Moon: became a big contributor to Common Lisp. Is still around, still doing some programming language research.
-Daniel Weinreb: co-founded Symbolics. After that, he bounced around for a while writing LISP at a couple different companies. He died in 2012 at age 55 from cancer.
+In the 19-something-or-other John McCarthy invented Lisp probably.
 
-Storage Management in LISP-based microprocessor
-Guy Lewis Steele Jr: what can't be said about him? emacs, common lisp, hacker culture, java, etc. He's still doing computer research do this day.
-Gerald Jay Sussman: 
+Soon after that, people began to wisper about lisp machines. I don't know when it began, but it seems to go back a long ways. But to contain it, I'm going to be picking my historical events to tell a story.
 
-LAMBDA: The ultimate opcode
-Guy Lewis Steele Jr
-Gerald Jay Sussman
+In November 1974, Tom Knight wrote a piece for the MIT AI Memos detailing a hypothetical machine optimized to run lisp. This was a big thing back in the 60s, apparently. At this point lisp was being widely used in the MIT AI lab, so this was an interesting and maybe practical proposal. It went over the design of the CPU and instruction encoding and such. I have a hard time reading it personally, but it apparently made a splash.
 
-scheme-79 authors:
-Jack Holloway
-Guy Lewis Steele Jr
-Gerald Jay Sussman
-Alan Bell: I haven't been able to find anything about him in the intervening years. On a forum about a year ago someone popped up who seems to match, his mind seems to be going: https://www.quora.com/profile/Dr-Alan-Bell-PhD
+Later that month, Richard Greenblatt wrote a follow-up detailing another lisp CPU architecture, but this one was much more expansive. This one describes a less stack-machine-y and more lisp-y architecture. It also goes on to describe a garbage collector, paging to a backing store, a GUI, traps, hardware type checking, and much more. A big leap!
 
-CADR authors:
-Thomas F Knight Jr
-David A Moon
-Jack Holloway
-Guy L Steele Jr
+A few years and a lot of work later, in August 1977 Richard Greenblatt and Tom Knight, now with teammates and coauthors Alan Bawden, Jack Holloway, David Moon, and Daniel Weinreb published the LISP Machine Progress Report. This one talks about ideas like "personal computers", and low-latency interactive software. This one was actually implemented, sans some more complicated stuff like a GC. It was (I believe) implemented as a kernel running on a several general purpose microprocessors, but I must have missed what it said it was. It introduced many many more built-in instructions, as well as many other features relating to speeding up paging and dynamic scoping. It's also the first place I can find that talks about cdr-coding, a way of greatly compacting lists in memory.
 
-Scheme-86 authors:
-Andrew A Berlin: has worked on a very wide range of subfields over the years, started lots of companies. Seems like a cool dude.
-Henry M Wu: did some hardware design, and then left the industry and now owns some hotels and restaurants
+In January of 1978 (?), our boys Guy Steele and Gerald Sussman enter the scene and write a paper describing a new dialect of lisp called Scheme. Scheme is fairly minimal and elegant. But perhaps most importantly it's lexically scoped, which makes it ideal for implementing in hardware, since variable references can in principle be reduced to direct references instead of iterating through a lookup table.
 
+Things are picking up now. In March 1979 the duo publish LAMBDA: The Ultimate Opcode detailing a lisp machine of their own. This one takes things a bit slower, and is more first-principles, though arrives at a lot of the same conclusions. One big focus of this one was, instead of building on top of an existing microprocessor, fabbing a custom CPU that directly runs cons cells in memory. Despite the crazy constraints they were facing, they also squeezed in a small garbage collector! By the time the paper was published, the chips hadn't come back yet.
+
+In January 1980 a more detailed report on that same computer, this time with Jack Holloway and Alan Bell as teammates. It goes over every single technical detail of the CPU. This is a fantastic paper and is very self-contained. Of the 3 chips that they had fabbed, one worked. I would love to know where that wafer ended up.
+
+In 1981, the team apparently tried again, but I don't know where I can get access to that paper. The chip that they made for this, though, is kept in the Computer History Museum.
+
+Around this same time the Tom Knight team, along with David Moon, Jack Holloway, and Guy Steele were still working on their lisp machine. The published a report on their follow-up machine the CADR.
+
+It was after this that Symbolics Inc was formed by Russell Noftsker, a former administrator of the AI lab, and Jack Holloway. Around the same time, Richard Greenblatt founded Lisp Machines Inc.
+
+After that, a small number lisp machines were made by the two companies, both making them more in the CADR-style over the Sussman-style.
+
+Years later, after when things started to go downhill for the two companies, another scheme machine was designed by Andrew Berlin and Henry Wu. It's similar to the scheme-79 computer architecture, adding multiple execution units. I'm not sure if this machine was every built, or if it was just simulated.
+
+... and that's about it. I know of one project on Github that attempts to recreate the scheme-79 CPU on an FPGA, but since I don't know how to use them very well I don't know if they succeeded. I've found a couple blogs online of people starting to make one, but no word on their progress or if they every completed. 
+
+As far as I can tell, the history of the true lisp machine, one that interprets cons cells in silicon, pretty much ended in the 1980s.
+
+A bit about the authors:
+- Alan Bawden: went on to get his PhD at MIT, with Gerald Sussman as his advisor. His last publication was in 2008, but he seems to still be kicking around, at least as of 2019.
+- Richard Greenblatt: went on to found Lisp Machines Inc to sell the CADR machines.
+- Jack Holloway: co-founded Symbolics, of which much ink has been spilt. After that died, he started a company doing phone line stuff. He died last year of Parkinsons.
+- Thomas Knight: went on to work on a number of very impressive things in the fields of supercomputing and biology. I had never heard of the term "adiabatic computing" before, very cool. He co-founded Ginkgo Bioworks, and seems to be doing very well.
+- David Moon: became a big contributor to Common Lisp. Is still around, still doing some programming language research.
+- Daniel Weinreb: co-founded Symbolics. After that, he bounced around for a while writing LISP at a couple different companies. He died in 2012 at age 55 from cancer.
+- Guy Lewis Steele Jr: what can't be said about him? emacs, common lisp, hacker culture, java, etc. He's still doing computer research do this day.
+- Gerald Jay Sussman: 
+- Alan Bell: I haven't been able to find anything about him in the intervening years. On a forum about a year ago someone popped up who seems to match, his mind seems to be going: https://www.quora.com/profile/Dr-Alan-Bell-PhD
+- Andrew A Berlin: has worked on a very wide range of subfields over the years, started lots of companies. Seems like a cool dude.
+- Henry M Wu: did some hardware design, and then left the industry and now owns some hotels and restaurants
 
 # The plan
 
@@ -62,6 +72,8 @@ The broad design borrows from LISP-79 in that the whole computer is set up like 
 There are some differences though. Mine uses a much less compact instruction encoding, much less instructions, a single-layered microcode design, no interupts, different cons cell encoding, and a simplified bus model. So, you know, besides those.
 
 My design certainly feels like one of the niave designs that Sussman et al talk about in "LAMBDA: The Ultimate Opcode" before they describe their better design. The lack of features, the obvious basic improvements. My microcode is hand-written and my chips hand-routed, and not even the output of an embeded DSL compiler. God, so lame. Oh well.
+
+This CPU implements a small subset of Scheme. It's kinda like `eval` in a physical form.
 
 ## Instruction Encoding
 
@@ -221,3 +233,4 @@ The same thing will happen with the microinstruction ROM. This makes it more ann
 The rest will be pretty straightforward. Lots of tristate buffers, lots of latches, lots of logic gates.
 
 # source
+
