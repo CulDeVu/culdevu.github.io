@@ -23,9 +23,9 @@ In 1981, the team apparently tried again, but I don't know where I can get acces
 
 Around this same time the Tom Knight team, along with David Moon, Jack Holloway, and Guy Steele were still working on their lisp machine. The published a report on their follow-up machine the CADR.
 
-It was after this that Symbolics Inc was formed by Russell Noftsker, a former administrator of the AI lab, and Jack Holloway. Around the same time, Richard Greenblatt founded Lisp Machines Inc.
+It was after this that Symbolics Inc was formed by Russell Noftsker, a former administrator of the AI lab, Jack Holloway, Daniel Weinreb, and 18 others. Around the same time, Richard Greenblatt founded Lisp Machines Inc.
 
-After that, a small number lisp machines were made by the two companies, both making them more in the CADR-style over the Sussman-style.
+After that, a small number lisp machines were made by the two companies. Both companies made them in the CADR-style over the Sussman-style.
 
 Years later, after when things started to go downhill for the two companies, another scheme machine was designed by Andrew Berlin and Henry Wu. It's similar to the scheme-79 computer architecture, adding multiple execution units. I'm not sure if this machine was every built, or if it was just simulated.
 
@@ -36,16 +36,16 @@ As far as I can tell, the history of the true lisp machine, one that interprets 
 A bit about the authors:
 
 - Alan Bawden: went on to get his PhD at MIT, with Gerald Sussman as his advisor. His last publication was in 2008, but he seems to still be kicking around, at least as of 2019.
+- Alan Bell: I haven't been able to find anything about him in the intervening years. On a forum about a year ago someone popped up who seems to match, his mind seems to be going: https://www.quora.com/profile/Dr-Alan-Bell-PhD
+- Andrew A Berlin: has worked on a very wide range of subfields over the years, started lots of companies. Seems like a cool dude.
+- Daniel Weinreb: co-founded Symbolics. After that, he bounced around for a while writing LISP at a couple different companies. He died in 2012 at age 55 from cancer.
+- David Moon: became a big contributor to Common Lisp. Is still around, still doing some programming language research.
+- Gerald Jay Sussman: 
+- Guy Lewis Steele Jr: what can't be said about him? emacs, common lisp, hacker culture, java, etc. He's still doing computer research do this day.
+- Henry M Wu: did some hardware design, and then left the industry and now owns some hotels and restaurants
 - Richard Greenblatt: went on to found Lisp Machines Inc to sell the CADR machines.
 - Jack Holloway: co-founded Symbolics, of which much ink has been spilt. After that died, he started a company doing phone line stuff. He died last year of Parkinsons.
 - Thomas Knight: went on to work on a number of very impressive things in the fields of supercomputing and biology. I had never heard of the term "adiabatic computing" before, very cool. He co-founded Ginkgo Bioworks, and seems to be doing very well.
-- David Moon: became a big contributor to Common Lisp. Is still around, still doing some programming language research.
-- Daniel Weinreb: co-founded Symbolics. After that, he bounced around for a while writing LISP at a couple different companies. He died in 2012 at age 55 from cancer.
-- Guy Lewis Steele Jr: what can't be said about him? emacs, common lisp, hacker culture, java, etc. He's still doing computer research do this day.
-- Gerald Jay Sussman: 
-- Alan Bell: I haven't been able to find anything about him in the intervening years. On a forum about a year ago someone popped up who seems to match, his mind seems to be going: https://www.quora.com/profile/Dr-Alan-Bell-PhD
-- Andrew A Berlin: has worked on a very wide range of subfields over the years, started lots of companies. Seems like a cool dude.
-- Henry M Wu: did some hardware design, and then left the industry and now owns some hotels and restaurants
 
 # The plan
 
@@ -63,8 +63,6 @@ It's a large undertaking, but it goes something like this:
 - Phase 3: ???
 
 I've decided that phase 1 is done. It's not actually, there's some functionality that I know it still required to implement, but those are all simple. The big thing that I was worried about, the garbage collector, has been completed.
-
-It's going to get tedious calling it "my computer" over and over, so let's give it a temporary name. Let's call it "SM-1" for "scheme machine 1".
 
 # Design
 
@@ -119,7 +117,7 @@ The cdr term is simple enough: it's an address of size ADDR-WIDTH. It points to 
 
 ## Architecture Overview
 
-The SM-1 of:
+The CPU of:
 
 - An address bus that can be written to. Has width ADDR-WIDTH.
 - A data bus of that can be read from and written to. Has width CONS-WIDTH.
