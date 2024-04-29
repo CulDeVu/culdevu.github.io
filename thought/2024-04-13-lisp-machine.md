@@ -80,10 +80,25 @@ Memory is organized, of course, as cons cells. Instructions and data are organiz
 
 It's funny, I'm still fuzzy on some of the details. But this is the current plan:
 
-[picture]
-[picture of lisp-79?]
+```
+One memory cell:
 
-Each cell has a type, value, and cdr pointing to the next cell. There are much better encodings, but this makes it easier to write the microcode.
+ -------------------------------------- 
+|    type    |   value    |    cdr     |
+ -------------------------------------- 
+.            .            .            .
+|------------|            .            .
+  TYPE-WIDTH .            .            .
+  5 bits?    .            .            .
+             |------------|            .
+               ADDR-WIDTH .            .
+               24 bits    .            .
+                          |------------|
+                            ADDR-WIDTH
+                            24 bits
+```
+
+Each cell in memory represents a single cons cell. Each cell has a typed value, and cdr pointing to the next cell. There are much better encodings, but this makes it easier to write the microcode.
 
 The type is self explanatory. There needs to be enough types to represent all of the fundemental operations that the computer is capable of, and hopefully enough room for lot of use-defined types as well. The current list of fundemental types looks like:
 
@@ -107,9 +122,9 @@ Which comes out to 8, or 3 bits. Not great, since it's already a little bloated 
 
 The most obvious possible changes to look into are: removing nil (nil is just a list whose value points to 0), and removing empty (empty could just be a nil with a cdr of 0? Because anything that's pointing to a nil with a cdr of 0 could just as easily have been pointing to location 0. The problem is that the GC would have to detect that, and I don't have any more free registers to stick that kind of info into. I may have to add a new control line...). That would give an extra 2 slots to work with and still be 3 bits, which would be nice. One of those will definately need to be a port type, and it'll be nice to have one extra.
 
-The original idea was that the lower 3 bits (or however many it turns out to be) would be the "fundamental" part of the type which it can decay to, and the rest of the bits can be used as you please. I don't think this is a good idea. It's probably just better to have a single bit that tells the GC if it's a list-like or a constant-type.
+The original idea was that the lower 3 bits (or however many it turns out to be) would be the "fundamental" part of the type which it can decay to, and the rest of the bits can be used as you please. I don't think this is a good idea. It's probably just better to have a single bit that tells the GC if it's a list-like or a constant-like.
 
-Due to the constraints of the microcode ROM, I'm thinking I may have to restrict types to be... just 5 bits. Much much lower than I was hoping. If I could relax that constraint, I could concievably go up to like 10 bits (or higher?). I'm not sure, so I'll be calling this size TYPE-WIDTH.
+Due to the constraints of the microcode ROM, I'm thinking I may have to restrict types to be... just 5 bits. Much much lower than I was hoping. If I could relax that constraint, I could concievably go up to like 10 bits (or higher, I could conceivably crank it up to whatever number I want). I'm not sure, so I'll be calling this size TYPE-WIDTH.
 
 The values are bigger. They need to be able to hold addresses as well as regular old integers and characters and the like. Of those, I suspect address sizes are going to be larger. Depending on the decision on TYPE-WIDTH, the ADDR-WIDTH could be 20 to 24 bits.
 
@@ -129,12 +144,18 @@ The timing is broken up into macrocycles, microcycles, and nanocycles. Typically
 
 I may have gone a bit overboard with the clock. I got really anal about signal integrety. What happens when, for a brief moment, two parts of the CPU see different clock states (spooky circuits)? What happens when a latch triggers but the data isn't there yet?
 
-The nanocycle timing I came up with works under the principles that, during a single nanocycle, signals should become stable (no rising edge detectors), and if two adjacent nanocycles overlap a bit it's okay. So we have this:
-[todo: a diagram]
+The nanocycle timing I came up with works under the principles that, during a single nanocycle, signals should become stable (no rising edge detectors), and if two adjacent nanocycles overlap a bit it's okay. So we have this, a fource-phase microcycle clock.
+
+```
+  WRITE CYCLE    READ CYCLE    MICRO-PHASE-1    MICRO-PHASE-2
+                ___________                    ________________
+ ______________/          _\__________________/__             _\__ ...
+/             /\         /  \                /   \           /  \
+```
 
 The write nanocycle lets registers and external memory write to the bus(ses). The read cycle lets them read. The two microinstruction cycles are for controlling the microcode ROM.
 
-- Each read/write nanocycle is separated a bit, so the data bus can't thrash.
+- Each read/write nanocycle is separated some time, so the data bus can't thrash.
 - The two microcode nanocycles are a bit silly. It's so that there can be a 2-layer latch for the microcode state. That's needed because, if either the read or write nanocycle overlaps with the latching of the microcode lookup address (described later), the CPU can end up executing a mixture of two different microinstructions.
 - This timing is very easy to do, just a single clock downsample by 2 and a few gates.
 
