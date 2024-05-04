@@ -7,13 +7,13 @@ In the 19-something-or-other John McCarthy invented Lisp probably.
 
 Soon after that, people began to wisper about lisp machines. I don't know when it began, but it seems to go back a long ways. But to contain it, I'm going to be picking my historical events to tell a story.
 
-In November 1974, Tom Knight wrote a piece for the MIT AI Memos detailing a hypothetical machine optimized to run lisp. This was a big thing back in the 60s, apparently. At this point lisp was being widely used in the MIT AI lab, so this was an interesting and maybe practical proposal. It went over the design of the CPU and instruction encoding and such. I have a hard time reading it personally, but it apparently made a splash.
+In November 1974, Tom Knight wrote a piece for the MIT AI Memos detailing a hypothetical machine optimized to run lisp. Machines optimized to run a particular language was a big thing back in the 60s, apparently. At this point lisp was being widely used in the MIT AI lab, so this was an interesting and maybe practical proposal. It went over the design of the CPU and instruction encoding and such. I have a hard time reading it personally, but it apparently made a splash.
 
 Later that month, Richard Greenblatt wrote a follow-up detailing another lisp CPU architecture, but this one was much more expansive. This one describes a less stack-machine-y and more lisp-y architecture. It also goes on to describe a garbage collector, paging to a backing store, a GUI, traps, hardware type checking, and much more. A big leap!
 
 A few years and a lot of work later, in August 1977 Richard Greenblatt and Tom Knight, now with teammates and coauthors Alan Bawden, Jack Holloway, David Moon, and Daniel Weinreb published the LISP Machine Progress Report. This one talks about ideas like "personal computers", and low-latency interactive software. This one was actually implemented, sans some more complicated stuff like a GC. It was (I believe) implemented as a kernel running on a several general purpose microprocessors, but I must have missed what it said it was. It introduced many many more built-in instructions, as well as many other features relating to speeding up paging and dynamic scoping. It's also the first place I can find that talks about cdr-coding, a way of greatly compacting lists in memory.
 
-In January of 1978 (?), our boys Guy Steele and Gerald Sussman enter the scene and write a paper describing a new dialect of lisp called Scheme. Scheme is fairly minimal and elegant. But perhaps most importantly it's lexically scoped, which makes it ideal for implementing in hardware, since variable references can in principle be reduced to direct references instead of iterating through a lookup table.
+In January of 1978 (?), our boys Guy Steele and Gerald Sussman enter the scene and write a paper entitled "Scheme-79" describing a new dialect of lisp called Scheme. Scheme is fairly minimal and elegant. But perhaps most importantly it's lexically scoped, which makes it ideal for implementing in hardware, since variable references can in principle be reduced to direct references instead of iterating through a lookup table.
 
 Things are picking up now. In March 1979 the duo publish LAMBDA: The Ultimate Opcode detailing a lisp machine of their own. This one takes things a bit slower, and is more first-principles, though arrives at a lot of the same conclusions. One big focus of this one was, instead of building on top of an existing microprocessor, fabbing a custom CPU that directly runs cons cells in memory. Despite the crazy constraints they were facing, they also squeezed in a small garbage collector! By the time the paper was published, the chips hadn't come back yet.
 
@@ -57,7 +57,7 @@ Anyways, I've been wanting to do a homebrew computer project for a while. I've p
 
 It's a large undertaking, but it goes something like this:
 
-- Phase 1: some simulators. I've written a couple so far to get my bearings. The most recent one (listed in full at the bottom of the post) simulates just the computer portion. In other words, just the part that executes instructions, no external hardware. It simulates the computer on the scale of clock signals and control lines, bus lines, and latches. So not quite logic gates, but close enough that I'm pretty confident that this design works.
+- Phase 1: some simulators. I've written a couple so far to get my bearings. The most recent one (link at bottom of the post) simulates just the computer portion. In other words, just the part that executes instructions, no external hardware. It simulates the computer on the scale of clock signals and control lines, bus lines, and latches. So not quite logic gates, but close enough that I'm pretty confident that this design works.
 - Phase 2a: some software. Notably a compiler and some software for interacting with hardware. I'm still a bit split on where I want to go with this.
 - Phase 2b: the build. Self-explanatory.
 - Phase 3: ???
@@ -66,73 +66,73 @@ I've decided that phase 1 is done. It's not actually, there's some functionality
 
 # Design
 
-The broad design borrows from LISP-79 in that the whole computer is set up like a state machine. On the large scale, the computer walks the instruction graph one cons cell at a time and permute the machine's state. For example, an `if` node will change the `state` register to `doing-if`. If the computer encounters a `0` when the state register is set to `doing-if`, the state register will then change to `doing-if-skip`. And so on.
+The broad design borrows from LISP-79 in that the whole computer is set up like a state machine. On the large scale, the computer walks the instruction graph one cons cell at a time and permutes the machine's state. For example, an `if` node will change the `state` register to `doing-if`. If the computer encounters a `0` when the state register is set to `doing-if`, the state register will then change to `doing-if-skip`. And so on.
 
-There are some differences though. Mine uses a much less compact instruction encoding, much less instructions, a single-layered microcode design, no interupts, different cons cell encoding, and a simplified bus model. So, you know, besides those.
+There are some differences though. Mine uses a much less compact instruction encoding, many less instructions, a single-layered microcode design, no interupts, different cons cell encoding, and a simplified bus model. So, you know, besides those.
 
 My design certainly feels like one of the niave designs that Sussman et al talk about in "LAMBDA: The Ultimate Opcode" before they describe their better design. The lack of features, the obvious basic improvements. My microcode is hand-written and my chips hand-routed, and not even the output of an embeded DSL compiler. God, so lame. Oh well.
 
-This CPU implements a small subset of Scheme. It's kinda like `eval` in a physical form.
+This CPU implements a small subset of Scheme.
 
 ## Instruction Encoding
 
-Memory is organized, of course, as cons cells. Instructions and data are organized in big trees, and the instructions are walked in depth-first order. Some registers, and the data bus both are able to hold a full cons cell.
+Memory is organized, of course, as cons cells. Instructions and data are organized in big trees, and the instructions are walked in depth-first order. The data bug and some registers are able to hold a full cons cell.
 
 It's funny, I'm still fuzzy on some of the details. But this is the current plan:
 
 ```
 One memory cell:
 
- -------------------------------------- 
-|    type    |   value    |    cdr     |
- -------------------------------------- 
-.            .            .            .
-|------------|            .            .
-  TYPE-WIDTH .            .            .
-  5 bits?    .            .            .
-             |------------|            .
-               ADDR-WIDTH .            .
-               24 bits    .            .
-                          |------------|
-                            ADDR-WIDTH
-                            24 bits
+ ------------------------------------------------------- 
+|   gc  | unused |    type    |   value    |    cdr     |
+ ------------------------------------------------------- 
+.       .        .            .            .            .
+|-------|        |------------|            |------------|
+  1 bit .        . TYPE-WIDTH .            . ADDR-WIDTH
+        .        . 5 bits?    .            . 24 bits
+        |--------|            |------------|
+          2 bits                ADDR-WIDTH 
+                                24 bits    
 ```
 
-Each cell in memory represents a single cons cell. Each cell has a typed value, and cdr pointing to the next cell. There are much better encodings, but this makes it easier to write the microcode.
+Each cell in memory represents a single cons cell. Each cell has a typed value and cdr pointing to the next cell. There are much better encodings, but this makes it easier to write the microcode.
 
-The type is self explanatory. There needs to be enough types to represent all of the fundemental operations that the computer is capable of, and hopefully enough room for lot of use-defined types as well. The current list of fundemental types looks like:
+The type is self explanatory. There needs to be enough types to represent all of the fundemental operations that the computer is capable of, and hopefully enough room for lots of use-defined types as well. The current list of fundemental types looks like:
 
-3 constant-like types:
-- nil: the terminating item of a list. Eventually, all lists end in one of these. See later discussion of pure functional memory.
+3 atom-like types:
+
+- nil: the terminating item of a list. Eventually, all lists end in one of these. See later discussion of pure functional memory. A nil element sites in the first slot in memory at address zero. This is so that lists can terminate with a cdr of `0`, instead of a whole new nil cell for each.
 - int
 - builtin-function: its value is one of a list of builtin operations the computer can do. So like `add`, `car`, `nand`, `zero?`, etc.
 
 3 list-like types:
+
 - list
 - call: an address to another list somewhere. Will push the CPU stack and put the CPU in a state where its expecting the next node to be a builtin-function or a closure
 - closure: prodecure and environment
 
 2 types needed for gc:
+
 - reloc: a marker left in memory saying "the item that was here has been moved to this other location"
 - empty: an empty cell, as opposed to a cell that has some other type of item in it.
 
-The first slot in memory, at memory location zero, sits a nil element. This is so that lists can terminate with a cdr of `0`, instead of a whole new nil cell for each.
-
 Which comes out to 8, or 3 bits. Not great, since it's already a little bloated and I don't even have a symbol type yet!
 
-The most obvious possible changes to look into are: removing nil (nil is just a list whose value points to 0), and removing empty (empty could just be a nil with a cdr of 0? Because anything that's pointing to a nil with a cdr of 0 could just as easily have been pointing to location 0. The problem is that the GC would have to detect that, and I don't have any more free registers to stick that kind of info into. I may have to add a new control line...). That would give an extra 2 slots to work with and still be 3 bits, which would be nice. One of those will definately need to be a port type, and it'll be nice to have one extra.
+The most obvious changes to look into are: removing nil (nil is just a list whose value points to 0), and removing empty (empty could just be a nil with a cdr of 0? Because anything that's pointing to a nil with a cdr of 0 could just as easily have been pointing to location 0. The problem is that the GC would have to detect that, and I don't have any more free registers to stick that kind of info into. I may have to add a new control line...). That would give an extra 2 slots to work with and still be 3 bits, which would be nice. One of those will definately need to be a port type, and it'll be nice to have one extra.
 
-The original idea was that the lower 3 bits (or however many it turns out to be) would be the "fundamental" part of the type which it can decay to, and the rest of the bits can be used as you please. I don't think this is a good idea. It's probably just better to have a single bit that tells the GC if it's a list-like or a constant-like.
+The original idea was that the lower 3 bits (or however many it turns out to be) would be the "fundamental" part of the type which it can decay to, and the rest of the bits can be used as you please. I don't think this is a good idea. It's probably just better to have a single bit that tells the GC if it's a list-like or an atom-like.
 
-Due to the constraints of the microcode ROM, I'm thinking I may have to restrict types to be... just 5 bits. Much much lower than I was hoping. If I could relax that constraint, I could concievably go up to like 10 bits (or higher, I could conceivably crank it up to whatever number I want). I'm not sure, so I'll be calling this size TYPE-WIDTH.
+Due to the constraints of the microcode ROM, I'm thinking I may have to restrict types to be... just 5 bits. Despite the fact that I have 2 more unused bits just sitting there. Much much lower than I was hoping. If I could relax that constraint, I could concievably go up to like 10 bits (or higher, I could conceivably crank it up to whatever number I want). I'm not sure, so I'll be calling this size TYPE-WIDTH.
 
 The values are bigger. They need to be able to hold addresses as well as regular old integers and characters and the like. Of those, I suspect address sizes are going to be larger. Depending on the decision on TYPE-WIDTH, the ADDR-WIDTH could be 20 to 24 bits.
 
 The cdr term is simple enough: it's an address of size ADDR-WIDTH. It points to the next cell in the linked list.
 
+Put them all together to form one cons cell, made up of CONS-WIDTH bits.
+
 ## Architecture Overview
 
-The CPU of:
+The CPU consists of:
 
 - An address bus that can be written to. Has width ADDR-WIDTH.
 - A data bus of that can be read from and written to. Has width CONS-WIDTH.
@@ -142,20 +142,22 @@ The CPU of:
 
 The timing is broken up into macrocycles, microcycles, and nanocycles. Typically one instruction from the instruction graph is consumed every macrocycle. Each macrocycle will consist of many microcycles, one for each microinstruction stored in the microcode ROM for a given state. Each microcycle is 4 nanocycles.
 
-I may have gone a bit overboard with the clock. I got really anal about signal integrety. What happens when, for a brief moment, two parts of the CPU see different clock states (spooky circuits)? What happens when a latch triggers but the data isn't there yet?
+I may have gone a bit overboard with the clock. I got really anal about signal integrety. What happens when, for a brief moment, two parts of the CPU see different clock states (spooky circuits)? What happens when a D-flip-flop triggers but the data isn't there yet?
 
 The nanocycle timing I came up with works under the principles that, during a single nanocycle, signals should become stable (no rising edge detectors), and if two adjacent nanocycles overlap a bit it's okay. So we have this, a fource-phase microcycle clock.
 
 ```
-  WRITE CYCLE    READ CYCLE    MICRO-PHASE-1    MICRO-PHASE-2
-                ___________                    ________________
- ______________/          _\__________________/__             _\__ ...
-/             /\         /  \                /   \           /  \
+  WRITE CYCLE    READ CYCLE     MICRO-PHASE-1    MICRO-PHASE-2
+_               ____________                    _______________
+ \__________   /           _\__________________/__            _\__ ...
+ /\         \ /           /  \                /   \          /  \
 ```
 
-The write nanocycle lets registers and external memory write to the bus(ses). The read cycle lets them read. The two microinstruction cycles are for controlling the microcode ROM.
+So in other words, we're looking at level-triggering, with a multiphase clock.
 
-- Each read/write nanocycle is separated some time, so the data bus can't thrash.
+The write nanocycle lets registers and external memory write to the bus(ses). The read cycle lets them read. The two microinstruction cycles are for controlling the microcode ROM, and can also be used in the future for more lengthy calculations like a multiply (if I ever add one).
+
+- Each read/write nanocycle is separated by some time, so the data bus can't thrash.
 - The two microcode nanocycles are a bit silly. It's so that there can be a 2-layer latch for the microcode state. That's needed because, if either the read or write nanocycle overlaps with the latching of the microcode lookup address (described later), the CPU can end up executing a mixture of two different microinstructions.
 - This timing is very easy to do, just a single clock downsample by 2 and a few gates.
 
@@ -224,11 +226,11 @@ If you look at the list of instructions, you'll see there's no "set!" or equival
 
 The GC is automatic: when it reaches the top of memory it stops the world and does its thing, and then returns to the state it was in before it started. There's currently no way to trigger a GC in userspace, but that's not a design decision or anything. It'd be very easy to add a builtin function `gc`, just haven't done it.
 
-GC is done in four phases: an init phase, a downward phase and marks and deletes garbage memory, an upward phase that compacts, and a cleanup phase.
+GC is done in four phases: an init phase, a downward phase that marks and deletes garbage memory, an upward phase that compacts, and a cleanup phase.
 
 The init phase pushes all of the registers onto the heap, and sets their gc `mark` bits.
 
-The downward phase walks the heap downards. If a cell is marked, it marks the cells its pointing to, and then unmarks itself. If a cell is not marked, it's replaced with an `empty` cell. At the end of this phase, all memory is unmarked, there are no `reloc` cells left, and there is no unreachable memory left in the heap.
+The downward phase walks the heap downards. If a cell is marked, it marks the cells it's pointing to, and then unmarks itself. If a cell is not marked, it's replaced with an `empty` cell. At the end of this phase, all memory is unmarked, there are no `reloc` cells left, and there is no unreachable memory left in the heap.
 
 The upward phase walks the heap upwards. It maintains two pointers, a low and a high. The low pointer searches for an `empty` cell and the high pointer searches for a non-`empty` cell to move to the low location, with the constraint that low pointer < high pointer. When a pair is found, the contents of the high pointer gets copied into the low pointer, and a `reloc` cell is put in its place notifying all cells further up the heap that it has moved. Before doing the move though, the contents of the high pointer are checked to see if *it* is pointing to any `reloc` cells, and rewrites them. At the end of this phase, the low pointer points to what will become the new `head`, there are no `empty` cells below the low pointer, and no non-`reloc` cells are pointing to a `reloc` cell. There are, however, still some `reloc` cells scattered around the heap that take up space and will get deleted in the next GC.
 
@@ -244,9 +246,7 @@ The upwards phase leaves a lot to be desired. Its purpose is to compact memory s
 
 The heap memory will be implemented as a bunch of parallel banks each holding part of a cons cell.
 
-[picture]
-
-For example, if we use 52-bit cons cells, we might be looking at 7 8-bit SRAM chips that each hold 8 bits of the cell. This makes things much nicer, since memory accesses can be a single read/write macrocycle.
+For example, if we use 56-bit cons cells, we might be looking at 7 8-bit SRAM chips that each hold 8 bits of the cell. This makes things much nicer, since memory accesses can be a single read/write macrocycle.
 
 The same thing will happen with the microinstruction ROM. This makes it more annoying to write ROMs, but I'll just have to deal with it.
 
@@ -254,3 +254,4 @@ The rest will be pretty straightforward. Lots of tristate buffers, lots of latch
 
 # source
 
+The source for the simulator is here [todo]. Please note that it is *very* first-draft-y.
