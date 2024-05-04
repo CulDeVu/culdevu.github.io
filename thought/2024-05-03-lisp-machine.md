@@ -1,11 +1,11 @@
 == Lisp machine simulator
-=== wip
+=== A learning project or NIH? I can't even tell anymore.
 
-# history
+# History
 
 In the 19-something-or-other John McCarthy invented Lisp probably.
 
-Soon after that, people began to wisper about lisp machines. I don't know when it began, but it seems to go back a long ways. But to contain it, I'm going to be picking my historical events to tell a story.
+Soon after that, people began to whisper about lisp machines. I don't know when it began, but it seems to go back a long ways. But to contain it, I'm going to be picking my historical events to tell a story.
 
 In November 1974, Tom Knight wrote a piece for the MIT AI Memos detailing a hypothetical machine optimized to run lisp. Machines optimized to run a particular language was a big thing back in the 60s, apparently. At this point lisp was being widely used in the MIT AI lab, so this was an interesting and maybe practical proposal. It went over the design of the CPU and instruction encoding and such. I have a hard time reading it personally, but it apparently made a splash.
 
@@ -13,7 +13,7 @@ Later that month, Richard Greenblatt wrote a follow-up detailing another lisp CP
 
 A few years and a lot of work later, in August 1977 Richard Greenblatt and Tom Knight, now with teammates and coauthors Alan Bawden, Jack Holloway, David Moon, and Daniel Weinreb published the LISP Machine Progress Report. This one talks about ideas like "personal computers", and low-latency interactive software. This one was actually implemented, sans some more complicated stuff like a GC. It was (I believe) implemented as a kernel running on a several general purpose microprocessors, but I must have missed what it said it was. It introduced many many more built-in instructions, as well as many other features relating to speeding up paging and dynamic scoping. It's also the first place I can find that talks about cdr-coding, a way of greatly compacting lists in memory.
 
-In January of 1978 (?), our boys Guy Steele and Gerald Sussman enter the scene and write a paper entitled "Scheme-79" describing a new dialect of lisp called Scheme. Scheme is fairly minimal and elegant. But perhaps most importantly it's lexically scoped, which makes it ideal for implementing in hardware, since variable references can in principle be reduced to direct references instead of iterating through a lookup table.
+In January of 1978, our boys Guy Steele and Gerald Sussman enter the scene and write a paper entitled "Scheme-79" describing a new dialect of lisp called Scheme. Scheme is fairly minimal and elegant. But perhaps most importantly it's lexically scoped, which makes it ideal for implementing in hardware, since variable references can in principle be reduced to direct references instead of iterating through a lookup table.
 
 Things are picking up now. In March 1979 the duo publish LAMBDA: The Ultimate Opcode detailing a lisp machine of their own. This one takes things a bit slower, and is more first-principles, though arrives at a lot of the same conclusions. One big focus of this one was, instead of building on top of an existing microprocessor, fabbing a custom CPU that directly runs cons cells in memory. Despite the crazy constraints they were facing, they also squeezed in a small garbage collector! By the time the paper was published, the chips hadn't come back yet.
 
@@ -23,28 +23,28 @@ In 1981, the team apparently tried again, but I don't know where I can get acces
 
 Around this same time the Tom Knight team, along with David Moon, Jack Holloway, and Guy Steele were still working on their lisp machine. The published a report on their follow-up machine the CADR.
 
-It was after this that Symbolics Inc was formed by Russell Noftsker, a former administrator of the AI lab, Jack Holloway, Daniel Weinreb, and 18 others. Around the same time, Richard Greenblatt founded Lisp Machines Inc.
+It was after this that Symbolics Inc was formed by Russell Noftsker, a former administrator of the AI lab, Jack Holloway, Daniel Weinreb, and 18 others. Around the same time, Richard Greenblatt founded Lisp Machines Inc. Much ink has been spilled about these companies.
 
 After that, a small number lisp machines were made by the two companies. Both companies made them in the CADR-style over the Sussman-style.
 
 Years later, after when things started to go downhill for the two companies, another scheme machine was designed by Andrew Berlin and Henry Wu. It's similar to the scheme-79 computer architecture, adding multiple execution units. I'm not sure if this machine was every built, or if it was just simulated.
 
-... and that's about it. I know of one project on Github that attempts to recreate the scheme-79 CPU on an FPGA, but since I don't know how to use them very well I don't know if they succeeded. I've found a couple blogs online of people starting to make one, but no word on their progress or if they every completed. 
+... and that's about it. I know of three projects on the internet that attempts to create a lisp machine on an FPGA (one of which even attempting to recreate the scheme-79 CPU!) but since I don't know how to use them very well I don't know if they succeeded. I've found a couple blogs online of people starting to make one, but no word on their progress or if they every completed. 
 
 As far as I can tell, the history of the true lisp machine, one that interprets cons cells in silicon, pretty much ended in the 1980s.
 
-A bit about the authors:
+A bit about the authors, and what happened to them afterwards:
 
 - Alan Bawden: went on to get his PhD at MIT, with Gerald Sussman as his advisor. His last publication was in 2008, but he seems to still be kicking around, at least as of 2019.
-- Alan Bell: I haven't been able to find anything about him in the intervening years. On a forum about a year ago someone popped up who seems to match, his mind seems to be going: https://www.quora.com/profile/Dr-Alan-Bell-PhD
+- Alan Bell: I haven't been able to find anything about him in the intervening years. I did find link(https://www.quora.com/profile/Dr-Alan-Bell-PhD)[this] account, and the personal information listed seems to line up. Make of that what you will. At the very least, if this is him then he's still alive as of last year.
 - Andrew A Berlin: has worked on a very wide range of subfields over the years, started lots of companies. Seems like a cool dude.
-- Daniel Weinreb: co-founded Symbolics. After that, he bounced around for a while writing LISP at a couple different companies. He died in 2012 at age 55 from cancer.
+- Daniel Weinreb: after Symbolics, he bounced around for a while writing LISP at a couple different companies. He died in 2012 at age 55 from cancer.
 - David Moon: became a big contributor to Common Lisp. Is still around, still doing some programming language research.
-- Gerald Jay Sussman: 
+- Gerald Jay Sussman: very much one of the heroes of the story. Wrote a very famous textbook, continues to proselytize Scheme, among many many other things. He's currently a professor of Electrical Engineering at MIT.
 - Guy Lewis Steele Jr: what can't be said about him? emacs, common lisp, hacker culture, java, etc. He's still doing computer research do this day.
-- Henry M Wu: did some hardware design, and then left the industry and now owns some hotels and restaurants
+- Henry M Wu: did some hardware design, and then left the industry entirely and now owns some hotels and restaurants.
 - Richard Greenblatt: went on to found Lisp Machines Inc to sell the CADR machines.
-- Jack Holloway: co-founded Symbolics, of which much ink has been spilt. After that died, he started a company doing phone line stuff. He died last year of Parkinsons.
+- Jack Holloway: after Symbolics, he started a company doing phone line stuff. He died last year of Parkinsons.
 - Thomas Knight: went on to work on a number of very impressive things in the fields of supercomputing and biology. I had never heard of the term "adiabatic computing" before, very cool. He co-founded Ginkgo Bioworks, and seems to be doing very well.
 
 # The plan
@@ -70,7 +70,7 @@ The broad design borrows from LISP-79 in that the whole computer is set up like 
 
 There are some differences though. Mine uses a much less compact instruction encoding, many less instructions, a single-layered microcode design, no interupts, different cons cell encoding, and a simplified bus model. So, you know, besides those.
 
-My design certainly feels like one of the niave designs that Sussman et al talk about in "LAMBDA: The Ultimate Opcode" before they describe their better design. The lack of features, the obvious basic improvements. My microcode is hand-written and my chips hand-routed, and not even the output of an embeded DSL compiler. God, so lame. Oh well.
+My design certainly feels like one of the naive designs that Sussman et al talk about in "LAMBDA: The Ultimate Opcode" before they describe their better design. The lack of features, the obvious basic improvements. My microcode is hand-written and my chips hand-routed, and not even the output of an embedded DSL compiler. God, so lame. Oh well.
 
 This CPU implements a small subset of Scheme.
 
@@ -97,7 +97,7 @@ One memory cell:
 
 Each cell in memory represents a single cons cell. Each cell has a typed value and cdr pointing to the next cell. There are much better encodings, but this makes it easier to write the microcode.
 
-The type is self explanatory. There needs to be enough types to represent all of the fundemental operations that the computer is capable of, and hopefully enough room for lots of use-defined types as well. The current list of fundemental types looks like:
+The type is self explanatory. There needs to be enough types to represent all of the fundamental operations that the computer is capable of, and hopefully enough room for lots of use-defined types as well. The current list of fundamental types looks like:
 
 3 atom-like types:
 
@@ -109,7 +109,7 @@ The type is self explanatory. There needs to be enough types to represent all of
 
 - list
 - call: an address to another list somewhere. Will push the CPU stack and put the CPU in a state where its expecting the next node to be a builtin-function or a closure
-- closure: prodecure and environment
+- closure: procedure and environment
 
 2 types needed for gc:
 
@@ -118,11 +118,11 @@ The type is self explanatory. There needs to be enough types to represent all of
 
 Which comes out to 8, or 3 bits. Not great, since it's already a little bloated and I don't even have a symbol type yet!
 
-The most obvious changes to look into are: removing nil (nil is just a list whose value points to 0), and removing empty (empty could just be a nil with a cdr of 0? Because anything that's pointing to a nil with a cdr of 0 could just as easily have been pointing to location 0. The problem is that the GC would have to detect that, and I don't have any more free registers to stick that kind of info into. I may have to add a new control line...). That would give an extra 2 slots to work with and still be 3 bits, which would be nice. One of those will definately need to be a port type, and it'll be nice to have one extra.
+The most obvious changes to look into are: removing nil (nil is just a list whose value points to 0), and removing empty (empty could just be a nil with a cdr of 0? Because anything that's pointing to a nil with a cdr of 0 could just as easily have been pointing to location 0. The problem is that the GC would have to detect that, and I don't have any more free registers to stick that kind of info into. I may have to add a new control line...). That would give an extra 2 slots to work with and still be 3 bits, which would be nice. One of those will definitely need to be a port type, and it'll be nice to have one extra.
 
 The original idea was that the lower 3 bits (or however many it turns out to be) would be the "fundamental" part of the type which it can decay to, and the rest of the bits can be used as you please. I don't think this is a good idea. It's probably just better to have a single bit that tells the GC if it's a list-like or an atom-like.
 
-Due to the constraints of the microcode ROM, I'm thinking I may have to restrict types to be... just 5 bits. Despite the fact that I have 2 more unused bits just sitting there. Much much lower than I was hoping. If I could relax that constraint, I could concievably go up to like 10 bits (or higher, I could conceivably crank it up to whatever number I want). I'm not sure, so I'll be calling this size TYPE-WIDTH.
+Due to the constraints of the microcode ROM, I'm thinking I may have to restrict types to be... just 5 bits. Despite the fact that I have 2 more unused bits just sitting there. Much much lower than I was hoping. If I could relax that constraint, I could conceivably go up to like 10 bits (or higher, I could conceivably crank it up to whatever number I want). I'm not sure, so I'll be calling this size TYPE-WIDTH.
 
 The values are bigger. They need to be able to hold addresses as well as regular old integers and characters and the like. Of those, I suspect address sizes are going to be larger. Depending on the decision on TYPE-WIDTH, the ADDR-WIDTH could be 20 to 24 bits.
 
@@ -137,14 +137,14 @@ The CPU consists of:
 - An address bus that can be written to. Has width ADDR-WIDTH.
 - A data bus of that can be read from and written to. Has width CONS-WIDTH.
 - RAM, ROM, external devices behind a simple memory map.
-- A microcode ROM, with [todo]
+- A microcode ROM
 - 8 registers: instr, stack, accumulator, state, temp, envt, mem-addr, head
 
 The timing is broken up into macrocycles, microcycles, and nanocycles. Typically one instruction from the instruction graph is consumed every macrocycle. Each macrocycle will consist of many microcycles, one for each microinstruction stored in the microcode ROM for a given state. Each microcycle is 4 nanocycles.
 
 I may have gone a bit overboard with the clock. I got really anal about signal integrety. What happens when, for a brief moment, two parts of the CPU see different clock states (spooky circuits)? What happens when a D-flip-flop triggers but the data isn't there yet?
 
-The nanocycle timing I came up with works under the principles that, during a single nanocycle, signals should become stable (no rising edge detectors), and if two adjacent nanocycles overlap a bit it's okay. So we have this, a fource-phase microcycle clock.
+The nanocycle timing I came up with works under the principles that, during a single nanocycle, signals should become stable (no rising edge detectors), and if two adjacent nanocycles overlap a bit it's okay. So we have this, a four-phase microcycle clock.
 
 ```
   WRITE CYCLE    READ CYCLE     MICRO-PHASE-1    MICRO-PHASE-2
@@ -205,7 +205,7 @@ The contents of instr-type, instr-val, state-val, and a few other things are pac
 
 The address fed into the microcode-address ROM is formed from:
 
-- instr-type, the first however-many-bits it takes to encode a fundemental type (3 currently)
+- instr-type, the first however-many-bits it takes to encode a fundamental type (3 currently)
 - instr-val, but only enough bits to encode a full type (5 currently)
 - state-val (5 currently, but likely to change)
 - 1 bit for "are the rest of the bits in instr-val zero?"
@@ -216,7 +216,7 @@ The total here comes out to 16 bits, to be stored in a 64kb ROM no room at all t
 
 I haven't tallied up the amount of space the microinstructions will take up. Lots and lots of bit patterns apply to the same set of microinstructions, but some microinstruction expansions are pretty big. I wouldn't be surprised if it came out to be over 1000 microinstructions total to store in the ROM. Very manageable number.
 
-At the end of each macrocycle, the state of instr-type, instr-val, state-val, and the other 1-bit calculations are snapshotted and stored into a couple dedicated microcode registers. This is so that the set of instructions that we're following doesn't change out from under us as we're executing and permuting the CPU state. At the end of each microcycle the stored microcode address is incremented, until it recieves the "latch microcode registers", in which case it resets to 0.
+At the end of each macrocycle, the state of instr-type, instr-val, state-val, and the other 1-bit calculations are snapshotted and stored into a couple dedicated microcode registers. This is so that the set of instructions that we're following doesn't change out from under us as we're executing and permuting the CPU state. At the end of each microcycle the stored microcode address is incremented, until it receives the "latch microcode registers", in which case it resets to 0.
 
 ## Garbage Collection
 
@@ -230,7 +230,7 @@ GC is done in four phases: an init phase, a downward phase that marks and delete
 
 The init phase pushes all of the registers onto the heap, and sets their gc `mark` bits.
 
-The downward phase walks the heap downards. If a cell is marked, it marks the cells it's pointing to, and then unmarks itself. If a cell is not marked, it's replaced with an `empty` cell. At the end of this phase, all memory is unmarked, there are no `reloc` cells left, and there is no unreachable memory left in the heap.
+The downward phase walks the heap downwards. If a cell is marked, it marks the cells it's pointing to, and then unmarks itself. If a cell is not marked, it's replaced with an `empty` cell. At the end of this phase, all memory is unmarked, there are no `reloc` cells left, and there is no unreachable memory left in the heap.
 
 The upward phase walks the heap upwards. It maintains two pointers, a low and a high. The low pointer searches for an `empty` cell and the high pointer searches for a non-`empty` cell to move to the low location, with the constraint that low pointer < high pointer. When a pair is found, the contents of the high pointer gets copied into the low pointer, and a `reloc` cell is put in its place notifying all cells further up the heap that it has moved. Before doing the move though, the contents of the high pointer are checked to see if *it* is pointing to any `reloc` cells, and rewrites them. At the end of this phase, the low pointer points to what will become the new `head`, there are no `empty` cells below the low pointer, and no non-`reloc` cells are pointing to a `reloc` cell. There are, however, still some `reloc` cells scattered around the heap that take up space and will get deleted in the next GC.
 
@@ -254,4 +254,4 @@ The rest will be pretty straightforward. Lots of tristate buffers, lots of latch
 
 # source
 
-The source for the simulator is here [todo]. Please note that it is *very* first-draft-y.
+The source for the simulator is link(microcode.scm)[here]. Please note that it is *very* first-draft-y.
