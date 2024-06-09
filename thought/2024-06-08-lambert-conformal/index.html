@@ -1,0 +1,128 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a><a href="/physics/" class="navitem">Physics</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Lambert conformal projection derivation</h2><i>Pub. 2024 Jun 8</i><p>Below is a simple derivation of the lambert conical conformal transform for a sphere.</p><p>Most resources online are like <a href="https://mathworld.wolfram.com/LambertConformalConicProjection.html">this wolfram mathworld page</a>, which sites a <a href="https://archive.org/details/USGSMapProjectionsAWorkingManual1987/page/n115/mode/2up">a book from 1987</a> contains just formulas, no derivation. That book in turn cites the original 1772 paper by Lambert. To nobody's surprise, I couldn't find this book, nor its 1972 translation online.</p><p><a href="https://geodesy.noaa.gov/library/pdfs/Special_Publication_No_47.pdf">This 1918 (?) paper</a> gives a good overview of the derivation. The first section gives a derivation of a (fairly poor) approximation, but then later gives the full thing. But it's over an ellipsoid, and it's maybe a bit overcomplicated.</p><p>Here's mine. I tried to keep it as simple as I could. It's only valid for a sphere, which is what the NDFD and HRRR datasets are in.</p><p><table><tr style="vertical-align:top"><td width=50%><figure><img src="sphere.png" style="width:100%"><figcaption></figcaption></figure></td><td><figure><img src="projected.png" width="100%"><figcaption></figcaption></figure></td></tr></table></p><p>We have here a sphere with radius $R$, a  reference point $G$ with parallel $\phi_0$ and meridian $0$, and another point on the sphere with parallel $\phi$ and meridian $\lambda$.</p><p>The transform has a couple properties:</p><ul><li>"Wedges" of the sphere, like in the left image above, get transformed into sectors of a circle, like in the right image above.</li><li>Meridians get mapped to straight lines radiating out from a center "origin" point (the point where the north pole gets mapped). Parallels get mapped to concentric circles (or rather portions of circles).</li><li>The length of the reference parallel is the same as the length of the circle that the reference parallel gets mapped to.</li><li>A wedge with angle $\lambda$ get transformed into a wedge with internal angle $\lambda \sin{\phi_0}$. You could conceivably choose something different, but this choice minimizes the distortion around the reference parallel.</li><li>From these two, the distance from $G'$ to the origin is $R \cot{\phi_0}$.</li></ul><p>To derive the transformation, we're going to be looking at what happens to $N$ and $E$ in the above diagram.</p><p>Say you're standing on the sphere at $(\phi, \lambda)$. Taking a small step of $\Delta$ meters northward corresponds to a change in parallel $d \phi = \frac{\Delta}{R}$. Taking the same small step $\Delta$ eastward cooresponds to a change in meridian of $d \lambda = \frac{\Delta}{R \cos{\phi}}$.</p><p>The goal here is to express the cooreponding change to $N$ and $E$ in the projected map, $dN$ and $dE$. Conformal maps preserve scale in all directions at every point, so $dN = dE$ in a lambert conformal map.</p><p>Going off of the diagram above, a step eastward on the globe would correspond to a change in the projected map $dE = (R \cot{\phi_0} - N) d \lambda \sin{\phi_0} = (R \cot{\phi_0} - N) \frac{\Delta}{R \cos{\phi}} \sin{\phi_0}$.</p><p>We don't know what $N$ is as a function of $\Delta$. However, we can say that whatever $N$ is, $dN = \frac{dN}{d \phi} d \phi = \frac{dN}{d \phi} \frac{\Delta}{R}$.</p><p>Putting it all together:</p><p>$$\begin{align}dN & = dE \\\frac{dN}{d \phi} \frac{\Delta}{R} & = (R \cot{\phi_0} - N) \frac{\Delta}{R \cos{\phi}} \sin{\phi_0} \\\frac{dN}{d \phi} & = (R \cot{\phi_0} - N) \sec{\phi} \sin{\phi_0}.\end{align}$$</p><p>This is where we need to bring in calculus. This is a fairly simple seperable differential equaion:</p><p>$$\frac{dN}{R \cot{\phi_0} - N} = \sec{\phi} \sin{\phi_0} d \phi,$$</p><p>which solves to</p><p>$$\begin{align}-\ln \left| R \cot{\phi_0} - N \right| & = \sin{\phi_0} \sinh^{-1}(\tan{\phi}) + C \\\text{OR} & = \sin{\phi_0} \ln \left| \sec{\phi} + \tan{\phi} \right| + C \\\text{OR} & = \sin{\phi_0} \ln \left| \tan \left( \frac{\phi}{2} + \frac{\pi}{4} \right) \right| + C \\\text{OR} & = ...\end{align}$$</p><p>There are famously several equivalent integrals of secant. Sticking with the top one:</p><p>$$\begin{align}-\ln \left| R \cot{\phi_0} - N \right| & = \sin{\phi_0} \sinh^{-1}(\tan{\phi}) + C \\\left| R \cot{\phi_0} - N \right| & = C e^{-\sin{\phi_0} \sinh^{-1}(\tan{\phi})} \\N & = R \cot{\phi_0} + C e^{-\sin{\phi_0} \sinh^{-1}(\tan{\phi})}.\end{align}$$</p><p>Combining this with $N(\phi_0) = 0$ gives:</p><p>$$N = R \cot{\phi_0} \left( 1 - e^{\sin{\phi_0}(\sinh^{-1}(\tan \phi_0) - \sinh^{-1}(\tan \phi))} \right).$$</p><p>Completing it with E:</p><p>$$E = (R \cot{\phi_0} - N) \lambda \sin{\phi_0}$$</p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2024 by Daniel Taylor</span></div><script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
