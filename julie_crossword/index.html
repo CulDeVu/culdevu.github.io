@@ -1,0 +1,2113 @@
+<html>
+<head>
+
+<!-- <script src="boards.js"></script> -->
+
+<style>
+
+/*-------------------------------------------------------------------------------*/
+/* Okay so this one is a lot more jank. Support for tweaking the spacing and
+/* sizing is more limited.
+/* Please note that sizing information in HTML is a *request* that you're making
+/* to the browser, not a guarentee. If you make the cell width 45 pixels, and then
+/* try to stick a 50 pixel wide thing inside of it, the browser will just make
+/* the cell bigger.
+/* ALSO: both cross.html and boards.js are required.
+/*-------------------------------------------------------------------------------*/
+
+/* If you want the crossword cell squares larger or smaller */
+.cell {
+	width: 45px;
+	height: 45px;
+}
+
+.border_cell {
+	background-color: #fff;
+	height: 30px;
+	text-align: center;
+}
+
+.letter_unfilled_cell {
+	background-color: #eee;
+	vertical-align: top;
+	font-size: 25px; /* The size of the number in the cell before a letter goes in it */
+}
+
+.letter_filled_cell {
+	background-color: #ddd;
+}
+
+.letter_filled_cell > table {
+	width: 100%;
+	border-spacing: 0;
+}
+
+.letter_filled_cell > table > tr {
+	margin: 0;
+	padding: 0;
+}
+
+.letter_filled_cell > table > tr > .number {
+	font-size: 15px; /* The size of the number in the cell after a letter goes in it */
+    font-weight: bold;
+	margin: 0;
+	padding: 0;
+	width: 33%; /* These are confusing. They also control how big the number is after the letter goes in. */
+	height: 33%; 
+}
+
+.letter_filled_cell > table > tr > .letter {
+	font-size: 20px; /* The size of the letters in the cell */
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	width: 66%; /* The opposizte of the numbers directly above */
+	height: 66%;
+}
+
+.empty_cell {
+	background-color: #000;
+	text-align: center;
+}
+
+.right_button {
+	float: right;
+}
+
+.down_button {
+	position: relative;
+	top: 10px;
+}
+
+</style>
+</head>
+<body>
+<script>
+
+window.addEventListener('load', function() {
+
+	/* As of right now, this only does the red book puzzles. More will be added later. */
+
+	/* There are two ways of choosing what puzzle to do.                                   */
+	/* 1. Change this variable here                                                        */
+	/* 2. Append "#" and the puzzle number to the url. So like "file://crossword.html#114" */
+	var PUZZLE_NUM = 114;
+
+	var N = 15;
+
+	console.log(window.location.hash);
+	if (window.location.hash != '') {
+		PUZZLE_NUM = parseInt(window.location.hash.substring(1));
+	}
+
+	var board = red_boards[PUZZLE_NUM - 51];
+
+	var red_holes = [
+		0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+		0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+		0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+		0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 
+		1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 
+		0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 
+		0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 
+		0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+		0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
+		0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 
+		1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 
+		0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 
+		0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+		0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+		0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 
+	]
+	var numbers = [
+		 1,  2,  3,  4,  0,  5,  6,  7,  8,  9,  0, 10, 11, 12, 13,
+		14,  0,  0,  0,  0, 15,  0,  0,  0,  0,  0, 16,  0,  0,  0,
+		17,  0,  0,  0,  0, 18,  0,  0,  0,  0,  0, 19,  0,  0,  0,
+		20,  0,  0,  0, 21,  0,  0,  0,  0, 22, 23,  0,  0,  0,  0,
+		 0,  0, 24, 25,  0,  0,  0,  0, 26,  0,  0,  0,  0,  0,  0,
+		27, 28,  0,  0,  0,  0,  0, 29,  0,  0,  0,  0,  0, 30, 31,
+		32,  0,  0,  0,  0,  0, 33,  0,  0,  0,  0,  0, 34,  0,  0,
+		35,  0,  0,  0,  0, 36,  0,  0,  0,  0,  0, 37,  0,  0,  0,
+		38,  0,  0,  0, 39,  0,  0,  0,  0,  0, 40,  0,  0,  0,  0,
+		41,  0,  0, 42,  0,  0,  0,  0,  0, 43,  0,  0,  0,  0,  0,
+		 0,  0, 44,  0,  0,  0,  0,  0, 45,  0,  0,  0,  0,  0,  0,
+		46, 47,  0,  0,  0,  0,  0, 48,  0,  0,  0,  0, 49, 50, 51,
+		52,  0,  0,  0,  0, 53, 54,  0,  0,  0,  0, 55,  0,  0,  0,
+		56,  0,  0,  0,  0, 57,  0,  0,  0,  0,  0, 58,  0,  0,  0,
+		59,  0,  0,  0,  0, 60,  0,  0,  0,  0,  0, 61,  0,  0,  0
+	];
+	var acrosses = [1, 5, 10, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 26, 27, 29, 30, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 48, 49, 52, 53, 55, 56, 57, 58, 59, 60, 61];
+	var downs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 21, 23, 25, 26, 27, 28, 29, 30, 31, 33, 34, 36, 37, 39, 40, 42, 43, 44, 45, 46, 47, 48, 50, 51, 54, 55];
+
+	function inner_cell(number_txt, letter_txt) {
+		table = document.createElement("table");
+		row1 = document.createElement("tr");
+		row2 = document.createElement("tr");
+
+		number = document.createElement("td");
+		number.appendChild(document.createTextNode(number_txt));
+		// number.innerHtml = "<pre> </pre>"
+		number.setAttribute("class", "number");
+		if (number_txt == 0) {
+			number.style.visibility='hidden';
+		}
+		
+		letter = document.createElement("td");
+		letter.appendChild(document.createTextNode(letter_txt));
+		letter.setAttribute("class", "letter");
+
+		row1.appendChild(number);
+		row1.appendChild(document.createElement("td"));
+		row2.appendChild(document.createElement("td"));
+		row2.appendChild(letter);
+
+		table.appendChild(row1);
+		table.appendChild(row2);
+
+		return table;
+	}
+
+	function click_right_button(event) {
+		console.log("hi!");
+		console.log(event.target.parentNode);
+		x_start = parseInt(event.target.parentNode.getAttribute("xpos"));
+		y = parseInt(event.target.parentNode.getAttribute("ypos"));
+
+		for (var x = x_start + 1; x < N; ++x) {
+			if (board[y*N + x] == ' ') {
+				break;
+			}
+
+			el = document.getElementById("cell_" + x + "_" + y);
+			while (el.firstChild) {
+				el.removeChild(el.firstChild);
+			}
+
+			el.setAttribute("class", "letter_filled_cell cell");
+			el.appendChild(inner_cell(numbers[y*N + x], board[y*N + x]));
+
+			console.log(board[y*N + x]);
+		}
+	}
+
+	function click_right_button_sidebar(event) {
+		console.log("hi!");
+		console.log(event.target.parentNode);
+		x_start = parseInt(event.target.getAttribute("xpos"));
+		y = parseInt(event.target.getAttribute("ypos"));
+
+		for (var x = x_start; x < N; ++x) {
+			if (board[y*N + x] == ' ') {
+				break;
+			}
+
+			el = document.getElementById("cell_" + x + "_" + y);
+			while (el.firstChild) {
+				el.removeChild(el.firstChild);
+			}
+
+			el.setAttribute("class", "letter_filled_cell cell");
+			el.appendChild(inner_cell(numbers[y*N + x], board[y*N + x]));
+
+			console.log(board[y*N + x]);
+		}
+	}
+
+	function click_down_button(event) {
+		console.log("hi!");
+		console.log(event.target.parentNode);
+		x = parseInt(event.target.parentNode.getAttribute("xpos"));
+		y_start = parseInt(event.target.parentNode.getAttribute("ypos"));
+
+		for (var y = y_start + 1; y < N; ++y) {
+			if (board[y*N + x] == ' ') {
+				break;
+			}
+
+			el = document.getElementById("cell_" + x + "_" + y);
+			while (el.firstChild) {
+				el.removeChild(el.firstChild);
+			}
+
+			el.setAttribute("class", "letter_filled_cell cell");
+			el.appendChild(inner_cell(numbers[y*N + x], board[y*N + x]));
+
+			console.log(board[y*N + x]);
+		}
+	}
+
+	function click_down_button_sidebar(event) {
+		console.log("hi!");
+		console.log(event.target.parentNode);
+		x = parseInt(event.target.getAttribute("xpos"));
+		y_start = parseInt(event.target.getAttribute("ypos"));
+		console.log(x);
+		console.log(y_start);
+
+		for (var y = y_start; y < N; ++y) {
+			if (board[y*N + x] == ' ') {
+				break;
+			}
+
+			el = document.getElementById("cell_" + x + "_" + y);
+			while (el.firstChild) {
+				el.removeChild(el.firstChild);
+			}
+
+			el.setAttribute("class", "letter_filled_cell cell");
+			el.appendChild(inner_cell(numbers[y*N + x], board[y*N + x]));
+
+			console.log(board[y*N + x]);
+		}
+	}
+
+	function right_button_el(y, x) {
+		btn = document.createElement("button");
+		btn.setAttribute("class", "right_button");
+		btn.addEventListener("click", click_right_button);
+		return btn;
+	}
+
+	function down_button_el(y, x) {
+		btn = document.createElement("button");
+		btn.setAttribute("class", "down_button");
+		btn.addEventListener("click", click_down_button);
+		return btn;
+	}
+
+	function validate_red() {
+		for (var i = 0; i < red_boards.length; ++i) {
+			if (red_boards[i].length != N*N) {
+				console.log("puzzle " + (i+51) + " not the right size");
+				continue;
+			}
+			for (var tile_ind = 0; tile_ind < red_holes.length; ++tile_ind) {
+				if (red_boards[i][tile_ind] == ' ' && red_holes[tile_ind] == 0) {
+					console.log("UH OH 1 on puzzle " + (i+51) + " at coord " + Math.floor(tile_ind/N) + "," + (tile_ind%N));
+				}
+				if (red_boards[i][tile_ind] != ' ' && red_holes[tile_ind] == 1) {
+					console.log("UH OH 2 on puzzle " + (i+51) + " at coord " + Math.floor(tile_ind/N) + "," + (tile_ind%N));
+				}
+			}
+		}
+	}
+
+	validate_red();
+
+	table = document.getElementById("board_area");
+	for (var y = -1; y < N; ++y) {
+		row = document.createElement("tr");
+		for (var x = -1; x < N; ++x) {
+			el = document.createElement("td");
+			el.setAttribute("xpos", x);
+			el.setAttribute("ypos", y);
+			el.setAttribute("id", "cell_" + x + "_" + y)
+			
+			if (y == -1 && x >= 0) {
+				el.setAttribute("class", "border_cell cell");
+
+				// if (board[0*y + x] != ' ') {
+				// 	el.appendChild(down_button_el(y, x));
+				// }
+			} else if (x == -1 && y >= 0) {
+				el.setAttribute("class", "border_cell");
+
+				// if (board[N*y + 0] != ' ') {
+				// 	el.appendChild(right_button_el(y, x));
+				// }
+			} else if (x >= 0 && y >= 0) {
+				inner = board[y*15 + x];
+				if (inner == ' ') {
+					el.setAttribute("class", "empty_cell cell");
+
+					// if (x < N-1 && board[y*15 + x + 1] != ' ') {
+					// 	el.appendChild(right_button_el(y, x));
+					// }
+					
+					// if (y < N-1 && board[(y+1)*15 + x] != ' ') {
+					// 	el.appendChild(down_button_el(y, x));
+					// }
+				} else {
+					el.setAttribute("class", "letter_unfilled_cell cell");
+					if (numbers[y*N + x] != 0) {
+						text = document.createTextNode(numbers[y*N + x]);
+						el.appendChild(text);
+					}
+				}
+			}
+			row.appendChild(el);
+		}
+		table.appendChild(row);
+	}
+
+	controls = document.getElementById("controls");
+	controls.appendChild(document.createTextNode("Across"));
+	controls.appendChild(document.createElement("br"));
+	for (var i = 0; i < acrosses.length; ++i) {
+		if (i % 10 == 0) {
+			controls.appendChild(document.createElement("br"));
+		}
+
+		ind = numbers.indexOf(acrosses[i]);
+
+		btn = document.createElement("button");
+		btn.setAttribute("xpos", ind % N);
+		btn.setAttribute("ypos", Math.floor(ind / N));
+		btn.addEventListener("click", click_right_button_sidebar);
+		btn.appendChild(document.createTextNode(acrosses[i]));
+		btn.style = "margin: 10px";
+		controls.appendChild(btn);
+	}
+
+	controls.appendChild(document.createElement("br"));
+	controls.appendChild(document.createElement("br"));
+	controls.appendChild(document.createElement("br"));
+
+	controls.appendChild(document.createTextNode("Down"));
+	for (var i = 0; i < downs.length; ++i) {
+		if (i % 10 == 0) {
+			controls.appendChild(document.createElement("br"));
+		}
+
+		ind = numbers.indexOf(downs[i]);
+
+		btn = document.createElement("button");
+		btn.setAttribute("xpos", ind % N);
+		btn.setAttribute("ypos", Math.floor(ind / N))
+		btn.addEventListener("click", click_down_button_sidebar);
+		btn.appendChild(document.createTextNode(downs[i]));
+		btn.style = "margin: 10px";
+		controls.appendChild(btn);
+	}
+
+	// a = []
+	// for (var y = 0; y < N; ++y) {
+	// 	row = document.createElement("tr");
+	// 	for (var x = 0; x < N; ++x) {
+	// 		if (numbers[y][x] != 0) {
+	// 			if (y == 0) {
+	// 				a.push(numbers[y][x]);
+	// 			} else if (board[(y-1)*N + x] == ' ') {
+	// 				a.push(numbers[y][x]);
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// console.log(a);
+
+	console.log('All assets are loaded');
+})
+
+</script>
+
+<table style="display:inline-block;" id="board_area"></table>
+<div style="display:inline-block;" id="controls"></div>
+
+<script>
+red_boards = [
+
+// 51
+	"STAT DARTS STEP" +
+	"CONE EBONY ORAL" +
+	"AREA TESTS NERO" +
+	"ROC EATS TENANT" +
+	"  DAVIS BERET  " +
+	"SHOVEL LIMIT LA" +
+	"TOTES RESIN CAW" +
+	"APER HAVOC CODA" +
+	"YES RAVEN TAMER" +
+	"SS LABEL FRIEND" +
+	"  BORIS BLIND  " +
+	"CORSET SLAP IRS" +
+	"EPEE ALTAR MAIL" +
+	"NEAR TEASE INCA" +
+	"ANDS SORTS ASHY",
+
+// 52
+	"SHED SALES DIAL" +
+	"TAXI ANILE ERNE" +
+	"ALUM LIMIT SATE" +
+	"ROB RUSE TEETER" +
+	"  EMOTE FLARE  " +
+	"CERISE CREST SO" +
+	"ELATE CHART NAP" +
+	"DONE PRAMS DELE" +
+	"APT ERASE WAGON" +
+	"RE GRATE MELONS" +
+	"  PRICE TIBET  " +
+	"PARENT HISS ICE" +
+	"ALOE IMAGE CALL" +
+	"RENT COVER ATOM" +
+	"KEGS EWERS PEGS",
+
+// 53
+	"COST GROSS PACK" +
+	"ARIA RADIO ALAE" +
+	"RANT ACORN ROSY" +
+	"ELK AVER GRANTS" +
+	"  HOPED ABODE  " +
+	"SHOVEL PRIME CO" +
+	"TALES THERE MAP" +
+	"EVER FROND LINE" +
+	"NES SAUNA BISON" +
+	"ON PENNY PROBES" +
+	"  SLACK MAINE  " +
+	"SALAMI RING HOP" +
+	"IRAN FOIST MAMA" +
+	"LENT UNDER EVIL" +
+	"OATS LEERY WETS",
+
+// 54
+	"CORE STEPS LAND" +
+	"OVEN PERIL OBOE" +
+	"LEND RANGE CANE" +
+	"ARE EIRE ELATED" +
+	"  GOWNS SPITE  " +
+	"PLANET MAINE ID" +
+	"RIDER CAINE GNU" +
+	"EVES SLING WRAP" +
+	"YES SPLIT DIANE" +
+	"SS SPANS SUPPED" +
+	"  FLING SHEEP  " +
+	"SPRANG BIAS LOP" +
+	"LOOT LEARN LIDO" +
+	"URGE EGRET ENOS" +
+	"MESS SONNY OGRE",
+
+// 55
+	"FIST RADAR CATS" +
+	"IDEA ELOPE ALOE" +
+	"FOND POLES MINE" +
+	"ELS DANE ELEVEN" +
+	"  ANISE SMILE  " +
+	"DETECT ROBES NO" +
+	"ARISE BOWLS CAP" +
+	"TROT TEPEE WHIT" +
+	"EON FIRED WEAVE" +
+	"SR GAMES DARTED" +
+	"  MOTET BESET  " +
+	"PROPEL GASP ELM" +
+	"EACH ELITE ARIA" +
+	"ACHE SAVOR DENT" +
+	"REAR SPENT ODES",
+
+// 56
+	"PORT GLADE MIME" +
+	"AVER RACES ORAL" +
+	"RELY AGENT ROIL" +
+	"ERA APES ELANDS" +
+	"  TIGER MEALS  " +
+	"SPICES RAMPS MD" +
+	"COVES DICES SAY" +
+	"OWED SALAD TERN" +
+	"RES STREW FORCE" +
+	"ER CARED RODEOS" +
+	"  SOLID HERON  " +
+	"CRAVED DOCK ACT" +
+	"ROLE ERASE IDLE" +
+	"ODOR NOTED READ" +
+	"PENT TEASE ASPS",
+
+// 57
+	"BRAG ROBOT PATE" +
+	"LONE EVADE AGED" +
+	"OBOE TENET RATE" +
+	"TEN BIND HASTEN" +
+	"  YEARS LEVEE  " +
+	"REMOTE CARED DG" +
+	"IRONS WAGER RIO" +
+	"ONUS TIRED RENO" +
+	"TIS SOLAR PAVED" +
+	"SE BERET TENORS" +
+	"  SLATS PERIL  " +
+	"POTATO BELT VOW" +
+	"ADAR IDEAL GIVE" +
+	"LINE SINCE ONER" +
+	"ENDS ENTER OGRE",
+
+// 58
+	"SODA CEDED SPAR" +
+	"OVAL RAISE HERE" +
+	"LINE EGRET ACTS" +
+	"ODD TALK REPAST" +
+	"  EMOTE RAVEN  " +
+	"POLITE VICES RS" +
+	"RUINS FISTS HOT" +
+	"ETON TAXES LAME" +
+	"SEN BAKER TOWER" +
+	"SR ALLEN TRITON" +
+	"  STEER TEASH  " +
+	"RENOWN SWAY OPT" +
+	"ORAN TIMID AREA" +
+	"MIRE ECOLE SNAP" +
+	"ACES DEGAS HERS",
+
+// 59
+	"LOVE LEMON BASS" +
+	"ANEW ALONE ELIA" +
+	"DUNE RAVES LENS" +
+	"SST PINE THOUGH" +
+	"  ILIAD FLINT  " +
+	"SILENT BRING RF" +
+	"PLANT BLOND DOE" +
+	"IOTA YOUNG HEMI" +
+	"NNE MONET SEVEN" +
+	"SA OASES EPROOT" +
+	"  SPIES SNORT  " +
+	"BECALM DART IDO" +
+	"IRAQ IMAGE GOOD" +
+	"TABU TILES INTO" +
+	"ESSE EGEST USSR",
+
+// 60
+	"POMP VALID STEW" +
+	"ARIA ABOVE TARA" +
+	"RANT LATER ACID" +
+	"ELI WITS ENTICE" +
+	"  ARISE SLEET  " +
+	"RETIRE ALIAS RD" +
+	"ELUDE EDICT CAR" +
+	"CARE TRACT LOVE" +
+	"UTE DRAPE TIMES" +
+	"RE HOIST CAMELS" +
+	"  TULLE SALAD  " +
+	"BARREL DARK IDE" +
+	"OVAL IRATE PAUL" +
+	"LODE OOZES ONES" +
+	"OWED NEEDS ISLE",
+
+// 61
+	"JADE COBRA CRIB" +
+	"OMAR AVAIL HARE" +
+	"GAVE VERGE IVAN" +
+	"SHE FOND RELENT" +
+	"  NEARS STALL  " +
+	"DEPART DAIRY NA" +
+	"AROSE GRINS TOT" +
+	"TART CLING TROT" +
+	"EST SLANT DIANA" +
+	"SE SHARK BANNER" +
+	"  SCARE BORES  " +
+	"SALAMI LENT PRO" +
+	"OVAL NOISE LIED" +
+	"LIKE ELDER ARID" +
+	"ODES TESTS PENS",
+
+// 62
+	"TACO PAGES PASS" +
+	"AWED OLIVE OLIO" +
+	"KALE LOVER SILL" +
+	"EYE LINE ESTATE" +
+	"  BRACE ANTES  " +
+	"PERUSE BRIAR PA" +
+	"EXALT BOOTY TUG" +
+	"CITE BALMY FARE" +
+	"ALE PASTA LINEN" +
+	"NE PARIS TARGET" +
+	"  WANTS RINSE  " +
+	"SPARSE SAND ROB" +
+	"LAVA RAPID LIVE" +
+	"ICED ERASE ONES" +
+	"MERE DETER PERT",
+
+// 63
+	"COST SCRAP SLAP" +
+	"ODER TRACE TODO" +
+	"RELY EAGER OVER" +
+	"ESE DAME SILENT" +
+	"  CLAMP SIDES  " +
+	"OTTERS RISEN MS" +
+	"FAINT TARTS TAT" +
+	"TROT DAZES TELE" +
+	"ERN DEMON SANTA" +
+	"NY LOSER THREAD" +
+	"  RIPER CREAM  " +
+	"SHINER SHAD ELA" +
+	"COLA TEPID ANON" +
+	"AMEN ERODE STUN" +
+	"NESS DATES ASTA",
+
+// 64
+	"CARP SALAD TRAP" +
+	"USER ELUDE RACE" +
+	"RIPE CORES AVER" +
+	"BAR SUNK OLDEST" +
+	"  INURE PILED  " +
+	"ADMIRE GRAND AS" +
+	"TRACE SLATE VIE" +
+	"TONE PLATE MADE" +
+	"AND GLIDE BONER" +
+	"RE GRADE BRAIDS" +
+	"  SLINK CLANS  " +
+	"DECANT ELAN HOP" +
+	"OVER ERROR VINE" +
+	"TINE RAISE INCA" +
+	"SLED STEED AGES",
+
+// 65
+	"RODS RADAR TAPS" +
+	"IDEA ELATE ALOE" +
+	"COLT MILES LOSE" +
+	"ERE BIKE OPENED" +
+	"  GEESE PLANE  " +
+	"TRADES CRUST BE" +
+	"ROTES TROTS DOT" +
+	"AMEN SHAVE PERU" +
+	"CAD SCONE RACED" +
+	"EN PHASE DECODE" +
+	"  PRONE WISER  " +
+	"RELIED MINT ALA" +
+	"OVEN AGAPE STOP" +
+	"BEAT LATER HENS" +
+	"ENDS SLEDS EDGE",
+
+// 66
+	"PACE ROBOT DASH" +
+	"ORAL ERODE ECHO" +
+	"DIRK PALER ERIN" +
+	"SAT DATE REPINE" +
+	"  ROUSE LIVED  " +
+	"SHINES SAFER LO" +
+	"CEDES SATIN DID" +
+	"RAGS RELIC RENO" +
+	"AVE SEVEN POSER" +
+	"ME CAVES PLAINS" +
+	"  WATER SLANG  " +
+	"BOATER BEAT NAG" +
+	"ALIT EBONY RACE" +
+	"RILL NOOSE ITEM" +
+	"NOSE TOTED MESS",
+
+// 67
+	"FIST ROBOT CREW" +
+	"EDEN EVADE RARE" +
+	"LENT PETER ANNA" +
+	"LAS DENT MATTER" +
+	"  AREAS RITES  " +
+	"PATENT MANOR BO" +
+	"ALIAS RECAP CAR" +
+	"TOOL HOTEL WORD" +
+	"ION CAVES BINGE" +
+	"OF BONER CANTER" +
+	"  CARDS LARGE  " +
+	"STANDS SERE NAB" +
+	"TANG OLIVE IDLE" +
+	"ORAL MINES MESA" +
+	"POLE EDGES PROM",
+
+// 68
+	"MODE TUTOR RARE" +
+	"EVER ASIDE ETON" +
+	"SAFE MULES GOLD" +
+	"ALE OPAL TWINES" +
+	"  CAMEL PRIME  " +
+	"TITLED SLIDE SO" +
+	"ONION PLACE NIP" +
+	"WAVE GRANT MERE" +
+	"ENE ELATE COVEN" +
+	"RE TRITE HAVENS" +
+	"  ORATE PALER  " +
+	"REPAST DULL MID" +
+	"AVID EVERT CODE" +
+	"MINE RINSE AREA" +
+	"PLED SATED REAL",
+
+// 69
+	"MOPE SALAD PORE" +
+	"EVEN ADILE ANEW" +
+	"SERE LEVEE LINE" +
+	"ARM DONE PILOTS" +
+	"  EVENT HERON  " +
+	"DRAINS MANOR RE" +
+	"RATES RAVEN COG" +
+	"APES LIKED BLUR" +
+	"MID WIDEN SLATE" +
+	"AD WATER CLOSET" +
+	"  TENTS SLOTS  " +
+	"PARADE SMOG IMP" +
+	"IRIS RAKES ICER" +
+	"NILE EXILE TARO" +
+	"TALL DENTS SLED",
+
+// 70
+	"TOME COOPS ANTE" +
+	"ARIA APRIL SAID" +
+	"MALT BETTE SIDE" +
+	"ELL FANS ELEVEN" +
+	"  IRONS SPARE  " +
+	"BANANA CHEST CO" +
+	"ELECT HEART RIM" +
+	"GORE PEARS CEDE" +
+	"ANY BLASE HAVEN" +
+	"NE TRADE CAPERS" +
+	"  SEATS RARER  " +
+	"VACANT DAMP EMS" +
+	"ERAS ELIDE GNAT" +
+	"TILE RIVAL ACRE" +
+	"ODES STARS SEEM",
+
+// 71
+	"DOTE PROPS SAGA" +
+	"AHOY RIVET WRAP" +
+	"RILE OPERA OILS" +
+	"TOE EVEN MORALE" +
+	"  RAVEN SPUDS  " +
+	"STARED PEERS PS" +
+	"CATER ROADS SEA" +
+	"APES PASTE ETAL" +
+	"LED CAVES TRACE" +
+	"ED BORED WHALES" +
+	"  CANAL RAISE  " +
+	"SNORED REIN MAT" +
+	"TORN IDEAL HALO" +
+	"ALEE SIEVE ATOM" +
+	"ROSY ENDED TEES",
+
+// 72
+	"BLEW TRADE SCAT" +
+	"ROLE AIDED TALE" +
+	"EGAD SLANG AREA" +
+	"WEB ITEM ESTEEM" +
+	"  OGRES SWEET  " +
+	"AFRAID ALIAS BE" +
+	"SLATS CREST TAR" +
+	"HATS GLIDE MORN" +
+	"ERE GRASS MELEE" +
+	"NE CRANE CATERS" +
+	"  SLINK PALER  " +
+	"SECOND HARE AGO" +
+	"ALAS EMOTE SNOW" +
+	"FINE SALES ACRE" +
+	"EAST TRESS WEED",
+
+// 73
+	"LACE SEVER CROP" +
+	"AGAS ELITE HAVE" +
+	"TARP DANES AGES" +
+	"ERN MATE INSERT" +
+	"  IRATE EDITS  " +
+	"REVISE SCENE LP" +
+	"OVALS HORNE RIA" +
+	"MALL GOOUT PENS" +
+	"ADS MASTS FACES" +
+	"NE BATTY ALLUDE" +
+	"  BATHS CRIER  " +
+	"SPARSE SHIP RIM" +
+	"LOST ROPES MERE" +
+	"ARTE ERASE ONES" +
+	"PEER DENTS ITSA",
+
+// 74
+	"PAPA RACES BABA" +
+	"ICED EVADE AVON" +
+	"ERRS SENOR LOST" +
+	"SEC AIRS VALISE" +
+	"  HERDS GAPED  " +
+	"SLEDGE TENET DS" +
+	"CARGO FRETS COT" +
+	"OBOE TRESS RODE" +
+	"PEN CRANE TINGE" +
+	"EL BLEND DAMSEL" +
+	"  CROAK SENSE  " +
+	"SALADS JACK NEW" +
+	"IRAN UNITE STIR" +
+	"FIND ROBIN HERE" +
+	"TASS EVENT EDEN",
+
+// 75
+	"MERE PARIS FRED" +
+	"EDEN ALIKE LUTE" +
+	"AGED ROSES ANTE" +
+	"TEN BANK SINGER" +
+	"  TRADE PINKS  " +
+	"CHEESE PLOTS MS" +
+	"HORSE PIANO COT" +
+	"ABET GLENS FORE" +
+	"ROD FLARE TENSE" +
+	"TS QUITS TRAVEL" +
+	"  PURSE WHERE  " +
+	"PRIEST RARE RAT" +
+	"ROLL ELIDE OGLE" +
+	"EVEL NOTES BELL" +
+	"MESS STASH IDYL",
+
+// 76
+	"CLAY APPLE SLOT" +
+	"HONE GLEAM CARE" +
+	"ANTS RANGE ACES" +
+	"TEE KEYS RAREST" +
+	"  LANES SAWED  " +
+	"SLOWED SALAD MA" +
+	"TEPEE DANDY DIM" +
+	"AGED LIVES MESA" +
+	"GAS FINER CAFES" +
+	"EL RATED RACERS" +
+	"  PACED LINEN  " +
+	"GARTER CAPS SIR" +
+	"ALIT ABATE TIDE" +
+	"POOL TONES AVON" +
+	"SERE EXERT MELT",
+
+// 77
+	"SAVE RACED GLAD" +
+	"OMEN EMOTE ROVE" +
+	"FENS FILES ERIN" +
+	"ANT MIST STANDS" +
+	"  ICONS PERSE  " +
+	"DELUDE FORAY MY" +
+	"ELATE FORTY COO" +
+	"CITE FLATS COOK" +
+	"ODE CLAMS MANSE" +
+	"YE BLURS CANCEL" +
+	"  BRUTE MOTEL  " +
+	"JULIET CAVE USE" +
+	"ARID ERODE ADAM" +
+	"PANG RADAR TERM" +
+	"ELKE STEMS EDDY",
+
+// 78
+	"MADE BRAVO STAG" +
+	"OVER AIDED TIME" +
+	"VOTE RODEO OMEN" +
+	"EWE ARTS MARINE" +
+	"  RACES CEDED  " +
+	"DAMPEN GATES CO" +
+	"ARIES RIPEN TIP" +
+	"TONS RIVER MODE" +
+	"USE DETER HELEN" +
+	"ME POSES CATERS" +
+	"  GAMES HOVER  " +
+	"CHOSEN COVE ARE" +
+	"ROOT TEASE STIR" +
+	"ELSE EAGER PESO" +
+	"WEED DRESS ASKS",
+
+// 79
+	"DAFT SPARK MASK" +
+	"ODOR CANOE AMIN" +
+	"VERY RIDER TONE" +
+	"ENE TINY CRINGE" +
+	"  CREPT THONG  " +
+	"FLAUNT BRING PN" +
+	"OUSTS GLUES WAY" +
+	"ANTS SHELF FOIL" +
+	"LAS STONY DINGO" +
+	"SR ALOUD BURDEN" +
+	"  SWIRL CEASE  " +
+	"EQUATE PALL RED" +
+	"LURK SCARF AFRO" +
+	"SAGE ULCER DUNE" +
+	"EDEN PUTTY OLES",
+
+// 80
+	"PEGS SLAPS REED" +
+	"ERAS LEVEE AXLE" +
+	"ANNE AVERT VASE" +
+	"LEG OVER BAILED" +
+	"  PAPER PAINT  " +
+	"CALLED LUCRE ST" +
+	"AGAIN SULKY ATE" +
+	"PINT FIRLS IDEA" +
+	"ELK PATES ORDER" +
+	"RE NAMED AVAILS" +
+	"  BARBS PLANT  " +
+	"SERIAL LULL IRE" +
+	"ORAL ELUDE BOOK" +
+	"BIKE RANGY ONCE" +
+	"SEED SWAYS ASKS",
+
+// 81
+	"STAY DALES SHED" +
+	"CONE ERASE TARO" +
+	"ARTS FONTS ALSO" +
+	"NEE PISA SILVER" +
+	"  ALONE SIDLE  " +
+	"RETIRE SHOES HP" +
+	"ERECT JEANS COO" +
+	"WORK REAPS BLUE" +
+	"ESS BELLE BOAST" +
+	"DE MALLS ROUSES" +
+	"  DELAY BESTS  " +
+	"PRESET PEPS MAT" +
+	"LOBS IMAGE MAMA" +
+	"ALAR BILLA ITEM" +
+	"NERD EASEL HENE",
+
+// 82
+	"BURN SWEAR BLAB" +
+	"OLEO TERSE PUNE" +
+	"ANEW RANKS OTOE" +
+	"TAN WERE TOKENS" +
+	"  TRESS ROBES  " +
+	"GREENS BARON MB" +
+	"LURID MELEE WOO" +
+	"AMEN WIELD WITS" +
+	"ROD WISPY PINTO" +
+	"ER PANTS RANDOM" +
+	"  PONDS VEMON  " +
+	"BELIEF NAVE ICE" +
+	"OVEN ATONE CLOG" +
+	"NEAT LOVER PLUG" +
+	"ENDS LEASE ASPS",
+
+// 83
+	"PETE MIDAS CRAB" +
+	"RARE IRONY HUGE" +
+	"OVAL SATYR APES" +
+	"PEP BATS INSERT" +
+	"  ELUDE GNOME  " +
+	"HAZARD WAGES CD" +
+	"ALONG REVEL PAR" +
+	"VOID POLES LORE" +
+	"END DROLL WANTS" +
+	"NE BEAMS CHIDES" +
+	"  FANCY THERE  " +
+	"THIRST LIEN REF" +
+	"HONE INANE DIVE" +
+	"ORAL COVES UNIT" +
+	"RELY ERASE OGLE",
+
+// 84
+	"HONE TSARS TALL" +
+	"AVOW ENSUE AREA" +
+	"HERE ROSES PRES" +
+	"ARM IRON SHEARS" +
+	"  AESOP DIARY  " +
+	"CALLER DOORS CC" +
+	"ALIKE PRONE TRI" +
+	"PITS TRAMS SHUN" +
+	"RAY GROWS BORED" +
+	"IS TRAPS BARELY" +
+	"  SHINS CASTS  " +
+	"BOARDS HUSH HAM" +
+	"OGLE APART COLE" +
+	"ORES CARVE PLOT" +
+	"MESH TYPES ADES",
+
+// 85
+	"VERY TRICE SPOT" +
+	"AGEE ROBIN NARE" +
+	"LOST IDEAL INCA" +
+	"ESP APEX APPEAR" +
+	"  IGLOO BREED  " +
+	"BARRED VIGOR TS" +
+	"ARIAS LIKEN BAA" +
+	"LEND TAXED LOUT" +
+	"END WATER WIMPY" +
+	"DA CABIN TIMBER" +
+	"  BEGUN RASPS  " +
+	"KERNEL BATH QUO" +
+	"EDIT AGENT BURN" +
+	"LIEN TINGE RAGE" +
+	"PEER ENDED ODES",
+
+// 86
+	"MATE EDGES DIED" +
+	"ICON LEAST ROBE" +
+	"NINE BALER ATOP" +
+	"IDO LOLA INFANT" +
+	"  THAWS SPATS  " +
+	"OTHERS CLIPS PS" +
+	"WEIRD JUANS JOE" +
+	"INNS NOBIG REIN" +
+	"NOG TOKEN TURNS" +
+	"GR DALES MINUTE" +
+	"  DELIS DENTS  " +
+	"OMELET PONY AMP" +
+	"VOTE TROUT ALEE" +
+	"ABET LASSO GENE" +
+	"LYRE ENTER EMUS",
+
+// 87
+	"HOPS GLADE PAVE" +
+	"AREA ROBIN AWAY" +
+	"VARY EVENT LANE" +
+	"ELM PEEL ROARED" +
+	"  EDITS LANCE  " +
+	"SPARES SINCE AD" +
+	"CATER SANCE SPA" +
+	"ANEW MELEE SCAR" +
+	"LED DINED SPACE" +
+	"EL PANTS SHARES" +
+	"  PARIS ATONE  " +
+	"SHARKS SNOW CRY" +
+	"POST TALON ERIE" +
+	"ANTE ELIDE ROMA" +
+	"REED RATES EWER",
+
+// 88
+	"TACT MEWED SWAT" +
+	"HIRE OLIVE TILE" +
+	"IDEA RATES USES" +
+	"SEA OATH CARPET" +
+	"  TERSE RENDS  " +
+	"PRUNES RUNTY DO" +
+	"LORDS HOLDS SIR" +
+	"ODES GIVES DIVA" +
+	"YES SEVER COMET" +
+	"SO DINER ALLUDE" +
+	"  ROTES STALL  " +
+	"WRITER CITY AGO" +
+	"HINT ADORE STOP" +
+	"ELSE LINES HERE" +
+	"NEED SPENT EDEN",
+
+// 89
+	"PORE THOSE SCOW" +
+	"AREA RAVEN LOPE" +
+	"PAST ERECT IVES" +
+	"ALI EARN INVENT" +
+	"  DANDY GREEN  " +
+	"SPENDS CLEAR HE" +
+	"PANTS GUILT TIN" +
+	"ONCE HARDY RENT" +
+	"ODE TENSE SINGE" +
+	"LA LEDGE RUNNER" +
+	"  SONGS SERGE  " +
+	"REPUTE RITE SAM" +
+	"ARID HAITI ASIA" +
+	"MIRE OLDER REDS" +
+	"SEER GEESE MEEK",
+
+// 90
+	"MORE REBEL SLIM" +
+	"UPON ELATE CONE" +
+	"LEAS VERSE ALTO" +
+	"END LICK WILLOW" +
+	"  BLAST DARES  " +
+	"MALICE BARES PS" +
+	"ALONE MAIDS CLI" +
+	"RICE MAILS GOAL" +
+	"INK SILLY CANTO" +
+	"SE PANES LANCES" +
+	"  DAVIS FORGE  " +
+	"BOONES EAST RED" +
+	"LINT TORME ANNE" +
+	"ALOE ELMER REIN" +
+	"BYRD READS EDDY",
+
+// 91
+	"COVE BARES RASP" +
+	"ABEL AMUSE OLIO" +
+	"TOSS RATED DONS" +
+	"SET LOSS AVENGE" +
+	"  IRONS STING  " +
+	"CABINS SPENT HA" +
+	"ACUTE SCALE LEG" +
+	"MOLE STORY TIRE" +
+	"ERE STORE BATON" +
+	"ON STAKE RECENT" +
+	"  STARE COLOR  " +
+	"DEPART SELL ARE" +
+	"ALIT LOCAL BLOW" +
+	"MINE ERASE ELSE" +
+	"PASS DETER DYES",
+
+// 92
+	"STAY RADAR SLAM" +
+	"LOSE ELATE COVE" +
+	"ARTS MOTEL ODES" +
+	"BEE MINE IDLERS" +
+	"  RAISE HERDS  " +
+	"SPORTS DOVES BE" +
+	"CRIME SINEW RAT" +
+	"RIDS LAVED PERU" +
+	"ADS RIVED BASED" +
+	"ME TOTED CERISE" +
+	"  RATED FATED  " +
+	"SHIVER DIPS ELL" +
+	"LIVE ATONE KNEE" +
+	"OVER TONER ICES" +
+	"TERN EWERS NEST",
+
+// 93
+	"GLOW LATER SPOT" +
+	"RARE ATONE PINE" +
+	"AVID DOLED INCA" +
+	"BAG SILL WINTER" +
+	"  IMPEL RODEO  " +
+	"DENIES POOLS AS" +
+	"ELAND CRUDE DIN" +
+	"MUTE FLITS NERO" +
+	"ODE BLADE MITER" +
+	"NE TEASE DECODE" +
+	"  BEATS SIREN  " +
+	"SILENT HUGE AGO" +
+	"ADAM ENURE STOP" +
+	"PORE RULES HERE" +
+	"SLED START EDEN",
+
+// 94
+	"REST PETER GAME" +
+	"ALTO ANISE ADIT" +
+	"SLAT REPEL ROLE" +
+	"PAL HEMS AWARDS" +
+	"  EBONY STAGE  " +
+	"MOEMNT SPINE RR" +
+	"EVADE GLOVE RUE" +
+	"TATS FLARE CEDE" +
+	"ATE GRANT RAVEL" +
+	"LE WAIST DINERS" +
+	"  TALES RULER  " +
+	"STOLEN DIRE ERA" +
+	"EARL DRIVE SNAG" +
+	"ELSE LOVES ACRE" +
+	"SLOT YEARS NEED",
+
+// 95
+	"CARE SCALD REDS" +
+	"OVER PALER OVAL" +
+	"METS IMAGE BARE" +
+	"ERA ACES ATONED" +
+	"  LAPEL EDITS  " +
+	"SHINES CAFES LA" +
+	"HEATS BOGUE DIM" +
+	"EATS GRILL REBA" +
+	"AVE CRANE PIPES" +
+	"RE PLANS PETALS" +
+	"  BLAND SOLAR  " +
+	"STRAND OMIT TAR" +
+	"LOAN SEDAN PURE" +
+	"ONCE OVERT ARES" +
+	"WEED NESTS NEAT",
+
+// 96
+	"SAGS CRAMS TIRE" +
+	"TILE RAVEL ARIA" +
+	"ADIT ARENA MOPS" +
+	"HEM OVER PLANET" +
+	"  MOWER IDOLS  " +
+	"SEEDED PRATE PA" +
+	"CARED GRASS TON" +
+	"USES TRUTH PAID" +
+	"BED CRANE SENSE" +
+	"AS SHADE STAGES" +
+	"  SHOVE STOKE  " +
+	"RECIPE SLOW RAG" +
+	"IRAN LATIN RICE" +
+	"MIRE ELUDE UNIT" +
+	"SEER DINES BEDS",
+
+// 97
+	"SHAG BIPED FRET" +
+	"PAPA ADORE RARE" +
+	"ASPS RENEW ASIA" +
+	"THE PRAY DIPPER" +
+	"  TALES CROPS  " +
+	"ANIMAL CRONE AD" +
+	"DOZEN SLAPS SRO" +
+	"OMEN PLOTS SPOT" +
+	"BAR RAISE CEASE" +
+	"ED CASTE TORTES" +
+	"  GRITS SHOAT  " +
+	"TOLEDO STOP EGO" +
+	"ALEE RATER ARID" +
+	"READ ADORN HERD" +
+	"SONS LOANS ADDS",
+
+// 98
+	"SACK STRUM CLAW" +
+	"OBOE TEASE RICE" +
+	"DENY RAVEL AMEN" +
+	"ADS TIRE OLDEST" +
+	"  IRONS IDOLS  " +
+	"WADING SMITE MA" +
+	"ITEMS CAPES PIN" +
+	"SORE CAVES SONG" +
+	"ENS CAROL REPEL" +
+	"RE SANER BEMUSE" +
+	"  CARTS BASIL  " +
+	"DERIDE ALIT AGO" +
+	"OVAL REGAL STOP" +
+	"GIVE EVADE HERE" +
+	"SLED DARED EDEN",
+
+// 99
+	"PACE PROSE SHIP" +
+	"ORAL RIPEN CODA" +
+	"MINK IDEAS AILS" +
+	"PAD OMEN HORSES" +
+	"  INNER TRACT  " +
+	"TIDIER WHITE MA" +
+	"OVALS GRINS DOT" +
+	"TOTE PRONE REDO" +
+	"ERE PRANK COVEN" +
+	"MY SLING RESALE" +
+	"  BEAST TONES  " +
+	"SILENT SHOT TAG" +
+	"ADAM ISLET RACE" +
+	"WORE NOISE ITEM" +
+	"SLED ENDED MESS",
+
+// 100
+	"RARE FACTS PROP" +
+	"OVEN ALLOW LAVA" +
+	"MEND STATE AGES" +
+	"PRO STEM ENTERS" +
+	"  VIPER STEED  " +
+	"TRADER CLEAN GO" +
+	"RATED SAINT SOB" +
+	"ODES CARDS HERE" +
+	"LID CHUTE MOPES" +
+	"LO COATS REMADE" +
+	"  TRITE DATER  " +
+	"PARENT TAME ADO" +
+	"ALEE ELITE STEP" +
+	"SOAP RIMED PEST" +
+	"SETS SEEDY ASKS",
+
+
+// 101
+	"TOSS GALES BALM" +
+	"ABEL ABOVE ALOE" +
+	"TONY RAVEN RIOT" +
+	"SET LATE SERENE" +
+	"  IMAGE SIREN  " +
+	"REMOVE CABAL BE" +
+	"ARENA CALLS WAX" +
+	"PANT TASTE FAKE" +
+	"IST HONEY PATER" +
+	"DE PARES MODEST" +
+	"  SORTS RISER  " +
+	"CONITO LAST FAR" +
+	"ALAS IRONS SAGE" +
+	"LIKE SINGE PLAN" +
+	"DOES EDGES ALSO",
+
+// 102
+	"FIGS DEMON DARE" +
+	"IDOL EXUDE ETON" +
+	"RELY VISES TOAD" +
+	"SAD VOLE TRENDS" +
+	"  ELATE SLICE  " +
+	"IGNORE TWIST HA" +
+	"TERRY BRINK LAW" +
+	"ANON SLANG LAVA" +
+	"LID SHADE DIVER" +
+	"YE STARE CANINE" +
+	"  STATE CORES  " +
+	"DEPART IRAN HOP" +
+	"ORAL ELDER VINE" +
+	"TIDE ROLES INCA" +
+	"SEET STYLE AGES",
+
+// 103
+	"STAB COMET TABU" +
+	"URGE ATONE ENOS" +
+	"MERE SHADE AIDE" +
+	"SEE STET TOSSED" +
+	"  ETHER LEVEE  " +
+	"BEARER SIRES SW" +
+	"ALBUM INNER STA" +
+	"NILE GREED THAN" +
+	"ATE CLEAR DEALT" +
+	"LE FROND BARGES" +
+	"  CLOSE LYING  " +
+	"STRIPS REPS YRS" +
+	"TEAM AROMA IDOL" +
+	"OATS REMUS DOVE" +
+	"PREY YEARS AGED",
+
+// 104
+	"RAPT SAVOR EPEE" +
+	"OGRE ELIDE XRAY" +
+	"TEEN RAVEN HAVE" +
+	"EDS LIRA ELATED" +
+	"  IBEAM AGILE  " +
+	"ORDEAL GRADE FM" +
+	"REEDS MAIDS PRO" +
+	"ANNS MELEE OLIO" +
+	"TAT FARES SPEAR" +
+	"EL SATIN SHEARS" +
+	"  AUDIT SPANS  " +
+	"CAREEN AMAH URN" +
+	"LIED EELER ARIA" +
+	"ARTE EAGLE BEAM" +
+	"DYES STATS ESSE",
+
+// 105
+	"FLAT RADAR MAST" +
+	"LATE EMOTE OLIO" +
+	"ANTE CAGES RIDE" +
+	"BEE BOSS PROVES" +
+	"  NEARS NOOSE  " +
+	"RETARD TENSE HE" +
+	"ARISE WORSE PER" +
+	"TROY CARVE PLAN" +
+	"ION HORSE GLARE" +
+	"OR HARPO PLANTS" +
+	"  BURRS SLATE  " +
+	"CHASTE SHED TOW" +
+	"LAST COCOA RAGE" +
+	"ARIL TRAPS ERLE" +
+	"MICE SENSE DYED",
+
+// 106
+	"DIAL LAPIS COPS" +
+	"ARNE SLIDE ARIA" +
+	"DOTE GONER RILL" +
+	"ANI VANE PAROLE" +
+	"  QUITE LEMON  " +
+	"SOURCE MANET LE" +
+	"IMAGE DEBTS CAM" +
+	"TETE SILOS VOTE" +
+	"AGE FACOR MILER" +
+	"RA SEDAN GALAXY" +
+	"  STAIN ALIEN  " +
+	"FRIARS ARID DAW" +
+	"LAMB TAXED SETA" +
+	"ANOL IRENE PROD" +
+	"DINE CEDAR ASPS",
+
+// 107 
+	"BASE STROP FILM" +
+	"ALPS PRUNE EDIE" +
+	"SOAP EIDER NEST" +
+	"SET WANE VACATE" +
+	"  THERE REBEL  " +
+	"SPEEDS BORES AT" +
+	"HARES TOAST PRO" +
+	"AHED TENSE OLIO" +
+	"RED BERET CRUST" +
+	"ED DRESS PLANES" +
+	"  TRITE BRAND  " +
+	"GARAGE SLAP EFT" +
+	"ATOP RELAY ERIE" +
+	"LOVE ERODE WERE" +
+	"AMES DATED EDEN",
+
+// 108
+	"STAT DARTS STEP" +
+	"CONE EBONY ORAL" +
+	"AREA TESTS NERO" +
+	"ROC EATS TENANT" +
+	"  DAVIS BERET  " +
+	"SHOVEL LIMIT LA" +
+	"TOTES RESIN CAW" +
+	"APER HAVOC CODA" +
+	"YES RAVEN TAMER" +
+	"SS LABEL FRIEND" +
+	"  BORIS BLIND  " +
+	"CORSET SLAP IRS" +
+	"EPEE ALTAR MAIL" +
+	"NEAR TEASE INCA" +
+	"ANDS SORTS ASHY",
+
+// 109
+	"SHED SALES DIAL" +
+	"TAXI ANILE ERNE" +
+	"ALUM LIMIT SATE" +
+	"ROB RUSE TEETER" +
+	"  AMOTE FLARE  " +
+	"CERISE CREST SO" +
+	"ELATE CHART NAP" +
+	"DONE PRAMS DELE" +
+	"APT ERASE WAGON" +
+	"RE GRATE MELONS" +
+	"  PRICE TIBET  " +
+	"PARENT HISS ICE" +
+	"ALOE IMAGE CALL" +
+	"RENT COVER ATOM" +
+	"KEGS EWERS PEGS",
+
+// 110
+	"COST GROSS PACK" +
+	"ARIA RADIO ALAE" +
+	"RANT ACORN ROSY" +
+	"ELK AVER GRANTS" +
+	"  HOPED ABODE  " +
+	"SHOVEL PRIME CO" +
+	"TALES THERE MAP" +
+	"EVER FROND LINE" +
+	"NES SAUNA BISON" +
+	"ON PENNY PROBES" +
+	"  SLACK MAINE  " +
+	"SALAMI RING HOP" +
+	"IRAN FOIST MAMA" +
+	"LENT UNDER EVIL" +
+	"OATS LEERY WETS",
+
+// 111
+	"CORE STEPS LAND" +
+	"OVEN PERIL OBOE" +
+	"LEND RANGE CANE" +
+	"ARE EIRE ELATED" +
+	"  GOWNS SPITE  " +
+	"PLANET MAINE ID" +
+	"RIDER CAINE GNU" +
+	"EVES SLING WRAP" +
+	"YES SPILT DIANE" +
+	"SS SPANS SUPPED" +
+	"  FLING SHEEP  " +
+	"SPRANG BIAS LOP" +
+	"LOOT LEARN LIDO" +
+	"URGE EGRET ENOS" +
+	"MESS SONNY OGRE",
+
+// 112
+	"FIST RADAR CATS" +
+	"IDEA ELOPE ALOE" +
+	"FOND POLES MINE" +
+	"ELS DANE ELEVEN" +
+	"  ANISE SMILE  " +
+	"DETECT ROBES NO" +
+	"ARISE BOWLS CAP" +
+	"TROT TEPEE WHIT" +
+	"EON FIRED WEAVE" +
+	"SR GAMES DARTED" +
+	"  MOTET BESET  " +
+	"PROPEL GASP ELM" +
+	"EACH ELITE ARIA" +
+	"ACHE SAVOR DENT" +
+	"REAR SPENT ODES",
+
+// 113
+	"PORT GLADE MIME" +
+	"AVER RACES ORAL" +
+	"RELY AGENT ROIL" +
+	"ERA APES ELANDS" +
+	"  TIGER MEALS  " +
+	"SPICES RAMPS MS" +
+	"COVES DICES SAY" +
+	"OWED SALAD TERN" +
+	"RES STREW FORCE" +
+	"ER CARED RODEOS" +
+	"  SOLID HERON  " +
+	"CRAVED DOCK ACT" +
+	"ROLE ERASE IDLE" +
+	"ODOR NOTED READ" +
+	"PENT TEASE ASPS",
+
+// 114
+	"BRAG ROBOT PATE" +
+	"LONE EVADE AGED" +
+	"OBOE TENET RATE" +
+	"TEN BIND HASTEN" +
+	"  YEARS LEVEE  " +
+	"REMOTE CARED DG" +
+	"IRONS WAGER RIO" +
+	"ONUS TIRED RENO" +
+	"TIS SOLAR PAVED" +
+	"SE BERET TENORS" +
+	"  SLATS PERIL  " +
+	"POTATO BELT VOW" +
+	"ADAR IDELA GIVE" +
+	"LINE SINCE ONER" +
+	"ENDS ENTER OGRE",
+
+// 115
+	"SODA CEDED SPAR" +
+	"OVAL RAISE HERE" +
+	"LINE EGRET ACTS" +
+	"ODD TALK REPAST" +
+	"  EMOTE RAVEN  " +
+	"POLITE VICES RS" +
+	"RUINS FISTS HOT" +
+	"ETON TAXES LAME" +
+	"SEN BAKER TOWER" +
+	"SR ALLEN TRITON" +
+	"  STEER TRASH  " +
+	"RENOWN SWAY OPT" +
+	"ORAN TIMID AREA" +
+	"MIRE ECOLE SNAP" +
+	"ACES DEGAS HERS",
+
+// 116
+	"LOVE LEMON BASS" +
+	"ANEW ALONE ELIA" +
+	"DUNE RAVES LENS" +
+	"SST PINE THOUGH" +
+	"  ILIAD FLINT  " +
+	"SILENT BRING RF" +
+	"PLANT BLOND DOE" +
+	"IOTA YOUNG HEMI" +
+	"NNE MONET SEVEN" +
+	"SA OASES UPROOT" +
+	"  SPIES SNORT  " +
+	"BECALM DART IDO" +
+	"IRAQ IMAGE GOOD" +
+	"TABU TILES INTO" +
+	"ESSE EGEST USSR",
+
+// 117
+	"ARIA BOWER ELSE" +
+	"RUNG EVOKE MAIL" +
+	"ALTO CARED BILL" +
+	"BEE PALE EVERTS" +
+	"  ROAMS PEERS  " +
+	"VALISE DOMES PA" +
+	"ADULT WISER GAB" +
+	"PODS SAVED FLUE" +
+	"ORE HIKES MOIST" +
+	"RE DINER HORSES" +
+	"  PARIS BESET  " +
+	"SCARES SLAT EAT" +
+	"POST TOTAL ONCE" +
+	"ANTE ERODE WERE" +
+	"NEED ROWED EDEN",
+
+// 118
+	"SODA RADAR SCAR" +
+	"ORES ELOPE TAPE" +
+	"LATH PORTS AMEN" +
+	"OLE PONY PALEST" +
+	"  CHOSE TOWEL  " +
+	"SATIRE FINER WE" +
+	"ALIVE BLESS DAW" +
+	"FIVE GLARE MITE" +
+	"EKE BEAMS COVER" +
+	"RE RINSE SEVERS" +
+	"  CADET RIDER  " +
+	"SHAVER HALE SAG" +
+	"HARE AFIRE MILE" +
+	"OVEN TOKEN ITEM" +
+	"WEDS EXERT DYES",
+
+// 119
+	"ROSE STILL DATA" +
+	"OPEN THREE STOP" +
+	"LAND ROOST LONE" +
+	"ELS BARN TELLER" +
+	"  AGAIN MEDAL  " +
+	"RETORT PARES PS" +
+	"ALIAS SIREN CAT" +
+	"IDOL POLED HOSE" +
+	"DEN HILLS PASTE" +
+	"SR REELS PORTAL" +
+	"  HARPY PANDA  " +
+	"TRAVEL CARD RAW" +
+	"RATE AVAST MINE" +
+	"OVEN NORSE ACTS" +
+	"TEDS TWEED PAST",
+
+// 120
+	"GLOW SALAD MAPS" +
+	"RARE EMOTE OBOE" +
+	"ACID VINES REST" +
+	"BEG FETE ELATES" +
+	"  IVORY CRESS  " +
+	"DENIES MITES PA" +
+	"OVALS RUDER NAG" +
+	"VOTE BASED SURE" +
+	"EKE WAGER WOMEN" +
+	"RE TIRED WIDEST" +
+	"  RAPID SONAR  " +
+	"AMULET KING ICE" +
+	"WIRE OWNED ECHO" +
+	"ELAN NAIVE RAIN" +
+	"DOLT ENTER ALPS",
+
+// 121
+	"TIRE MELON SHOP" +
+	"AREA ADORE CAGE" +
+	"REST RIVET AILS" +
+	"ASP CITE WALLET" +
+	"  ETONS CODES  " +
+	"RECEDE MARES MA" +
+	"ENTRY PARKS GOP" +
+	"ITEM CARES TELE" +
+	"NED SHIRT SONAR" +
+	"SR FAIRY CATERS" +
+	"  CALLS VAPOR  " +
+	"TEASED LIPS ALE" +
+	"HILT RAISE ITES" +
+	"ERLE ERROR LEAP" +
+	"YEAR NEARS EDDY",
+
+// 122
+	"LACE SCOTS CLOG" +
+	"AVOW HOVEL LOPE" +
+	"VINE ARENA OVAL" +
+	"ADS AVER NOVELS" +
+	"  PACES ADDED  " +
+	"SWIPED SHEDS BE" +
+	"HARES PEERS CAN" +
+	"AGES CODAS CORD" +
+	"ROD SALAD LUNGE" +
+	"EN LINEN HERDED" +
+	"  PELTS SENSE  " +
+	"MORALE SUES MAT" +
+	"IRIS RATED ONCE" +
+	"SAME ELIDE WERE" +
+	"SLED DARED EDEN",
+
+// 123
+	"MOSS DARTS FINE" +
+	"ABUT EVOKE OMAR" +
+	"LOGE FAVOR RAIN" +
+	"LEA BASE GAGGLE" +
+	"  REACT MELEE  " +
+	"ENCORE LEAST HS" +
+	"DIANE PIANO MOW" +
+	"INNS SLANT GIVE" +
+	"CEE WEARY MINED" +
+	"TS BARNS CIRCLE" +
+	"  GRIPE HORDE  " +
+	"PAROLE MORE MOD" +
+	"ANEW NEARS MENU" +
+	"STEN TENSE RACE" +
+	"SINS SLEET STET",
+
+// 124
+	"LIFE ROBIN SALT" +
+	"AVOW APACE ALOE" +
+	"MARE BALES TORN" +
+	"ANT DILL TWINED" +
+	"  IRONS BLARE  " +
+	"MOTIVE GLIDE AS" +
+	"ELUDE CRANE FIT" +
+	"TIDE CLANG BASE" +
+	"EVE TREND BELLE" +
+	"RE TREAT PEALED" +
+	"  SHEAR PANDA  " +
+	"CLARET SOLD COD" +
+	"LINE UNTIL PIPE" +
+	"AREA RAISE REEL" +
+	"WARD EGRET ESNE",
+
+// 125
+	"CAVE AMBER ABLE" +
+	"OVAL POISE CLAY" +
+	"PECK PREPS RUDE" +
+	"ERA SEAR CRONES" +
+	"  TOTAL QUEST  " +
+	"SPINAL RUINS PS" +
+	"TROUT FAINT WIN" +
+	"RUNS BRING WINE" +
+	"ADS FROST MINCE" +
+	"YE SEIZE LUSTER" +
+	"  THESE BATHE  " +
+	"BAREST LAST RIB" +
+	"ALEE LOOSE AIRY" +
+	"LINT EAGER CZAR" +
+	"DADS DRESS TEND",
+
+// 126
+	"HOLE LOCAL SHOP" +
+	"EDIT IMAGE LAVA" +
+	"ROBE TIMES URAL" +
+	"ORE FATE SAMPLE" +
+	"  RAINS HELPS  " +
+	"SCANTY DANES TB" +
+	"MALTS COVES SEA" +
+	"IDLE HONED STAR" +
+	"TRY BARON LOOSE" +
+	"HE TAPER SEARED" +
+	"  RASPS SPARE  " +
+	"CHAISE SHIP RUB" +
+	"RAIL NOMAD MOEL" +
+	"ELSE ELUDE AONE" +
+	"WEED DETER OMAR",
+
+// 127
+	"ECRU BUFFS RETS" +
+	"OLES ALLOT EARN" +
+	"NOSE STARE ARIA" +
+	"SGT DIRT WALLOP" +
+	"  ABACA MAILS  " +
+	"ACTORS SORRY PS" +
+	"GLINT ACIDS CUT" +
+	"RANG PRESS MORE" +
+	"ENG FRONT SINGE" +
+	"EG FLAME RUNNER" +
+	"  ARENA MELEE  " +
+	"MANIAC HICK COO" +
+	"ACNE EMOTE ATOP" +
+	"SHUN ROBED DOZE" +
+	"HELD SWORE ORES",
+
+// 128
+	"SITE CEDAR REDS" +
+	"ODOR ADOBE EVIL" +
+	"DOLE RISEN PARE" +
+	"ALE FETE OPENED" +
+	"  ROLES OVENS  " +
+	"SHAVER PLANT VA" +
+	"TOTED GRITS DAD" +
+	"AVER GROVE PESO" +
+	"LED CRANE COVER" +
+	"ER SHAPE GREASE" +
+	"  SHINE PLOTS  " +
+	"ATTEND SLAW TAP" +
+	"LURE SALAD GALA" +
+	"ABUT OVINE ETAL" +
+	"SETS NAMES TENS",
+
+// 129
+	"ZEAL SOLID DEAL" +
+	"URGE PRIDE ELLA" +
+	"LARD IDEAL BEEP" +
+	"USE ACES IMAGES" +
+	"  EDGER EVERY  " +
+	"STAYED BLESS CI" +
+	"ORBED COBRA RRS" +
+	"WILD ALLOY TEAL" +
+	"EKE AVIEW FALSE" +
+	"RE OVENS REPAST" +
+	"  SHORT LEAST  " +
+	"PATINA PACT IKE" +
+	"OLEO GRATE AVER" +
+	"ETNA EASED LEER" +
+	"MOON SWORE ASPS",
+
+// 130
+	"SLED SCALE MOPS" +
+	"TAXI HIVES ERIE" +
+	"ANTE IDEAS DIET" +
+	"GEE EVER ORDERS" +
+	"  NEWER KNELL  " +
+	"MASTER PRIDE LS" +
+	"EDITS SLATS SEE" +
+	"DOVE CHAFE LENA" +
+	"IRE GRUNT DEVIL" +
+	"AN BLAST RAVENS" +
+	"  BEECH LEMON  " +
+	"SHRANK LOVE TEN" +
+	"HOES ELIDE AERO" +
+	"ABET RIVER REST" +
+	"GODS SPENT KNEE",
+
+// 131
+	"STOP BONER SCAB" +
+	"TORE ADORE COME" +
+	"ARIA NOMAD ERIE" +
+	"BOG PARE HINDER" +
+	"  IRONS DELES  " +
+	"MANILA HEALS AM" +
+	"ABASE FEEDS TVA" +
+	"DATE BEADS TRAP" +
+	"ATE BRATS FRAIL" +
+	"ME SLURS DOODLE" +
+	"  STUNS WRITE  " +
+	"BEWARE NOEL MAN" +
+	"AGOG TRAMS WANE" +
+	"BARE TOTES ARTS" +
+	"ADES EBONY SKIS",
+
+// 132
+	"BATS ROMAN DENT" +
+	"EVIL EVADE ERIE" +
+	"TIDY MENDS FOLD" +
+	"ADA MINE TRADES" +
+	"  LEANS PLACE  " +
+	"COWARD BRINE SE" +
+	"AMASS CLING STY" +
+	"RAVE SLING STAR" +
+	"THE CHANT HORNE" +
+	"SA BRAND SALADS" +
+	"  DUETS APRON  " +
+	"FORGET SLIM GYP" +
+	"ABEL ELATE LEER" +
+	"LOSE RIVAL ERLE" +
+	"LESS SEERS ASPS",
+
+// 133
+	"DROP REMIT MAYO" +
+	"RARE EXUDE USER" +
+	"ALIT BISON SCAN" +
+	"BEG MALT ENCORE" +
+	"  IRATE SMELT  " +
+	"SENATE GEESE PS" +
+	"CLASH POINT SOL" +
+	"OATH PLANT SARI" +
+	"RTE SHADE DOTED" +
+	"EE THATS DELUDE" +
+	"  SHINE DECOR  " +
+	"RELENT DESK AIM" +
+	"ALAS ORATE ETNA" +
+	"MINI MITER PERT" +
+	"PATS SMART IDEE",
+
+// 134
+	"ROAD PASTE ABES" +
+	"ALLY ELTON WRAP" +
+	"PETE ATONE HIVE" +
+	"TOE FLOP RAINED" +
+	"  RILES AGILE  " +
+	"CANNED BRIDE FA" +
+	"AWAKE PRIZE MAS" +
+	"BATS GOOSE CART" +
+	"IRE PEKOE DANCE" +
+	"NE PINED DANDER" +
+	"  PALES LIVER  " +
+	"ERASER ROVE ERA" +
+	"DONS ASIDE SLAP" +
+	"ALEE LATER ELSE" +
+	"MESS SPENT ASPS",
+
+// 135
+	"TRAY PRATE TRAP" +
+	"HOPE LEMON RICE" +
+	"ASPS ALIEN ADES" +
+	"TEE ACID ODDEST" +
+	"  TOPIC OBOES  " +
+	"GAINED COLOR TB" +
+	"LITER DOZER PRO" +
+	"USES WAVED ARID" +
+	"ELS HOMES BLOKE" +
+	"SE SANER BEAMED" +
+	"  POMDS GESSO  " +
+	"DELUDE SEAT TIM" +
+	"ODIN RUMOR PIPE" +
+	"NEED ETUDE ROSS" +
+	"ENDS DETER ENOS",
+
+// 136
+	"SLIT SPARE SHIP" +
+	"NONO PRIOR TONE" +
+	"ANTE OILER ANNA" +
+	"GEE SUDS ARREST" +
+	"  RAISE KNEES  " +
+	"REVILE METES GO" +
+	"AVERT BEARD SAT" +
+	"ZANY TESTY SHUT" +
+	"ODE GRASS SIEGE" +
+	"RE DAISY TILLER" +
+	"  PRINT DEPOT  " +
+	"SHRANK HENS ERA" +
+	"LOOP EVENS ERIN" +
+	"ELSE TERSE TEND" +
+	"WEED STEED EDDY",
+
+// 137
+	"PLUG CLAUS EDNA" +
+	"LANA RAISE LOAD" +
+	"ANDS EIDER ALMA" +
+	"NEE SERE ESTEEM" +
+	"  RAILS ANTES  " +
+	"OTHERS BRAES DC" +
+	"GEARS BARDS RIA" +
+	"RENO PEKOE SEND" +
+	"END SHREW SAVED" +
+	"SS POEMS CELERY" +
+	"  ARIAS SHEET  " +
+	"PANELS TIES ETE" +
+	"ERNE ALINE SNOW" +
+	"REIN NINES ACRE" +
+	"MAES TEASE GEES",
+
+// 138
+	"DAME SPATS ERIN" +
+	"ONER TAROT ROSE" +
+	"ONCE ALINE ABLE" +
+	"RAH AREA EASIER" +
+	"  ANGER ALLEN  " +
+	"GENIES SHEER LA" +
+	"ARILS PEERS MEN" +
+	"LACE PLEAS DEAN" +
+	"ASS BEARD HORSE" +
+	"SE BARNS FENCES" +
+	"  CURSE SLATE  " +
+	"STEREO ACID NEB" +
+	"LIAR NEWER WADE" +
+	"ALSO AGENT ARID" +
+	"TEES LOSES RYES",
+
+// 139
+	"AGRE AMASS ACHE" +
+	"PLEA COLON URAL" +
+	"TUTU CREPE TOIL" +
+	"SEE FUSE ABHORS" +
+	"  NOISE AKRON  " +
+	"MATURE CLEAR SC" +
+	"EDITS SHORT RAH" +
+	"AMOS OPENS DELE" +
+	"TIN APACE DOMOS" +
+	"ST SPECK URGENT" +
+	"  THERE SPASM  " +
+	"SAHARA DIET BRO" +
+	"EWER THORN PEAR" +
+	"EASE OOZED ERST" +
+	"DYES REEDS ASPS",
+
+// 140
+	"HALO ELATE SLAP" +
+	"AVID LIBEL TILE" +
+	"ROBE INANE EVEN" +
+	"EWE AXES MOVIES" +
+	"  ROBIN HEWED  " +
+	"SHAVER BONES BA" +
+	"HOTEL WANTS RED" +
+	"AVON WARES HERO" +
+	"PER PAGED CATER" +
+	"ER DINED ROTATE" +
+	"  BENDS TOWEL  " +
+	"BERATE ERAS IRA" +
+	"ARIL RADAR LAIR" +
+	"NIDE ELIDE ATOM" +
+	"DEER DATED GETS",
+
+// 141
+	"PADS GAMUT TREE" +
+	"ALEE ALIKE RELY" +
+	"SITE LONER EASE" +
+	"SIE FOND MENDED" +
+	"  CHORE FINDS  " +
+	"SATIRE BONDS CA" +
+	"OLIVE ALIAS NOD" +
+	"LIVE STALL COMO" +
+	"AVE CLODS WATER" +
+	"RE PLANE BERATE" +
+	"  GRACE TENET  " +
+	"SHRINK DEFT IRA" +
+	"PAID ELOPE BOAR" +
+	"ERNE NOVEL ANNE" +
+	"WEDS STEEL ASKS",
+
+// 142
+	"CARP CALMS SALT" +
+	"OVER ALIEN ERIE" +
+	"TONY RIATA AREA" +
+	"EWE HEAR TALONS" +
+	"  GROSS SCREW  " +
+	"TRAILS APHID DE" +
+	"RUDDY GREED DIN" +
+	"ALES TREND WANT" +
+	"YES GRAND BINGE" +
+	"SR GRETA CANDOR" +
+	"  BLASE PASSE  " +
+	"SHRIMP DOVE LID" +
+	"LAID AVASE AIDE" +
+	"ERNE SEVER GOON" +
+	"DEER STERN ONLY",
+
+// 143
+	"LACE SWAMP DOWN" +
+	"OVAL POWER ECHO" +
+	"CORK IRATE SEES" +
+	"OWN EERY TREATY" +
+	"  APTLY STERN  " +
+	"ANTICS RAINT MA" +
+	"FAITH PAVED COG" +
+	"TROY CATER HERE" +
+	"EEN TAPED TALON" +
+	"RS DOTES SILENT" +
+	"  CEDAR THROB  " +
+	"FLAVOR DARE RUG" +
+	"LOGO AGILE VASE" +
+	"ABET CAVED ITEM" +
+	"POSE TRESS MESS",
+
+// 144
+	"WIND IVIES GLEN" +
+	"ACER MARSH ROLY" +
+	"RACY PLATE ERSE" +
+	"NNE GAIN PLANET" +
+	"  SOLID CHOSE  " +
+	"EASIER THESE GP" +
+	"SMILE SHARE ARE" +
+	"SETS CHARD AMIS" +
+	"ANY CHANT ALAMO" +
+	"YD SHANK PRIZES" +
+	"  WHITE TRITE  " +
+	"ORIENT BEAD MRS" +
+	"BODE RINSE INGE" +
+	"OVER RINSE INGE" +
+	"EENS STEED ETES",
+
+// 145
+	"WADE CRAFT COOP" +
+	"ODIN RIVER HUGE" +
+	"KISS ADOBE ASEA" +
+	"ETC OVEN SISTER" +
+	"  ORDER APSES  " +
+	"MOVIES SCALD PA" +
+	"ABETS CHOSE HUB" +
+	"SERE DOERS COLA" +
+	"OSS SIREN TRUST" +
+	"NE WAVER LEASEE" +
+	"  CAGED SERGE  " +
+	"COLDER SLAM WIT" +
+	"ILED GAMIN SIVA" +
+	"TEAL ELUDE AFAR" +
+	"YORE SATED WENT",
+
+// 146
+	"CRIB RAPID BALI" +
+	"HONE ALIDE EBON" +
+	"ANTE VOTES HONK" +
+	"PAR FINS CRAVES" +
+	"  ORANG DRIVE  " +
+	"REDUCE PRICE PS" +
+	"ELUDE TRIBE CII" +
+	"LACE PRONE CHAN" +
+	"ATE FRISK MAINE" +
+	"YE SLICE HALLOW" +
+	"  FLASK WORLD  " +
+	"RELENT NAVY HER" +
+	"ALOE IRATE OOZE" +
+	"SLOP NOVEL NORA" +
+	"PADS EWERS EDAM",
+
+// 147
+	"SOME ABETS COTS" +
+	"CHAR DEERE ADIT" +
+	"SITS OGLES NORA" +
+	"TOE ORES SECRET" +
+	"  RELET SIDES  " +
+	"CHIDES SPOIL SA" +
+	"LOADS CHANT TUB" +
+	"ONLY SHOTS ARIA" +
+	"DES STEPS SLANT" +
+	"SD SLAWS PLEDGE" +
+	"  MOONS TEASE  " +
+	"SHAVED AHEM MET" +
+	"HATE ANGEL BARE" +
+	"AVER ROUTE ERIN" +
+	"MESS DREAD EKED",
+
+// 148
+	"HORN GLOAT QUIT" +
+	"EPEE YOUTH UNDO" +
+	"REST RACER ALLY" +
+	"ONE OATH ENVIES" +
+	"  MONTH SWEET  " +
+	"BUBBLE CHOIR BS" +
+	"ALLOY RERUN CAT" +
+	"SNEE BALEY DARE" +
+	"TAD WORLD HINGE" +
+	"ES FACES CARDER" +
+	"  FRIAR BALKY  " +
+	"UNROLL ZERO COG" +
+	"RAIN INURE LAVA" +
+	"GILT ZONES ANEW" +
+	"ELLS EDITS PERK",
+
+// 149
+	"ARAB ARDOR VISA" +
+	"CEDE MOORE AVIS" +
+	"HAVE BUTTS LIPS" +
+	"ERA MUTE TRUEST" +
+	"  NOISE BREED  " +
+	"DETACH BLOBS MD" +
+	"ELATE TRIOS FOE" +
+	"LUGS CHASM WAVE" +
+	"ADE SLEDS RAVED" +
+	"YE TOURS HONORS" +
+	"  BONBE DATER  " +
+	"WARMER MIRE ARK" +
+	"ALIT OMEGA OBOE" +
+	"DODO OASIS PLAY" +
+	"SEEM MEATS TEDS",
+
+// 150
+	"GUYS RACES PETE" +
+	"AREA ELATE ELIA" +
+	"LAST CIDER ALEC" +
+	"ALT PENS VANISH" +
+	"  ERODE VALUE  " +
+	"GARAGE JANET CA" +
+	"RADIO CASTS SAW" +
+	"ARAL CAPES LENA" +
+	"TOY VISAS MANOR" +
+	"EN RAVEN LASTED" +
+	"  DELIS MORSE  " +
+	"MARVEL MOVE NIP" +
+	"ALAR IRATE ACRE" +
+	"RAIL ANGER PEAR" +
+	"ANNS NAILS ESNE",
+];
+</script>
+</body>
+</html>
