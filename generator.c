@@ -263,7 +263,7 @@ void write_footer(FILE *fout)
 {
 	char *str = u8"</div><div style=\"background-color: #222; padding: 1em; color: #fafafa\">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style=\"color: #aaa\">\u00a9 2024 by Daniel Taylor</span></div>";
 	fwrite(str, 1, strlen(str), fout);
-	fprintf(fout, "<script src=\"https://polyfill.io/v3/polyfill.min.js?features=es6\"></script>\n<script id=\"MathJax-script\" async src=\"/3rd-party/mathjax/tex-mml-chtml.js\"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>");
+	fprintf(fout, "<script id=\"MathJax-script\" async src=\"/3rd-party/mathjax/tex-mml-chtml.js\"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>");
 }
 void write_markdown(FILE *fout, char *buf, char **name, char **descr, char *date)
 {
