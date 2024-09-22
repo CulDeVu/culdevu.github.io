@@ -69,26 +69,51 @@
 				(max 0.000001 (sqrt (+ (square (* 2 (- x cx))) (square (* 2 (- y cy))))))
 					))))|#
 
-()
+(define-macro (scaled-ddx body)
+	(letrec (
+(dddx
+	(lambda (body)
+		(cond
+		((eq? body `x) 1)
+		((number? body) 0)
+		((symbol? body) 0)
+		((list? body)
+			(let ((op (car body)))
+				(cond
+					((eq? op `cos)
+						`(* (- (sin ,(cadr body))) ,(dddx (cadr body))))
+					((eq? op `+)
+						`(+ ,(dddx (cadr body)) ,(dddx (caddr body))))
+					((eq? op `-)
+						`(- ,(dddx (cadr body)) ,(dddx (caddr body))))
+					((eq? op `*)
+						`(+ (* ,(dddx (cadr body)) ,(caddr body)) (* ,(cadr body) ,(dddx (caddr body)))))
+					(#t (error "unrecognized op in ddx: " body)))))
+		(#t (error "unrecognized body in ddx: " body)))))
+) `(/ ,body (sqrt1+sqr ,(dddx body)))))
+
+; (display (dddx `(- y (+ (cos (* 2pi7/8 (- x b))) (cos (* 2pi1/8 (- x b)))))))
+;(display (dddx `(cos (* 2pi7/8 x))))
 
 (define sin-v2-1
 	(lambda (x y b)
-		(/
+		(scaled-ddx
 			(- y (+ (cos (* 2pi7/8 (- x b))) (cos (* 2pi1/8 (- x b)))))
-			(sqrt1+sqr (+ (* 2pi7/8 (sin (* 2pi7/8 (- x b)))) (* 2pi1/8 (sin (* 2pi1/8 (- x b))))))
+			;(sqrt1+sqr (+ (* 2pi7/8 (sin (* 2pi7/8 (- x b)))) (* 2pi1/8 (sin (* 2pi1/8 (- x b))))))
+			;(sqrt1+sqr (ddx (- y (+ (cos (* 2pi7/8 (- x b))) (cos (* 2pi1/8 (- x b)))))))
 			)))
 (define sin-v2-2
 	(lambda (x y b)
-		(- y (+ 
+		(scaled-ddx (- y (+ 
 				(* (cos (* 2pi7/8 (- x b))) sinc-pi-7/8)
 				(* (cos (* 2pi1/8 (- x b))) sinc-pi-1/8)
-				))))
+				)))))
 (define sin-v2-3
 	(lambda (x y b)
-		(- y (+ 
+		(scaled-ddx (- y (+ 
 				(* (cos (+ (* 2pi1/8 x) (* 2pi7/8 b) )) sinc-pi-7/8)
 				(* (cos (* 2pi1/8 (- x b))) sinc-pi-1/8)
-				))))
+				)))))
 (define circ-2
 	(lambda (x y cx b)
 		(let ((cy (+ 
@@ -163,7 +188,7 @@
 (map
 	(lambda (index)
 		(save-file (string-append "output-" (number->string index) ".ppm") (* index 0.125)))
-	;(list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63)
+	(list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63)
 	;(list 5)
-	(list 0 1)
+	;(list 0 1)
 	)
