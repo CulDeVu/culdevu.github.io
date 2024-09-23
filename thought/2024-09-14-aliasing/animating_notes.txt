@@ -1,0 +1,6 @@
+To make an animated gif:
+
+ffmpeg -framerate 5 -i output-%d.ppm output.gif
+
+gifsicle -i flickering_graph_animation.gif -O3 --colors 8 -o output.gif
+

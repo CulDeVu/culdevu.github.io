@@ -17,31 +17,54 @@
 	(lambda (x)
 		(sqrt (+ 1 (square x)))))
 
-(define sin1
-	(lambda (x y)
-		(/ 
-			(- y (sin (* 2pi7/8 x)))
-			(sqrt1+sqr (* 2pi7/8 (cos (* 2pi7/8 x)))))))
+(define-macro (scaled-ddx body)
+	(letrec (
+(dddx
+	(lambda (body)
+		(cond
+		((eq? body `x) 1)
+		((number? body) 0)
+		((symbol? body) 0)
+		((list? body)
+			(let ((op (car body)))
+				(cond
+					((eq? op `cos)
+						`(* (- (sin ,(cadr body))) ,(dddx (cadr body))))
+					((eq? op `+)
+						`(+ ,(dddx (cadr body)) ,(dddx (caddr body))))
+					((eq? op `-)
+						`(- ,(dddx (cadr body)) ,(dddx (caddr body))))
+					((eq? op `*)
+						`(+ (* ,(dddx (cadr body)) ,(caddr body)) (* ,(cadr body) ,(dddx (caddr body)))))
+					(#t (error "unrecognized op in ddx: " body)))))
+		(#t (error "unrecognized body in ddx: " body)))))
+) `(/ ,body (sqrt1+sqr ,(dddx body)))))
 
-(define sin2
-	(lambda (x y)
-		(/
-			(- y (* 1 (sin (* 2pi7/8 x)) sinc-pi-7/8))
-			(sqrt1+sqr (* 1 2pi7/8 sinc-pi-7/8 (cos (* 2pi7/8 x)))))))
+(define sin-v1-1
+	(lambda (x y b)
+		(scaled-ddx
+			(- y (cos (* 2pi7/8 x)))
+			)))
+
+(define sin-v1-2
+	(lambda (x y b)
+		(scaled-ddx
+			(- y (* (cos (* 2pi7/8 x)) sinc-pi-7/8))
+			)))
 
 (define circ-1
-	(lambda (x y cx)
-		(let ((cy (* (sin (* 2pi7/8 cx)) sinc-pi-7/8)))
+	(lambda (x y cx b)
+		(let ((cy (* (cos (* 2pi7/8 cx)) sinc-pi-7/8)))
 			(/ 
 				(min 0 (- 0.001 (square (- x cx)) (square (- y cy))))
 				(max 0.000001 (sqrt (+ (square (* 2 (- x cx))) (square (* 2 (- y cy))))))
 					))))
 
-(define sin3
-	(lambda (x y)
-		(/
-			(- y (* (sin (- (* 2pi1/8 x))) sinc-pi-7/8))
-			(sqrt1+sqr (* 2pi1/8 sinc-pi-7/8 (cos (* 2pi1/8 x)))))))
+(define sin-v1-3
+	(lambda (x y bs)
+		(scaled-ddx
+			(- y (* (cos (* 2pi1/8 x)) sinc-pi-7/8))
+			)))
 
 #|(define sin-v2-1
 	(lambda (x y b)
@@ -68,29 +91,6 @@
 				(min 0 (- 0.001 (square (- x cx)) (square (- y cy))))
 				(max 0.000001 (sqrt (+ (square (* 2 (- x cx))) (square (* 2 (- y cy))))))
 					))))|#
-
-(define-macro (scaled-ddx body)
-	(letrec (
-(dddx
-	(lambda (body)
-		(cond
-		((eq? body `x) 1)
-		((number? body) 0)
-		((symbol? body) 0)
-		((list? body)
-			(let ((op (car body)))
-				(cond
-					((eq? op `cos)
-						`(* (- (sin ,(cadr body))) ,(dddx (cadr body))))
-					((eq? op `+)
-						`(+ ,(dddx (cadr body)) ,(dddx (caddr body))))
-					((eq? op `-)
-						`(- ,(dddx (cadr body)) ,(dddx (caddr body))))
-					((eq? op `*)
-						`(+ (* ,(dddx (cadr body)) ,(caddr body)) (* ,(cadr body) ,(dddx (caddr body)))))
-					(#t (error "unrecognized op in ddx: " body)))))
-		(#t (error "unrecognized body in ddx: " body)))))
-) `(/ ,body (sqrt1+sqr ,(dddx body)))))
 
 ; (display (dddx `(- y (+ (cos (* 2pi7/8 (- x b))) (cos (* 2pi1/8 (- x b)))))))
 ;(display (dddx `(cos (* 2pi7/8 x))))
@@ -128,7 +128,7 @@
 (define circ
 	(lambda (x y t)
 		(apply max (map
-				(lambda (cx) (circ-2 x y cx t))
+				(lambda (cx) (circ-1 x y cx t))
 				(list -4 -3 -2 -1 0 1 2 3 4)))))
 
 (define draw-sinousoids
@@ -136,14 +136,21 @@
 		(let* (
 				(px (/ (- x 400) 80))
 				(py (/ (- y 200) 100))
-				(val1 (abs (sin-v2-1 px py t)))
-				(val2 (abs (sin-v2-2 px py t)))
-				(val3 (abs (sin-v2-3 px py t)))
+				; (val1 (abs (sin-v2-1 px py t)))
+				; (val2 (abs (sin-v2-2 px py t)))
+				; (val3 (abs (sin-v2-3 px py t)))
+				; (val4 (abs (circ px py t)))
+				
+				(val1 (abs (sin-v1-1 px py t)))
+				(val2 (abs (sin-v1-2 px py t)))
+				(val3 (abs (sin-v1-3 px py t)))
 				(val4 (abs (circ px py t)))
+
 				(v1 (if (< val1 0.01) 255 0))
 				(v2 (if (< val2 0.01) 255 0))
 				(v3 (if (< val3 0.01) 255 0))
 				(v4 (if (< val4 0.02) 255 0))
+				
 				)
 			(begin
 				(put-u8 file (max v1 v4))
@@ -188,7 +195,7 @@
 (map
 	(lambda (index)
 		(save-file (string-append "output-" (number->string index) ".ppm") (* index 0.125)))
-	(list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63)
+	;(list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63)
 	;(list 5)
-	;(list 0 1)
+	(list 0)
 	)
