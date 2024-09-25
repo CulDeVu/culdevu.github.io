@@ -11,6 +11,9 @@
 
 (define 2pi11/12 (* 2pi (/ 11.0 12.0)))
 
+(define 2pi0.49 (* 2pi 0.49))
+(define 2pi0.51 (* 2pi 0.51))
+
 (define square
 	(lambda (x)
 		(* x x)))
@@ -134,6 +137,14 @@
 				(lambda (cx) (circ-1 x y cx t))
 				(list -4 -3 -2 -1 0 1 2 3 4)))))
 
+(define signal-basic-1
+	(lambda (cx cy b n)
+		(* 1 (+ 0.5 (* 0.5 (cos (* 2pi0.49 cx)))))))
+(define signal-basic-2
+	(lambda (cx cy b n)
+		(* 1 (+ 0.5 (* 0.5 (cos (* 2pi0.51 cx)))))))
+
+
 (define signal-static
 	(lambda (x y t)
 		(*
@@ -175,9 +186,10 @@
 				; (val4 (abs (circ px py t)))
 
 				; (val1 (signal-static px py t))
-				(val1 (/ (signal-static-sampler px py t 64) 64.0)) ; 512
+				(val1 (/ (signal-basic-2 px py t 1) 1.0)) ; 512
 
-				(v1 (inexact->exact (floor (* 255 (/ val1 (+ val1 1))))))
+				;(v1 (inexact->exact (floor (* 255 (/ val1 (+ val1 1))))))
+				(v1 (inexact->exact (floor (* 255 val1))))
 				; (v2 (if (< val2 0.01) 255 0))
 				; (v3 (if (< val3 0.01) 255 0))
 				; (v4 (if (< val4 0.02) 255 0))
@@ -226,8 +238,8 @@
 (map
 	(lambda (index)
 		(save-file (string-append "output-" (number->string index) ".ppm") (* index 0.125)))
-	(list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63)
-	;(list 5)
+	; (list 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63)
+	(list 0)
 	; (list 0 1 2 3 4 5 6 7 8 9 10 11 12)
 	; (list 5 6 7 8 9 10 11 12)
 	)
