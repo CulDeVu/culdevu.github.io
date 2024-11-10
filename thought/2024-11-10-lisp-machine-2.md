@@ -7,7 +7,7 @@ Since last time:
 
 # Software
 
-I had gotten the simulator to the point where I wanted to test larger programs in the simulator. I want to be able to run a simple REPL on the finished machine at the very least, so I started with that. But along the way I ended up doing a partial rewrite of the simulation.
+I had gotten the simulator to the point where I wanted to test larger programs. I want to be able to run a simple REPL on the finished machine at the very least, so I started with that. But along the way I ended up doing a partial rewrite of the simulator.
 
 The old design had a dedicated cons cell type called `node-type-call`. The idea is that you would tell the lisp machine explicitly to execute a list, as opposed to just passing it as a value. Not some amazing feature of the ISA or anything, it just made the microcode easier to write.
 
