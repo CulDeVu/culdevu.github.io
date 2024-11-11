@@ -9,7 +9,7 @@ Since last time:
 
 I had gotten the simulator to the point where I wanted to test larger programs. I want to be able to run a simple REPL on the finished machine at the very least, so I started with that. But along the way I ended up doing a partial rewrite of the simulator.
 
-The old design had a dedicated cons cell type called `node-type-call`. The idea is that you would tell the lisp machine explicitly to execute a list, as opposed to just passing it as a value. Not some amazing feature of the ISA or anything, it just made the microcode easier to write.
+The old design had a dedicated cons cell type called `node-type-call`. The idea is that you would tell the lisp machine explicitly to execute a list, as opposed to it executing any list node that it came across. Not some amazing feature of the ISA or anything, it just made the microcode easier to write.
 
 The problem is that, in the old design, you couldn't write a compiler that returns a `node-type-call`. If you tried, the `node-type-call` would be in the `instr` register at the start of the next macrocycle and it would be immediately executed. You'd have to return a raw list containing the instructions. And there'd be no possible way to construct a `node-type-call` that points to it either. You'd have to make a whole new instruction, called `eval`, whose job is to execute lists. Which was supposed to be the job of `node-type-call`. So I ended up getting rid of `node-type-call` and just implemented the normal lisp calling convention: lists encountered while running instructions are executed, lists encountered while returning from calls are not.
 
