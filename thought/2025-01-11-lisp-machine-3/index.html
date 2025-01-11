@@ -1,0 +1,137 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a><a href="/physics/" class="navitem">Physics</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Lisp machine interlude</h2><i>Pub. 2025 Jan 11</i><p>Since last time:</p><h3 class="section_heading">Software</h3><p>I wrote another simulator. This will be the 4th one, by my count. Unlike the others, this one is designed to run on an Arduino.</p><p>The idea is this: I would write a simulator of the lisp machine on my Arduino, at the level of busses and logical components. I would expose the major busses on the IO pins, and gradually replace parts of the simulation with real circuit boards on those busses. Output (at least at the beginning) is done through an LCD screen.</p><p>Some changes had to happen:</p><p>I added a <code class="codeinline">port</code> instruction for outputting to the LCD screen. Previously, the machine would output a result by storing it in the <code class="codeinline">instr</code> register and transitioning to an illegal state, stopping the simulation. Seeing the number on a screen is much nicer.</p><p>Very simple programs were taking forever. I would write a simple program to multiply two numbers together, and the sim would show that dozens of garbage collections happening. There are a ton of reasons, but I made a big dent in the problem by changing how local variables work. Previously, you would call <code class="codeinline">(envt)</code> to get the contents of the environment register, a list type. Then, to get the n'th item in the environment you'd do <code class="codeinline">(car (cdr ... n-1 of these ... (cdr (envt))))</code>. This results in a <i>ton</i> of function calls, which then generate a ton of garbage on the heap, filling up memory. So I added a feature whre you can do <code class="codeinline">(envt 10)</code> instead to get the 10th item in the environment. Honestly, I'd be happier with a system that could handle call stack garbage in a more general way. But that's a problem for another day.</p><p>Jesus christ, I didn't realize that how deep the arduino rabbit hole goes. There are huge, blatant bugs in the compiler that have been there for years. For example, this compiles:</p><pre class="codeblock"><code>typedef struct { int a; } A_t;
+int bar(A_t a) { return a.a; }
+void setup() {}
+void loop() {}
+</code></pre><p>But this doesn't:</p><pre class="codeblock"><code>void foo() {}
+typedef struct { int a; } A_t;
+int bar(A_t a) { return a.a; }
+void setup() {}
+void loop() {}
+</code></pre><p>The latter claims that <code class="codeinline">A_t</code> on line 3 is not declared. This is because the arduino compiler (in the IDE as well as the <code class="codeinline">arduino --verify file.ino</code>) first runs a preprocessor over the file that rewrites shit, adds <code class="codeinline">#include</code> s to the top of files, moves shit around. But it doesn't create an AST or anything before it starts rewriting your file, so sometimes it rewrites your perfectly valid C into non-valid C before passing it off to <code class="codeinline">avr-gcc</code>.</p><p>In the above specifically, it's detecting functions <code class="codeinline">foo</code>, <code class="codeinline">bar</code>, <code class="codeinline">setup</code>, and <code class="codeinline">loop</code>, and inserting forward declarations at the top of the file. Presumably to "fix" the error that will show up when someone writes two mutually recursive functions.</p><p>This old issue may very well be the first person to complain about this problem, almost exactly 15 years ago: <a href="https://code.google.com/archive/p/arduino/issues/188">adfa</a>.</p><p>Honestly, I find this crazy. Like, why? Someone in their programming journey will learn about function prototypes vs definitions in like the 2nd or 3rd week [citation needed]. In an effort to make programming slightly less confusing for the first 3 weeks, the Arduino devs decided to make programming slightly harder and less predictable for weeks 4 through infinity.</p><p>Luckily, the solution is easy: make a <code class="codeinline">main.h</code> file that contains everything you would normally put in your <code class="codeinline">.ino</code> file, and make your <code class="codeinline">.ino</code> file look like this:</p><pre class="codeblock"><code>#include "main.h"
+</code></pre><p>The arduino compiler only does it's stupid preprocessing on <code class="codeinline">.ino</code> files, not on <code class="codeinline">.c</code> or <code class="codeinline">.h</code> files. So those are safe. <i>For now</i>.</p><p>Also, damn arduinos have a tiny amount of RAM. Luckily, the MEGA has quite a bit of flash. If you have lots of data to stuff into flash memory, the normal <code class="codeinline">PROGMEM</code> macro doesn't work. You have to explicitly place the data on the <i>far</i> side of the address space, and let the code in the <code class="codeinline">.text</code> section have the lower addresses. You have to add <code class="codeinline">__attribute__((__section__(".fini1")))</code>, or one of the other <code class="codeinline">fini</code>'s defined in the compiler's linker script. Reading can be done with a custom <code class="codeinline">memcpy</code> function using <code class="codeinline">pgm_read_byte_far</code>.</p><h3 class="section_heading">The build, first steps</h3></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2024 by Daniel Taylor</span></div><script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
