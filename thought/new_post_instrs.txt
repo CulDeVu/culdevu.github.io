@@ -1,0 +1,10 @@
+
+To see any exif data in jpeg:
+exif <filename>
+
+To remove all exif data from jpeg
+exif --remove <filename>
+
+To remove gps location and audio from video:
+ffmpeg -i <input file> -metadata location="" -metadata location-eng="" -vcodec copy -an <output file>
+
