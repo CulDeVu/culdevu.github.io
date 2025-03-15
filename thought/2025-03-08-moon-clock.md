@@ -83,21 +83,36 @@ The basic problem is that everything is moving.
 
 The sun and moon are moving. The earth's axis is moving relative to them. The stars are moving, as is their places in the sky. These can't just be averaged away either.
 
-If you were to teleport 10000 years into the future, all of the constellations would be in all the wrong places in the sky, and some of the constellations would look weird because their individual stars moved around. The sun's track through the sky would be off, as would the moon. When you appeared it wouldn't be the same season, even if it was exactly 10000 years. You might not even appear on land. Not because of sea levels rising, but because the continents have physically moved out from under you. Earth's magnetic field may even be reversed.
+If you were to teleport 10000 years into the future, all of the constellations would be in all the wrong places in the sky, and some of the constellations would look weird because their individual stars moved in different directions. The sun's track through the sky would be off, as would the moon. When you appeared it wouldn't be the same season, even if it was exactly 10000 years. You might not even appear on land. Not because of sea levels rising, but because the continents have physically moved out from under you. Earth's axis of rotation would be at a different spot, and a magnetic compass won't either.
 
 So it's hard to establish a good coordinate system based on observable things. There are a couple things you can do though:
 
 - Construct a coordinate system based on distant stars, the old classic.
-- Construct a reference based on something that is conserved. For example, the average longitudinal movement of the tectonic plates must be 0. Any value other than 0 would be indistinguishable from normal rotation around earth's axis. This is how the IERS Reference Prime Meridian is maintained.
-- Construct a coordinate system based on something that changes, but whose 2nd-and-higher-order terms are fairly small. You then just recalibrate every so often, and just deal with it.
+- Construct a reference based on something that is conserved. For example, the average longitudinal movement of the all of the Earth's tectonic plates must be 0. Any value other than 0 would be indistinguishable from normal rotation around earth's axis. This is how the IERS Reference Prime Meridian is maintained.
+- Construct a coordinate system based on something that changes, but whose 2nd-and-higher-order terms are fairly small. You recalibrate every so often, and just deal with it.
 
-In the book, position is relatively simple. As far as I can tell, all coordinates in the book are geocentric, not geodetic, so you don't have to worry about that.
+The book takes the third approach.
 
-There are 3 basic coordinate systems:
+There are so many coordinate systems used in the book.
 
-- Equatorial: "horizontal" angles measured from the sun's ascending node, "vertical" angles measured how you think. This one is basically your normal lat/lon, but where the horizontal angle is measured [0, 360) and not [-180, 180), and are measured from the ascending node instead of the equator/prime meridian intersection. The "horizontal" angle is called the "right ascension", and the "vertical" angle is called the "declination".
+- Equatorial: "horizontal" angles measured from the sun's ascending node, "vertical" angles measured how you think. Angles measured relative to the center of the Earth. This one is basically your normal lat/lon, but where the horizontal angle is measured [0, 360) and not [-180, 180), and are measured from the ascending node instead of the equator/prime meridian intersection. The "horizontal" angle is called the "right ascension", and the "vertical" angle is called the "declination".
 - Ecliptic: "horizontal" and "vertical" angles are measured the same way, but relative to the ecliptic plane (the plane of the sun's orbit). Since the ascending node is at the intersection of the equatorial and ecliptic plane, this works.
 - Other: For the moon calculation, we won't be working in the above coordinate systems, because the moon's orbit lies in a slightly different plane, something around 1 degree off. [todo]
+- An ecliptic coordinate system, but centered on the solar system's barycenter, used to calculate the "mean distance" to planets.
+
+As I understand, all coordinates in the book are geocentric, not geodetic, so you don't have to worry about that.
+
+Before getting into the actual position of the sun and moon, I should first go over all the stuff that has to be accounted for separately.
+
+Also as I understand it, the book gives formulas for computing the *actual* positions of the various bodies, not apparent positions, so a delay should be applied to account for time it takes light to travel and how fast it's moving. [calculate the time dialation of jupiter and compare it to its moving speed].
+
+When it comes to computing where a body is visually in the sky, there's also the effect of parallax. Depending on which side of the earth you're on, you will see different bodies at slightly different angles in the sky. There's also the parallactic angle, the angle that the body appears to be rotated, which changes throughout the day and the body moves across the sky.
+
+You'll need to compute the nutation. This is a small angle
+
+You'll need to calculate the precession
+
+In addition to the normal precession there's another even smaller precession about the line of nodes. Normal precession just rotates the ecliptic and equatorial planes, but doesn't change the angle between them. But that angle *does* change, on a cycle of about 
 
 
 
@@ -253,8 +268,8 @@ var ecliptic_inv_transform = (date) => {
       23.439291 +
       -0.0130042 * T +
       -0.000000164 * T * T +
-      0.00000050361 * T * T * T;
-  var obliquity_ecliptic_delta = 0; // TODO: Chapter 22
+      0.00000050361 * T * T * T; // Chapter 22
+  var obliquity_ecliptic_delta = 0; // TODO: Chapter 22.3 the effect of the other kind of precession
   var obliquity_ecliptic = obliquity_ecliptic_base + obliquity_ecliptic_delta;
   print("obliquity_ecliptic: " + degree_norm(obliquity_ecliptic));
   
