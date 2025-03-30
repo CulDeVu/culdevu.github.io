@@ -1,5 +1,5 @@
 == Rack, REPL, and registers
-=== wip
+=== More lisp machine work
 
 Since last time:
 
