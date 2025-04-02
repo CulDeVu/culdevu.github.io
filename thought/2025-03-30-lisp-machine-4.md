@@ -91,7 +91,7 @@ What I'm trying to say is that a program of this size is likely to be the limit 
 
 Note that I plan on running programs in RAM in the final build. On reset, the first microinstructions will copy the program from ROM to RAM. Also in the finished build I have enough address lines for 16K cons cells, meaning it will be able to run programs about 60x as large.
 
-When it first ran on the hardware, it took around 5m 40s to execute. This is running the simulator at max speed on the Arduino, which empirically is about 2100 lisp machine cycles per second.
+When it first ran on the hardware, it took around 5m 40s to execute. This is running the simulator at max speed on the Arduino, which empirically is about 3100 lisp machine cycles per second.
 
 A good amount of the runtime is taken up by GCs. It does 10 GCs while executing this program. So I did some work trying to reduce memory pressure.
 
