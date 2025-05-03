@@ -17,13 +17,15 @@ I learned about astronomical algorithms from this little project. I want to writ
 
 # The book
 
-I have no education in astronomy. I have skimmed half of one book on the subject: Astronomical Algorithms, Second Edition by Jean Meeus, published in 1998. From what I gathered online, this book is really the go-to for anyone wanting to do this sort of thing. If you use like a python or go or js or whatever library to calculate the current moon phase or eclipse time or easter or whatever, it's probably written by some shitty programmer like me, and not a professional astronomer. And so that library should probably be referencing this book.
+I have no education in astronomy. I have skimmed half of one book on the subject. That book is Astronomical Algorithms, Second Edition by Jean Meeus, published in 1998. From what I gathered online, this book is really the go-to for anyone wanting to do this sort of thing. If you use like a python or go or js or whatever library to calculate the current moon phase or eclipse time or easter or whatever, it's probably written by some shitty programmer like me, and not a professional astronomer. And so that library should probably be referencing this book.
 
 The book is pretty cool. It dispenses with the "why"s of the calculations, just gives the "what"s. Though, it's no so stingy with its words that you're not able to learn a great deal from it. The only main topic that it doesn't cover is the positions of various important stars, constellations, and comets.
 
 The book is also an anachronism. It takes great pains to talk about ancient computers, how to compute things in BASIC, reducing `a*x + b*x*x` to `x*(b*x + a)`, how many digits are stored in an HP-85, etc. I enjoyed those bits. They're a fun look into computing history.
 
-The book is also pretty good at being practical when it comes to numerical precision. If you're trying to center a telescope on Jupiter, you only really need 3 decimal places of precision when its location is expressed in degrees. I will not be taking this approach. I will be as pedantic and precise as I possibly can. While approximation is a useful skill, you can only do it effectively if you already have a good idea of how much error is there already. If you say "oh, that parameter is small, we can ignore that", but in reality you have no idea if that parameter really is small, I think the result is worse than if you just stuck with unnecessary precision.
+The book is also pretty good at being practical when it comes to numerical precision. If you're trying to center a telescope on Jupiter, you only really need 3 decimal places of precision when its location is expressed in degrees.
+
+I will not be taking this approach. I will be as pedantic and precise as I possibly can. While approximation is a useful skill, you can only do it effectively if you already have a good idea of how much error is there already. If you say "oh, that parameter is small, we can ignore that", but in reality you have no idea if that parameter really is small, I think the result is worse than if you just stuck with unnecessary precision.
 
 There are also a bunch of things that seem very old-fasioned to me. I'll be talking about that.
 
@@ -34,18 +36,19 @@ Time is hard.
 Luckily, time travels pretty much the same everywhere on Earth, so that's not a problem.
 
 Time is tracked in 2 main ways:
+
 - Observation of the motion of the Earth via the position of the sun, moon, or stars in the sky.
 - Observation of known periodic physical phenomina on Earth, like swings of a pendulum, or atomic clocks.
 
 Both of these kinds are useful for different things.
 
-Time measured with the motion of the sun is called solar time. A day is the amount of time it takes the sun to do exactly 1 revolution around Earth, and is called a solar day or a synodic day. Throughout the year a solar day varies by a few minutes due to Earth's elliptical orbit, by a few seconds here and there due to Earth's irregular rotation, and will change much more over the millenia. On average, though, currently, a mean solar day is about 86400.0047 [todo: check this] seconds. More about exactly what that means in a bit. [todo: more about UT1, UTC, etc]
+Time measured with the motion of the sun is called solar time. A "day" is the amount of time it takes the sun to do exactly 1 revolution around Earth, and is called a solar day or a synodic day. Throughout the year a solar day varies by a few minutes due to Earth's elliptical orbit, by a few seconds here and there due to Earth's irregular rotation, and will change much more over the millenia. On average, though, currently, a mean solar day is about 86400.0047 [todo: check this] seconds. More about exactly what that means in a bit. [todo: more about UT1, UTC, etc]
 
 Time measured with the position of the moon is called lunar time. A lunar month is the amount of time the moon takes to do one full phase cycle, from full moon to full moon. This one is a bit rarer to see in the wild. Again, this can change with the irregularities of Earth's orbit, and will change more over the millenia. On average, currently, a mean lunar month is about [] seconds.
 
 Time measured with atomic clocks is called atomic time. [more]
 
-There is also the time between the exact moments of the March equinox each year, called a tropical year. This is measured at the moment the sun is directly over the equator on the day of the equinox. This will happen each year at a specific longitude. These longitudes are very close together year after year, but it does drift [todo: by about how much per year?]. This spot on the equator is called the ascending node. If you count the number of times the sun passes the ascending node (taking into account the amount that it needs to be continously precessing) between topical years, you get a whole number, [todo]. The amount of time between these passes is called a sidereal day. Same caveat as above, these take on average [todo:].
+There is also the time between the exact moments of the March equinox each year, called a tropical year. This is measured at the moment the sun is directly over the equator on the day of the equinox. This will happen each year at a specific longitude. These longitudes are very close together year after year, but it does drift [todo: by about how much per year?]. This spot on the equator is called the "ascending node." If you count the number of times the sun passes the ascending node (taking into account the amount that it needs to be continously precessing) between topical years, you get a whole number, [todo]. The amount of time between these passes is called a sidereal day. Same caveat as above, a tropical year takes on average [todo:], and a sidereal day is around [todo:].
 
 Since the sun's ascending node is pretty stable from day to day, and the Earth's rotation is pretty stable from day to day, you can ask "given my current longitude, how far away am I from the ascending node?", which in turn is a very 
 
@@ -56,24 +59,71 @@ If you want to get away from tracking the position of the sun, the next best thi
 
 Actually, in addition to the slow drift, Earth's axis wobbles on a period of about [TODO: how long?], so these tropical years and sidereal days and stellar days and ascending nodes are actually determined relative to the *mean* equator instead. We'll talk about this later.
 
-In Astronomical Algorithms, time is mostly tracked using Julian days. This is an approximation of a solar day, set to be exactly 86400 seconds. A Julian year is also an approximation of a tropical year, set to be exactly 356.25 Julian days, and a Julian century is exactly 36525 Julian days.
+In Astronomical Algorithms, time is mostly tracked using Julian days. This is an approximation of a solar day, set to be exactly 86400 seconds. A Julian year is also an approximation of a tropical year, set to be exactly 356.25 Julian days, and a Julian century is exactly 36525 Julian days. [todo: is this right? I don't think so. None of the numbers add up right.]
+
+Actually, most algorithms use a Julian day number, which is a count of how many Julian days, including fractions of days, that have ellapsed since... well, noon at 0° longitude on January 1 4713 BC according to the Julian calendar. But that's a little confusing due to calendar issues. So you can also think of it as the count of days, positive or negative, since noon January 1 2000 AD, plus 2451545. Alternatively, it's also the count of days since the Unix epoch, midnight Janurary 1 1970 AD, plus 2440587.5.
+
+The book gives an algorithm for calculating the Julian day number from the current day, month, year, and time. This algorithm is valid for all dates since the earth started spinning.
+
+```
+// Dates after October 15 1582 AD (the Gregorian calendar reform) are assumed to be Gregorian calendar dates, and dates before that are assumed to be Julian calendar dates.
+var julian_day = (date) => {
+  var Y = date.getFullYear();
+  var M = date.getMonth() + 1;
+  var D = date.getDate() + date.getHours()/24 + date.getMinutes()/1440 + date.getSeconds()/86400 + date.getTimezoneOffset()/1440;
+  if (M == 1 || M == 2) {
+    M = M + 12;
+    Y = Y - 1;
+  }
+  var A = Math.floor(Y / 100);
+  // [todo: if date is before Oct 15 1582 AD, set B to 0]
+  var B = 2 - A + Math.floor(A / 4);
+  var JD = Math.floor(365.25 * (Y + 4716)) + Math.floor(30.6 * (M + 1)) + D + B - 1524.5;
+  return JD;
+};
+```
+
+Actually, most algorithms in the book are built off of dynamical time. The book uses a very odd measure of dynamical time:
+
+```
+var dynamical_time = (date) => {
+  var JD = julian_day(date);
+  var DT = 68; // This must be read out from a table.
+  var JDE = JD + DT/86400;
+  
+  var T = (JDE - 2451545) / 36525;
+  return T;
+};
+```
 
 ## Cometary
 
 Hopefully I'm not not the only one that hates that "Universal time" isn't the universal one, and "dynamical time" is the one that ticks at an unchanging static rate. It's needlessly confusing.
 
-Amusingly, the book predicts $\Deleta$ T, the number of seconds between universal and dynamical time, to be around +80s in 2015. Jean Meeus couldn't have known that the graph of $\Delta$ T over time would flatten out around the year 2000. In actuality, $\Delta$ T is actually +68 in 2015.
+Amusingly, the book predicts $\Delta T$, the number of seconds between universal and dynamical time, to be around +80s in 2015. Jean Meeus couldn't have known that the graph of $\Delta T$ over time would flatten out around the year 2000. In actuality, $\Delta T$ is actually +68 in 2015.
 
 [talk about exactly where on earth the equinox happens. Like, what longitude?]
 
 The big thing about all this, though, is it all seems just very old-fashioned. Like, This book was written after radio time signals, like WWV, were implemented around the world. It was also written after NTP was introduced, though I don't know how widespread it was in 1991 when the first edition was published.
 
 What I'm trying to say is that, for an average person trying to program one of these algorithms, or for an average user of one of these algorithms, you're going to be using a computer. That computer has some natural notion of time, and some derived quantities that are going to be easy to access. Those are:
-- Current time UTC
+
+- Current date/time UTC
 - Current Unix time
 - Current count of seconds since 1970-01-01T00:00:00
 
-UTC cooresponds to solar time, and "count of seconds" cooresponds to dynamical time, and Unix time doesn't really coorespond to anything. These are the 21st century ways of talking about time on earth. All that stuff about the equinoxes is, in my opinion, overly complicated and not necessary.
+UTC cooresponds to solar time, "count of seconds" cooresponds to dynamical time, and Unix time cooresponds to Julian days. These are the 21st century ways of talking about time on earth. All that stuff about the equinoxes is, in my opinion, overly complicated and not necessary.
+
+A hopefully easier version of Julian day numbers would be something like:
+
+```
+var julian_day = (date) => {
+  // date.getTime() in javascript follows unix time, so the count of SI seconds since 1970-01-01T00:00:00,
+  // minus the number of leap seconds elapsed.
+  var JD = date.getTime()/1000.0/60/60/24 + 2440587.5;
+  return JD;
+};
+```
 
 # Position
 
@@ -83,13 +133,13 @@ The basic problem is that everything is moving.
 
 The sun and moon are moving. The earth's axis is moving relative to them. The stars are moving, as is their places in the sky. These can't just be averaged away either.
 
-If you were to teleport 10000 years into the future, all of the constellations would be in all the wrong places in the sky, and some of the constellations would look weird because their individual stars moved in different directions. The sun's track through the sky would be off, as would the moon. When you appeared it wouldn't be the same season, even if it was exactly 10000 years. You might not even appear on land. Not because of sea levels rising, but because the continents have physically moved out from under you. Earth's axis of rotation would be at a different spot, and a magnetic compass won't either.
+If you were to teleport 10000 years into the future, all of the constellations would be in all the wrong places in the sky, and some of the constellations would look weird because their individual stars moved in different directions. The sun's track through the sky would be off, as would the moon. When you teleport in, it wouldn't be the same season, even if it was exactly 10000 years to the day. You might not even appear on land. Not because of sea levels rising, but because the continents have physically moved out from under you. Earth's axis of rotation would be at a different spot. If you teleport holding a magnetic compass, it would point in a different direction.
 
-So it's hard to establish a good coordinate system based on observable things. There are a couple things you can do though:
+So it's hard to establish a good coordinate system based on observable things. At least, that's the case if you want to be able to predict where things in the sky are hundreds or thousands of years in the future or past. There are a couple things you can do though:
 
-- Construct a coordinate system based on distant stars, the old classic.
-- Construct a reference based on something that is conserved. For example, the average longitudinal movement of the all of the Earth's tectonic plates must be 0. Any value other than 0 would be indistinguishable from normal rotation around earth's axis. This is how the IERS Reference Prime Meridian is maintained.
-- Construct a coordinate system based on something that changes, but whose 2nd-and-higher-order terms are fairly small. You recalibrate every so often, and just deal with it.
+- Construct a coordinate system based on distant stars, the old classic. [TODO: how far away? Can they be in the same galaxy?]
+- Construct a reference frame based on something that is conserved. For example, the average longitudinal movement of the all of the Earth's tectonic plates must be 0. Any value other than 0 would be indistinguishable from normal rotation around earth's axis. This is how the IERS Reference Prime Meridian is maintained.
+- Construct a coordinate system based on something that changes, but whose higher-order terms are fairly small. You recalibrate every so often, and just deal with it.
 
 The book takes the third approach.
 
@@ -106,7 +156,7 @@ Before getting into the actual position of the sun and moon, I should first go o
 
 Also as I understand it, the book gives formulas for computing the *actual* positions of the various bodies, not apparent positions, so a delay should be applied to account for time it takes light to travel and how fast it's moving. [calculate the time dialation of jupiter and compare it to its moving speed].
 
-When it comes to computing where a body is visually in the sky, there's also the effect of parallax. Depending on which side of the earth you're on, you will see different bodies at slightly different angles in the sky. There's also the parallactic angle, the angle that the body appears to be rotated, which changes throughout the day and the body moves across the sky.
+When it comes to computing where a body is visually in the sky, there's also the effect of parallax. Depending on which side of the earth you're on, you will see different bodies at slightly different angles in the sky. There's also the parallactic angle, the angle that the body appears to be rotated, which changes throughout the day and the body moves across the sky. [TODO: image]
 
 You'll need to compute the nutation. This is a small angle
 
