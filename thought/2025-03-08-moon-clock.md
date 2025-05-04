@@ -114,7 +114,7 @@ What I'm trying to say is that, for an average person trying to program one of t
 
 UTC cooresponds to solar time, "count of seconds" cooresponds to dynamical time, and Unix time cooresponds to Julian days. These are the 21st century ways of talking about time on earth. All that stuff about the equinoxes is, in my opinion, overly complicated and not necessary.
 
-A hopefully easier version of Julian day numbers would be something like:
+An easier version of Julian day numbers would be something like:
 
 ```
 var julian_day = (date) => {
@@ -135,10 +135,53 @@ The sun and moon are moving. The earth's axis is moving relative to them. The st
 
 If you were to teleport 10000 years into the future, all of the constellations would be in all the wrong places in the sky, and some of the constellations would look weird because their individual stars moved in different directions. The sun's track through the sky would be off, as would the moon. When you teleport in, it wouldn't be the same season, even if it was exactly 10000 years to the day. You might not even appear on land. Not because of sea levels rising, but because the continents have physically moved out from under you. Earth's axis of rotation would be at a different spot. If you teleport holding a magnetic compass, it would point in a different direction.
 
+Before getting into the actual position of the sun and moon, I should first go over all the stuff that has to be accounted for separately.
+
+## Stuff that influences position
+
+Also as I understand it, the book gives formulas for computing the *actual* positions of the various bodies, not apparent positions, so a delay should be applied to account for time it takes light to travel and how fast it's moving. [calculate the time dialation of jupiter and compare it to its moving speed].
+
+When it comes to computing where a body is visually in the sky, there's also the effect of parallax. Depending on which side of the earth you're on, or when in the year you are, you will see different bodies at slightly different angles in the sky. These effect the sun and moon and planets greatly. Astronomical Algorithms says that there are only 13 stars brighter than magnitude 9.0 whose parallax exceeds 0.00007 degrees.
+
+There's also the parallactic angle, the angle that the body appears to be rotated, which changes throughout the day and the body moves across the sky. [TODO: image]
+
+Conceptually, Earth spins on an axis at a rate of one revolution per "day" (solar, sidereal, etc). However, as mentioned above, the Earth's axis actually wobbles a bit due to the pull of various stellar bodies. This wobbling gets decomposed into several types:
+
+First is nutation. The Earth's axis of rotation wobbles around a "mean" axis, like pictured below. The largest term has a period of ~18.6 years. [todo: by how much?]
+
+[animation of nutation, exagerated?]
+
+```
+nutation = (date) => {
+}
+```
+
+Second is precession. The Earth's axis rotates around the normal vector of the ecliptic very slowly, with a period of about 26000 years. Currently, our axis is pointed very close to Polaris. In 13000 years our axis will point as far away as [todo] before heading back to Polaris.
+
+[image of precession]
+
+[image of what stars and constellations the north pole will be at at what time.]
+
+In addition to precession, the ecliptic plane also rotates slowly. [todo more explanation of this]. This has a period of roughly 2.7 million years.
+
+Fourth is unpredictable rotation. The Earth's rotation can speed up or slow down slightly for many reasons. [todo: between 0 and 2 seconds/decade recently]
+
+There's also of course the effects of proper motion, which is just a fancy way of saying that objects in the universe are moving.
+
+Along a similar vein, there's the effects of relativity. Aberration is the big one, which is where stars will appear in slightly different positions at different times of the year due to different relativistic length contactions when Earth's velocity changes. This affects all stars, by upwards of ~0.005 degrees.
+
+Also of course is light deflection of gravity. This one, I have no idea. I'm very slowly working through link(https://www.amazon.com/Course-Differential-Geometry-Readings-Mathematics/dp/8185931674)[A Course in Differential Geometry and Lie Groups], so maybe one day I'll understand this stuff.
+
+... Yeah. I think that's about everything. At least the lower order terms.
+
+## Coordinate systems
+
+As we've talked about, everything is moving. To construct a coordinate system we need, at the very least, an origin point and two non-colinear vectors.
+
 So it's hard to establish a good coordinate system based on observable things. At least, that's the case if you want to be able to predict where things in the sky are hundreds or thousands of years in the future or past. There are a couple things you can do though:
 
 - Construct a coordinate system based on distant stars, the old classic. [TODO: how far away? Can they be in the same galaxy?]
-- Construct a reference frame based on something that is conserved. For example, the average longitudinal movement of the all of the Earth's tectonic plates must be 0. Any value other than 0 would be indistinguishable from normal rotation around earth's axis. This is how the IERS Reference Prime Meridian is maintained.
+- Construct a reference frame based on something that is conserved. For example, the average longitudinal movement of the all of the Earth's tectonic plates must be 0. Any value other than 0 would be indistinguishable from irregular rotation around earth's axis. This is how the IERS Reference Prime Meridian is maintained.
 - Construct a coordinate system based on something that changes, but whose higher-order terms are fairly small. You recalibrate every so often, and just deal with it.
 
 The book takes the third approach.
@@ -151,20 +194,6 @@ There are so many coordinate systems used in the book.
 - An ecliptic coordinate system, but centered on the solar system's barycenter, used to calculate the "mean distance" to planets.
 
 As I understand, all coordinates in the book are geocentric, not geodetic, so you don't have to worry about that.
-
-Before getting into the actual position of the sun and moon, I should first go over all the stuff that has to be accounted for separately.
-
-Also as I understand it, the book gives formulas for computing the *actual* positions of the various bodies, not apparent positions, so a delay should be applied to account for time it takes light to travel and how fast it's moving. [calculate the time dialation of jupiter and compare it to its moving speed].
-
-When it comes to computing where a body is visually in the sky, there's also the effect of parallax. Depending on which side of the earth you're on, you will see different bodies at slightly different angles in the sky. There's also the parallactic angle, the angle that the body appears to be rotated, which changes throughout the day and the body moves across the sky. [TODO: image]
-
-You'll need to compute the nutation. This is a small angle
-
-You'll need to calculate the precession
-
-In addition to the normal precession there's another even smaller precession about the line of nodes. Normal precession just rotates the ecliptic and equatorial planes, but doesn't change the angle between them. But that angle *does* change, on a cycle of about 
-
-
 
 ```
 var image = atob("sLAB//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////6AAL////////////////////////9QBVVRX//////////////////////4AAAAAAP/////////////////////QAAVVVUBf////////////////////AAAAACAAD////////////////////AAAVVVVVVX//////////////////+AAAAAKoAAA//////////////////9VVVVVVVVUVVf////////////////+AAAACqqqqAIL////////////////9FVVVVVVVVVVVX///////////////+AACqqqq6/6AAi////////////////BVVVVVVVVVVVVV///////////////ACqr/qqqq/qCCgP//////////////VVVVVVVVVVVVVVV//////////////gCr/+qqqqqqqAKgP/////////////1VVVVVVVVVVVVVVVf////////////wAqruqoKqiqqqqKqD////////////1VVVVVVVVVVVVVVVVf///////////4Cv6qi6oqqqqqqqICD///////////9VVVVVVVVVVVVVVVVVf//////////+ivqqv/qiqqKqqqIKCj///////////VVVVVVVVVVVVVVVVVVf//////////qrqqru//qqir+quqgAr//////////1VVVVVVVVVVVVVVVVVVf/////////7r+oq////qoKr+r4qACr/////////9VVVVVVVVVVVVVVVVVVVf////////+//qv/////qiqrvv6AACD/////////VVVVVVVVVVVVVVVVVVVVf////////v/qr//////qr/7++qAAKD////////1VVVVVVVVVVVVVVVVVVVVf/////////+q/////6+o///6qACAAD///////9VVVVVVVVVVVVVVVVVVVVVf/////////6r/////+/r///4qAAKIH///////1VVVVVVVVVVVVVVVVVUVVV///////7/+q//////6+v///+gAgKov//////9VVVVVVVVVVVVVVVVVVVVVV//////+//77//////67////6AKqqoP//////VVVVVVVVVVVVVVVVVVVVVVV//////7/////////6r/////oIqo/qf/////9VVVVVVVVVVVVVVVVVVVVVVX/////+/////////7+q/////qqqr/o//////VVVVVVVVVVVVVVVVVVVVVVVX/////////////////r////+q4iP/r/////9VVVVVVVVVVVVVVVVVVVVVVVf////+/////////6r+v////6roA//r/////VVVVVVVVVVVVVVVVVVVVVVVVf//////////////+6q/////6/6A/+P////9VVVVVVVVVVVVVVVVVVVVQVVV///////////////7qL///////qD/6v////VVVVVVVVVVVVVVVVVVVVVVVVV///////////////+qv//////+qD/q////9VVVVVVVVVVVVVVVVVVVVVVVVX///+//+////////6u//47v//+oL+q////VVVVVVVVVVVVVVVVVVVVXVVVVX//////7//7/v//+q///r/////oKqj///9VVVVVVVVVVVVVVVVV1VVVVVVVf/////+P///////qv/6+v////6oq6v///1VVVVVVVVVVVVVVVVVVVVVVVVV///7/////////+vv///6/////v6KqP///VVVVVVVVVVVVVVVVVVVVVVVVVX///7////////uv/////r/////76qq///1VVVVVVVVVVVVVV1VXVVVVVVVVX/////////66q7v////6v////+r6qr///VVVVVVVVVVVVVVVVVVVVVVVVVVf////////+rqqr//7//qv//////7uv//9VdVVVVVVVVVVVVVVVVVVVVVVVV//+//////6qqqv/+ruqK/////v//6///1X1VVVVVVVVVVVVVVVVVVVVVVVX//7//////qqCq//qquqq///r7//+r//9VV1VVVVVVVVVVVVVVVVVVVVVVVf//v//////qgL//+qogCp//+qv//6r//1Vf1VVVVVVVV1VVVVVVVVFVVVVV//+////+//6r///6qqgCr//4q///qv//VVdVVVVVVVVXVVVVVVVVVVVVVVV//z////6v/q/////6oAiq/+qq//+q//9VVdVVVVVVVVVVVVVVVVVVVVVVVX//v///+q+vr////+6IACCv+qq//6r//1VVV1VVVVVVVVVVVVVVVVVVVVVVf/+v///+r/+r///r+iCogAuoiv/+Kv//VVVVVVVVVVVVVVVVVVVVVVVVVVV//6v///6//7q//6rqgKIAD/qCv/oq//9VVVVVVVVVVVVVVVVVUVVVVVVVVX//i///////66//6qqoioAq6oCv+ir//1VVVVVVVVVVVVVVVVVRVVVVVVVVf/8K////////7/6iqqgAACqqqCvuqv//VV9VXVVVVVVVVVVVVVVVVVVVVVV//wr////////q6ioqoAAACCPqKq6q//9VVVVVVVVVVVVVVVRVVVVVVVVVVX//KP/////7/+r+qqqgCIAAKv4qLqr//1VXVX1VVVVVVVVVVVVFVVVVVVVVf/+q///////+6v6qqqgAAAAL+Ag6qv//VVVV3VVVVVVVVVVVVVVBVVVVVVV//6L/////+//q/+qqqIgAAAv+Iq6q//9VVVXdVVVVVVVVVVVVVUFVVVVVVf//oL/////6//r/6qqoigIACv4q6Kr//9VXdVVVVVVVVVVVVVVVVBVVVVVV//+or/////r//7/qqoKACAAK/qrgqf//1VVVVVVVVVVVVVVVVVVUVVVVVVX//6ru////+v//r/6qqoAIAAK6qqir///VVVVVVVVVVVVVVVVVVVVVVVVVVf//yuv/////////+qqiCiAAAoKqoqv//9VVVVVVVVVVVVVVVVVVVVVVVVVX///o6//////+///+qoCoAiACogAoi///9VVVVVVVVVVVVVVVVVVVVVVVVVf//+Cq///v//7///qgiKAAIAIKAAAn///1VVVVVVVVVVVVVVVVVVUVVVUVV///8Kq+v+v/7v//+oKooAKAAAoAAC////VVVVVVVVVVVVVVVVVVVFVVUBVX///4ii7qq//7///6ioKACIAACAAAL////VUVVVVVVVVVVVVVRVVVVVVQBV////qqiv6q7+v///qCggACAAAAAAA////9VVVVVVVVVVVVVVVFVVVVVVAVX////gqq+qr+u+///oICACgAAAAAAL////9VVVVVdVVVVVVVFVVVFVVFUBV////+qyqqP/6/////gAAAIAgAAAAA/////1VVVVVVVVVVVVVRVVRVVVVAFX////+qiqq///u///+gAAAAAAAAAAL/////VVVVVVVVVVVVVRRVVFVVVVFV/////6qCqr//////6gAAAAAAAAAAA//////VVVVVVVVVVVVVQFURVVVVRFX/////4AAqv//6+77oAAAAAAAgAAAL//////VVVVVVVVVVVQAVVVVVVVUVV//////gAAKP/+rqqoAAAAAAAAAACq//////9VFVVVVVVVVQAFRRVVVVUVVX//////gACAv/q6oAAAAAAAAAAAAIr//////9UFVVVVVVRVAAAVVVVVVVVV///////KAICq6r/gAAAAAAAACAAAi///////1VVRVVVVVREAAABVVVVVVVf//////+CgoAKq+qgAAAAAAAAAAAKv///////1VVVVVVVVRAAAFBRVVVBVV///////+CIgAqqqgAAAAAAAAAAACD////////1VVVVVVVVRBABUVVVURVVf///////+Kqqq6qiAAAAAAAAAAACC/////////1VVVVVVVVRVAAFVVVVVVX////////+IqiK6CqoAAAAAAAAAAAv/////////1VVVVVVVVEFBAFVVVVVV/////////8ioqqqAAAAAAAAAAAACL//////////VVVVVVVVUVQAQVVVVVVf/////////8KoqigCIAAAAAAAAAAAP//////////VVVVVVVVQAAAVVVVVVX//////////+KKqqiCIAAAAAAAAAAD///////////1VVVVVVVEBBQVVVVVV///////////+CqqqqAgAAAAAAAAAA////////////1VVVVVVUQABVVVVVVf///////////+CqqqqAgAAAAAAAAAf////////////1VVVVVVRQUBQVVVVf/////////////AoKqqKAAAAAAAAAP/////////////9VVVVVVUEBVUVVQX//////////////oKqqoAAAAAAAAAD//////////////9VVVVVVUEVVFRVV///////////////4KAqoAAAAAAAAD////////////////VVVVVVUABEAFV////////////////+CoAAAAAAAAAD/////////////////1VVVVVAARAAF//////////////////gAAAAAAAAAD//////////////////9VVVVVAAAAF///////////////////4AAAAAAAAD////////////////////1VRVVQAAX/////////////////////gAAAAAA///////////////////////VQQAQF////////////////////////+AAAv//////////////////////////X///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8=");
