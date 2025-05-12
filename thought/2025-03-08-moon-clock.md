@@ -50,6 +50,8 @@ Time measured with atomic clocks is called atomic time. [more]
 
 There is also the time between the exact moments of the March equinox each year, called a tropical year. This is measured at the moment the sun is directly over the equator on the day of the equinox. This will happen each year at a specific longitude. These longitudes are very close together year after year, but it does drift [todo: by about how much per year?]. This spot on the equator is called the "ascending node." If you count the number of times the sun passes the ascending node (taking into account the amount that it needs to be continously precessing) between topical years, you get a whole number, [todo]. The amount of time between these passes is called a sidereal day. Same caveat as above, a tropical year takes on average [todo:], and a sidereal day is around [todo:].
 
+[todo: mention Besselian year, a year measured between when the sun is exactly 280 deg longitude. Is this the same as a tropical year?]
+
 Since the sun's ascending node is pretty stable from day to day, and the Earth's rotation is pretty stable from day to day, you can ask "given my current longitude, how far away am I from the ascending node?", which in turn is a very 
 
 [image of path of sun on earth to show the equinox position, exaggerated for effect]
@@ -141,7 +143,7 @@ Before getting into the actual position of the sun and moon, I should first go o
 
 Also as I understand it, the book gives formulas for computing the *actual* positions of the various bodies, not apparent positions, so a delay should be applied to account for time it takes light to travel and how fast it's moving. [calculate the time dialation of jupiter and compare it to its moving speed].
 
-When it comes to computing where a body is visually in the sky, there's also the effect of parallax. Depending on which side of the earth you're on, or when in the year you are, you will see different bodies at slightly different angles in the sky. These effect the sun and moon and planets greatly. Astronomical Algorithms says that there are only 13 stars brighter than magnitude 9.0 whose parallax exceeds 0.00007 degrees.
+When it comes to computing where a body is visually in the sky, there's also the effect of parallax. Depending on which side of the earth you're on, or when in the year you are, you will see different bodies at slightly different angles in the sky. These effect the sun and moon and planets greatly. For stars, not so much. Astronomical Algorithms says that there are only 13 stars brighter than magnitude 9.0 whose parallax exceeds 0.00007 degrees.
 
 There's also the parallactic angle, the angle that the body appears to be rotated, which changes throughout the day and the body moves across the sky. [TODO: image]
 
@@ -199,11 +201,78 @@ We're mostly going to be working with equatorial and ecliptic coordinate systems
 
 But how would they work? They're both based on the intersection of the equatorial and ecliptic planes. But as we've seen, those planes move relative to each other, and relative to distant stars
 
-For the field of astronomy, the answer is "it's too complicated, so fuck it." In the above list of complications that influence the angles and positions of these planes, two of them work on human timescales: nutation and polar motion.
+For the field of astronomy, the answer is "it's too complicated, so fuck it." In the above list of complications that influence the angles and positions of these planes, only two of them work on human timescales: nutation and polar motion.
 
-Nutation is a large enough effect, and happens with a short enough period that it has to be taken into account in the coordinate system. Otherwise, every 10 years all of the starts and planets in the sky will be whole degrees off [todo: check].
+Nutation is a large enough effect, and happens with a short enough period that it has to be taken into account in the coordinate system. Otherwise, every 10 years all of the starts and planets in the sky will be whole arcseconds off (gasp!) [todo: check].
 
+[todo: more]
 
+The solution to this craziness is:
+
+- Fix the ecliptic plane.
+- Find the "mean equator," the average equatorial plane over short timescales. So that would be nutation and polar motion.
+- Describe the locations of all modies in the sky in terms of these planes, and backsolve to the true coordinate, taking into account the theoretical nutation and polar motion.
+
+These planes, the ecliptic and mean equator, do change, just not on human timescales. You want to enable ultra precise calculations, or to enable people to do calculations for the very distant past. So you associate these planes, and all of the measurements you make with them, relative to a moment in time. The current "epoch" in use is J2000, January 1 2000 at 12:00 noon TT. The next epoch will be J2050.
+
+This way, measurements of things in the sky can stay relatively stable over the years, can remain precise, and can also be "about right" even if you don't account for nutation and the rest.
+
+[todo: some code]
+
+## Cometary
+
+# Objects in orbit
+
+Ellipses are hard...
+
+In order to cope, a number of concepts are introduced. Similar to what happened in the coordinate system chapter, we're first going to take care of the happy case, circular orbits, and then start adding terms to get to elliptical orbits.
+
+The eccentricity of the earth's orbit around the sun is roughly 0.0167 at the moment. This means that the ratio of the semi-minor axis to the semi-major axis is $\sqrt{1 - 0.0167^2}$, which is about 0.9998. Meaning, earth's orbit around the sun is extremely close to a perfect circle. The moon is similar, with an eccentricity of around 0.05.
+
+Circular orbits have the property that their velocity (and thus their period) are determined by the masses of both bodies and the radius. Which means if we know about the masses and period of an eliptical orbit, we can find a unique "matching" circular orbit of the same period.
+
+In an eliptical orbit velocities vary over time, fastest near the pericenter and slowest near the apocenter. But in a circular orbit, (angular) velocity is constant. In Astronomical Algorithms, there are higher order terms, but this doesn't affect the analysis.
+
+If we mark the pericenter as a "starting point" in the orbit, we can ask "in the orbital plane, how far has the orbiting body traveled past the starting point, expressed as an angle?" This is called the body's "true anomaly."
+
+We can also ask "how far would the body have traveled past its starting point if it had a circular orbit of the same period, expressed as an angle?" This is called the body's "mean anomaly."
+
+If we do the same thing, but this time mark the ascending node as the "starting point", we'd get the "true longitude" and "mean longitude" instead.
+
+The last one to introduce is the "argument of periapsis," which is the angle between the ascending node and the pericenter. So in other words, "true longitude = true anomaly + argument of periapsis", and likewise "mean longitude = mean anomaly + argument of periapsis"".
+
+[image]
+
+The thing that connects the "true" values with the "mean" values is the "equation of center". The equation of center is the true anomaly minus the mean anomaly. There's no closed-form expression for the equation of center, but for low eccentricities (like the sun-earth and earth-moon orbits) there's a good series expansion:
+
+For mean anomaly $M$ and eccentricity $e$, Astronomical Algorithms expands the equation of center out to $\sin{3M}$:
+
+$$
+\begin{aligned}
+EOC \approx & \left( 2e - \frac{1}{4}e^3 + \frac{5}{96}e^5 + \frac{107}{4608}e^7 \right) \sin{M} + \\
+      & \left( \frac{5}{4}e^2 - \frac{11}{24}e^4 + \frac{17}{192}e^6 \right) \sin{2M} + \\
+      & \left( \frac{13}{12}e^3 + \frac{43}{64}e^5 + \frac{95}{512}e^7 \right) \sin{3M} .
+\end{aligned}
+$$
+
+Here, EOC is expressed in radians because $e$ is unitless.
+
+So yeah. You can get the true longitude from the mean longitude by adding the equation of center:
+
+$$
+\begin{aligned}
+& \text{mean longitude} + EOC \\
+&= (\text{argument of periapsis} + \text{mean anomaly}) + (\text{true anomaly} - \text{mean anomaly}) \\
+&= \text{argument of periapsis} + \text{true anomaly} \\
+&= \text{true longitude} .
+\end{aligned}
+$$
+
+## Cometary
+
+So all of this is clearly antiquated. Elliptical orbits were obviously very difficult to work with before calculators and computers. Hence you do most of your calcs in terms of circular orbits, and correct them at the end.
+
+In a 2-body system, this analysis applies equally well to both objects. However, Astronomical Algorithms never touches on this. The book just assumes that, for the sun-earth and the earth-moon systems, the big object stays fixed at the focus of the smaller body's orbit. Which seems like a large omission for such a book.
 
 ```
 var image = atob("sLAB//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////6AAL////////////////////////9QBVVRX//////////////////////4AAAAAAP/////////////////////QAAVVVUBf////////////////////AAAAACAAD////////////////////AAAVVVVVVX//////////////////+AAAAAKoAAA//////////////////9VVVVVVVVUVVf////////////////+AAAACqqqqAIL////////////////9FVVVVVVVVVVVX///////////////+AACqqqq6/6AAi////////////////BVVVVVVVVVVVVV///////////////ACqr/qqqq/qCCgP//////////////VVVVVVVVVVVVVVV//////////////gCr/+qqqqqqqAKgP/////////////1VVVVVVVVVVVVVVVf////////////wAqruqoKqiqqqqKqD////////////1VVVVVVVVVVVVVVVVf///////////4Cv6qi6oqqqqqqqICD///////////9VVVVVVVVVVVVVVVVVf//////////+ivqqv/qiqqKqqqIKCj///////////VVVVVVVVVVVVVVVVVVf//////////qrqqru//qqir+quqgAr//////////1VVVVVVVVVVVVVVVVVVf/////////7r+oq////qoKr+r4qACr/////////9VVVVVVVVVVVVVVVVVVVf////////+//qv/////qiqrvv6AACD/////////VVVVVVVVVVVVVVVVVVVVf////////v/qr//////qr/7++qAAKD////////1VVVVVVVVVVVVVVVVVVVVf/////////+q/////6+o///6qACAAD///////9VVVVVVVVVVVVVVVVVVVVVf/////////6r/////+/r///4qAAKIH///////1VVVVVVVVVVVVVVVVVUVVV///////7/+q//////6+v///+gAgKov//////9VVVVVVVVVVVVVVVVVVVVVV//////+//77//////67////6AKqqoP//////VVVVVVVVVVVVVVVVVVVVVVV//////7/////////6r/////oIqo/qf/////9VVVVVVVVVVVVVVVVVVVVVVX/////+/////////7+q/////qqqr/o//////VVVVVVVVVVVVVVVVVVVVVVVX/////////////////r////+q4iP/r/////9VVVVVVVVVVVVVVVVVVVVVVVf////+/////////6r+v////6roA//r/////VVVVVVVVVVVVVVVVVVVVVVVVf//////////////+6q/////6/6A/+P////9VVVVVVVVVVVVVVVVVVVVQVVV///////////////7qL///////qD/6v////VVVVVVVVVVVVVVVVVVVVVVVVV///////////////+qv//////+qD/q////9VVVVVVVVVVVVVVVVVVVVVVVVX///+//+////////6u//47v//+oL+q////VVVVVVVVVVVVVVVVVVVVXVVVVX//////7//7/v//+q///r/////oKqj///9VVVVVVVVVVVVVVVVV1VVVVVVVf/////+P///////qv/6+v////6oq6v///1VVVVVVVVVVVVVVVVVVVVVVVVV///7/////////+vv///6/////v6KqP///VVVVVVVVVVVVVVVVVVVVVVVVVX///7////////uv/////r/////76qq///1VVVVVVVVVVVVVV1VXVVVVVVVVX/////////66q7v////6v////+r6qr///VVVVVVVVVVVVVVVVVVVVVVVVVVf////////+rqqr//7//qv//////7uv//9VdVVVVVVVVVVVVVVVVVVVVVVVV//+//////6qqqv/+ruqK/////v//6///1X1VVVVVVVVVVVVVVVVVVVVVVVX//7//////qqCq//qquqq///r7//+r//9VV1VVVVVVVVVVVVVVVVVVVVVVVf//v//////qgL//+qogCp//+qv//6r//1Vf1VVVVVVVV1VVVVVVVVFVVVVV//+////+//6r///6qqgCr//4q///qv//VVdVVVVVVVVXVVVVVVVVVVVVVVV//z////6v/q/////6oAiq/+qq//+q//9VVdVVVVVVVVVVVVVVVVVVVVVVVX//v///+q+vr////+6IACCv+qq//6r//1VVV1VVVVVVVVVVVVVVVVVVVVVVf/+v///+r/+r///r+iCogAuoiv/+Kv//VVVVVVVVVVVVVVVVVVVVVVVVVVV//6v///6//7q//6rqgKIAD/qCv/oq//9VVVVVVVVVVVVVVVVVUVVVVVVVVX//i///////66//6qqoioAq6oCv+ir//1VVVVVVVVVVVVVVVVVRVVVVVVVVf/8K////////7/6iqqgAACqqqCvuqv//VV9VXVVVVVVVVVVVVVVVVVVVVVV//wr////////q6ioqoAAACCPqKq6q//9VVVVVVVVVVVVVVVRVVVVVVVVVVX//KP/////7/+r+qqqgCIAAKv4qLqr//1VXVX1VVVVVVVVVVVVFVVVVVVVVf/+q///////+6v6qqqgAAAAL+Ag6qv//VVVV3VVVVVVVVVVVVVVBVVVVVVV//6L/////+//q/+qqqIgAAAv+Iq6q//9VVVXdVVVVVVVVVVVVVUFVVVVVVf//oL/////6//r/6qqoigIACv4q6Kr//9VXdVVVVVVVVVVVVVVVVBVVVVVV//+or/////r//7/qqoKACAAK/qrgqf//1VVVVVVVVVVVVVVVVVVUVVVVVVX//6ru////+v//r/6qqoAIAAK6qqir///VVVVVVVVVVVVVVVVVVVVVVVVVVf//yuv/////////+qqiCiAAAoKqoqv//9VVVVVVVVVVVVVVVVVVVVVVVVVX///o6//////+///+qoCoAiACogAoi///9VVVVVVVVVVVVVVVVVVVVVVVVVf//+Cq///v//7///qgiKAAIAIKAAAn///1VVVVVVVVVVVVVVVVVVUVVVUVV///8Kq+v+v/7v//+oKooAKAAAoAAC////VVVVVVVVVVVVVVVVVVVFVVUBVX///4ii7qq//7///6ioKACIAACAAAL////VUVVVVVVVVVVVVVRVVVVVVQBV////qqiv6q7+v///qCggACAAAAAAA////9VVVVVVVVVVVVVVVFVVVVVVAVX////gqq+qr+u+///oICACgAAAAAAL////9VVVVVdVVVVVVVFVVVFVVFUBV////+qyqqP/6/////gAAAIAgAAAAA/////1VVVVVVVVVVVVVRVVRVVVVAFX////+qiqq///u///+gAAAAAAAAAAL/////VVVVVVVVVVVVVRRVVFVVVVFV/////6qCqr//////6gAAAAAAAAAAA//////VVVVVVVVVVVVVQFURVVVVRFX/////4AAqv//6+77oAAAAAAAgAAAL//////VVVVVVVVVVVQAVVVVVVVUVV//////gAAKP/+rqqoAAAAAAAAAACq//////9VFVVVVVVVVQAFRRVVVVUVVX//////gACAv/q6oAAAAAAAAAAAAIr//////9UFVVVVVVRVAAAVVVVVVVVV///////KAICq6r/gAAAAAAAACAAAi///////1VVRVVVVVREAAABVVVVVVVf//////+CgoAKq+qgAAAAAAAAAAAKv///////1VVVVVVVVRAAAFBRVVVBVV///////+CIgAqqqgAAAAAAAAAAACD////////1VVVVVVVVRBABUVVVURVVf///////+Kqqq6qiAAAAAAAAAAACC/////////1VVVVVVVVRVAAFVVVVVVX////////+IqiK6CqoAAAAAAAAAAAv/////////1VVVVVVVVEFBAFVVVVVV/////////8ioqqqAAAAAAAAAAAACL//////////VVVVVVVVUVQAQVVVVVVf/////////8KoqigCIAAAAAAAAAAAP//////////VVVVVVVVQAAAVVVVVVX//////////+KKqqiCIAAAAAAAAAAD///////////1VVVVVVVEBBQVVVVVV///////////+CqqqqAgAAAAAAAAAA////////////1VVVVVVUQABVVVVVVf///////////+CqqqqAgAAAAAAAAAf////////////1VVVVVVRQUBQVVVVf/////////////AoKqqKAAAAAAAAAP/////////////9VVVVVVUEBVUVVQX//////////////oKqqoAAAAAAAAAD//////////////9VVVVVVUEVVFRVV///////////////4KAqoAAAAAAAAD////////////////VVVVVVUABEAFV////////////////+CoAAAAAAAAAD/////////////////1VVVVVAARAAF//////////////////gAAAAAAAAAD//////////////////9VVVVVAAAAF///////////////////4AAAAAAAAD////////////////////1VRVVQAAX/////////////////////gAAAAAA///////////////////////VQQAQF////////////////////////+AAAv//////////////////////////X///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8=");
