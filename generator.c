@@ -270,7 +270,7 @@ void write_markdown(FILE *fout, char *buf, char **name, char **descr, char *date
 	write_header(fout);
 
 	int line_num = 0;
-	char *lines[1024];
+	char *lines[8192];
 	while (strlen(buf))
 	{
 		lines[line_num] = consume_line(&buf);
