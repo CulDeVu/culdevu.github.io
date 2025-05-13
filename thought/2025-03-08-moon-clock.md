@@ -211,7 +211,7 @@ The solution to this craziness is:
 
 - Fix the ecliptic plane.
 - Find the "mean equator," the average equatorial plane over short timescales. So that would be nutation and polar motion.
-- Describe the locations of all modies in the sky in terms of these planes, and backsolve to the true coordinate, taking into account the theoretical nutation and polar motion.
+- Describe the locations of all modies in the sky in terms of these planes, and backsolve to the "apparent" coordinate, the coordinate that you would actually observe in the sky, taking into account the theoretical nutation and polar motion.
 
 These planes, the ecliptic and mean equator, do change, just not on human timescales. You want to enable ultra precise calculations, or to enable people to do calculations for the very distant past. So you associate these planes, and all of the measurements you make with them, relative to a moment in time. The current "epoch" in use is J2000, January 1 2000 at 12:00 noon TT. The next epoch will be J2050.
 
@@ -273,6 +273,74 @@ $$
 So all of this is clearly antiquated. Elliptical orbits were obviously very difficult to work with before calculators and computers. Hence you do most of your calcs in terms of circular orbits, and correct them at the end.
 
 In a 2-body system, this analysis applies equally well to both objects. However, Astronomical Algorithms never touches on this. The book just assumes that, for the sun-earth and the earth-moon systems, the big object stays fixed at the focus of the smaller body's orbit. Which seems like a large omission for such a book.
+
+# The position of the sun
+
+We now have everything we need to compute the position of the sun in the sky! All angles from here on are going to be in degrees. The book guarentees accuracy within 0.01 degrees for some unknown amount of time around J2000.
+
+We're going to be using [todo] time for these.
+
+```
+var T = dynamical_time(date);
+```
+
+We imagine the sun rotating around the earth instead of the other way around. It makes the same ellipse. As detailed in the last section, we calculate the mean longitude and the equation of center.
+
+```
+var sun_mean_longitude =
+  280.46646 +
+  36000.76983 * T +
+  0.0003032 * T * T;
+var EOC =
+  (1.914602 - 0.004817*T - 0.000014*T*T) * sind(M) +
+  (0.019993 - 0.000101*T) * sind(2*M) +
+  0.000289 * sind(3*M);
+var sun_true_longitude = sun_mean_longitude + EOC;
+```
+
+The `EOC` here is calculated by substituting `sun_eccentricity` (see below) into the expression in the previous section.
+
+Astronomical Algorithms just sets the sun's latitude to be equal to 0. The sun does wobble above and below the ecliptic plane, but never more than 0.0004 degrees.
+
+For my use case, I also need the distance to the sun. This is a standard formula for ellipses, but 
+
+```
+var sun_eccentricity = 0.016708634 - 0.000042037 * T - 0.0000001267*T*T
+var sun_argument_of_periapsis =
+  -77.0627 +
+  1.71954 * T +
+  0.0004569 * T * T;
+var sun_true_anomaly = sun_true_longitude - sun_argument_of_periapsis;
+var sun_sun = 149597870.700 * 1.000001018 * (1 - sun_eccentricity*sun_eccentricity) / (1 + sun_eccentricity * cosd(sun_true_anomaly));
+```
+
+Before we convert to right ascension/declination, we want to find the "apparent" longitude and obliquity. Actually, Astronomical Algorithms calls the apparent obliquity "true obliquity" because I swear to fucking god the terminology in this field is a dumpster fire. It's presumably called this because the book has another name for the sun's longitude: the "mean equinox of the date", and the apparent sun's longitude is also called the "true equinox of the date." But I'm not going to use any of those names because they're confusing.
+
+Astronomical Algorithms calculates the apparent longitude using ONLY nutation. Presumably because the other terms are unnecessary to hit the 0.01 degree precision goal.
+
+```
+var delta_longitude = [todo]
+var delta_equator_obliquity = [todo]
+
+var sun_apparent_longitude = sun_true_longitude + delta_longitude;
+```
+
+Now the equatorial plane. This is just trig.
+
+```
+var obliquity_ecliptic = 
+  23.439291 +
+  -0.0130042 * T +
+  -0.000000164 * T * T +
+  0.00000050361 * T * T * T;
+var apparent_obliquity_ecliptic = obliquity_ecliptic + delta_obliquity;
+
+var declination_sun = asind(sind(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude));
+var right_ascension_sun = atan2d(cosd(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude), cosd(sun_apparent_longitude));
+```
+
+# Cometary
+
 
 ```
 var image = atob("sLAB//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////6AAL////////////////////////9QBVVRX//////////////////////4AAAAAAP/////////////////////QAAVVVUBf////////////////////AAAAACAAD////////////////////AAAVVVVVVX//////////////////+AAAAAKoAAA//////////////////9VVVVVVVVUVVf////////////////+AAAACqqqqAIL////////////////9FVVVVVVVVVVVX///////////////+AACqqqq6/6AAi////////////////BVVVVVVVVVVVVV///////////////ACqr/qqqq/qCCgP//////////////VVVVVVVVVVVVVVV//////////////gCr/+qqqqqqqAKgP/////////////1VVVVVVVVVVVVVVVf////////////wAqruqoKqiqqqqKqD////////////1VVVVVVVVVVVVVVVVf///////////4Cv6qi6oqqqqqqqICD///////////9VVVVVVVVVVVVVVVVVf//////////+ivqqv/qiqqKqqqIKCj///////////VVVVVVVVVVVVVVVVVVf//////////qrqqru//qqir+quqgAr//////////1VVVVVVVVVVVVVVVVVVf/////////7r+oq////qoKr+r4qACr/////////9VVVVVVVVVVVVVVVVVVVf////////+//qv/////qiqrvv6AACD/////////VVVVVVVVVVVVVVVVVVVVf////////v/qr//////qr/7++qAAKD////////1VVVVVVVVVVVVVVVVVVVVf/////////+q/////6+o///6qACAAD///////9VVVVVVVVVVVVVVVVVVVVVf/////////6r/////+/r///4qAAKIH///////1VVVVVVVVVVVVVVVVVUVVV///////7/+q//////6+v///+gAgKov//////9VVVVVVVVVVVVVVVVVVVVVV//////+//77//////67////6AKqqoP//////VVVVVVVVVVVVVVVVVVVVVVV//////7/////////6r/////oIqo/qf/////9VVVVVVVVVVVVVVVVVVVVVVX/////+/////////7+q/////qqqr/o//////VVVVVVVVVVVVVVVVVVVVVVVX/////////////////r////+q4iP/r/////9VVVVVVVVVVVVVVVVVVVVVVVf////+/////////6r+v////6roA//r/////VVVVVVVVVVVVVVVVVVVVVVVVf//////////////+6q/////6/6A/+P////9VVVVVVVVVVVVVVVVVVVVQVVV///////////////7qL///////qD/6v////VVVVVVVVVVVVVVVVVVVVVVVVV///////////////+qv//////+qD/q////9VVVVVVVVVVVVVVVVVVVVVVVVX///+//+////////6u//47v//+oL+q////VVVVVVVVVVVVVVVVVVVVXVVVVX//////7//7/v//+q///r/////oKqj///9VVVVVVVVVVVVVVVVV1VVVVVVVf/////+P///////qv/6+v////6oq6v///1VVVVVVVVVVVVVVVVVVVVVVVVV///7/////////+vv///6/////v6KqP///VVVVVVVVVVVVVVVVVVVVVVVVVX///7////////uv/////r/////76qq///1VVVVVVVVVVVVVV1VXVVVVVVVVX/////////66q7v////6v////+r6qr///VVVVVVVVVVVVVVVVVVVVVVVVVVf////////+rqqr//7//qv//////7uv//9VdVVVVVVVVVVVVVVVVVVVVVVVV//+//////6qqqv/+ruqK/////v//6///1X1VVVVVVVVVVVVVVVVVVVVVVVX//7//////qqCq//qquqq///r7//+r//9VV1VVVVVVVVVVVVVVVVVVVVVVVf//v//////qgL//+qogCp//+qv//6r//1Vf1VVVVVVVV1VVVVVVVVFVVVVV//+////+//6r///6qqgCr//4q///qv//VVdVVVVVVVVXVVVVVVVVVVVVVVV//z////6v/q/////6oAiq/+qq//+q//9VVdVVVVVVVVVVVVVVVVVVVVVVVX//v///+q+vr////+6IACCv+qq//6r//1VVV1VVVVVVVVVVVVVVVVVVVVVVf/+v///+r/+r///r+iCogAuoiv/+Kv//VVVVVVVVVVVVVVVVVVVVVVVVVVV//6v///6//7q//6rqgKIAD/qCv/oq//9VVVVVVVVVVVVVVVVVUVVVVVVVVX//i///////66//6qqoioAq6oCv+ir//1VVVVVVVVVVVVVVVVVRVVVVVVVVf/8K////////7/6iqqgAACqqqCvuqv//VV9VXVVVVVVVVVVVVVVVVVVVVVV//wr////////q6ioqoAAACCPqKq6q//9VVVVVVVVVVVVVVVRVVVVVVVVVVX//KP/////7/+r+qqqgCIAAKv4qLqr//1VXVX1VVVVVVVVVVVVFVVVVVVVVf/+q///////+6v6qqqgAAAAL+Ag6qv//VVVV3VVVVVVVVVVVVVVBVVVVVVV//6L/////+//q/+qqqIgAAAv+Iq6q//9VVVXdVVVVVVVVVVVVVUFVVVVVVf//oL/////6//r/6qqoigIACv4q6Kr//9VXdVVVVVVVVVVVVVVVVBVVVVVV//+or/////r//7/qqoKACAAK/qrgqf//1VVVVVVVVVVVVVVVVVVUVVVVVVX//6ru////+v//r/6qqoAIAAK6qqir///VVVVVVVVVVVVVVVVVVVVVVVVVVf//yuv/////////+qqiCiAAAoKqoqv//9VVVVVVVVVVVVVVVVVVVVVVVVVX///o6//////+///+qoCoAiACogAoi///9VVVVVVVVVVVVVVVVVVVVVVVVVf//+Cq///v//7///qgiKAAIAIKAAAn///1VVVVVVVVVVVVVVVVVVUVVVUVV///8Kq+v+v/7v//+oKooAKAAAoAAC////VVVVVVVVVVVVVVVVVVVFVVUBVX///4ii7qq//7///6ioKACIAACAAAL////VUVVVVVVVVVVVVVRVVVVVVQBV////qqiv6q7+v///qCggACAAAAAAA////9VVVVVVVVVVVVVVVFVVVVVVAVX////gqq+qr+u+///oICACgAAAAAAL////9VVVVVdVVVVVVVFVVVFVVFUBV////+qyqqP/6/////gAAAIAgAAAAA/////1VVVVVVVVVVVVVRVVRVVVVAFX////+qiqq///u///+gAAAAAAAAAAL/////VVVVVVVVVVVVVRRVVFVVVVFV/////6qCqr//////6gAAAAAAAAAAA//////VVVVVVVVVVVVVQFURVVVVRFX/////4AAqv//6+77oAAAAAAAgAAAL//////VVVVVVVVVVVQAVVVVVVVUVV//////gAAKP/+rqqoAAAAAAAAAACq//////9VFVVVVVVVVQAFRRVVVVUVVX//////gACAv/q6oAAAAAAAAAAAAIr//////9UFVVVVVVRVAAAVVVVVVVVV///////KAICq6r/gAAAAAAAACAAAi///////1VVRVVVVVREAAABVVVVVVVf//////+CgoAKq+qgAAAAAAAAAAAKv///////1VVVVVVVVRAAAFBRVVVBVV///////+CIgAqqqgAAAAAAAAAAACD////////1VVVVVVVVRBABUVVVURVVf///////+Kqqq6qiAAAAAAAAAAACC/////////1VVVVVVVVRVAAFVVVVVVX////////+IqiK6CqoAAAAAAAAAAAv/////////1VVVVVVVVEFBAFVVVVVV/////////8ioqqqAAAAAAAAAAAACL//////////VVVVVVVVUVQAQVVVVVVf/////////8KoqigCIAAAAAAAAAAAP//////////VVVVVVVVQAAAVVVVVVX//////////+KKqqiCIAAAAAAAAAAD///////////1VVVVVVVEBBQVVVVVV///////////+CqqqqAgAAAAAAAAAA////////////1VVVVVVUQABVVVVVVf///////////+CqqqqAgAAAAAAAAAf////////////1VVVVVVRQUBQVVVVf/////////////AoKqqKAAAAAAAAAP/////////////9VVVVVVUEBVUVVQX//////////////oKqqoAAAAAAAAAD//////////////9VVVVVVUEVVFRVV///////////////4KAqoAAAAAAAAD////////////////VVVVVVUABEAFV////////////////+CoAAAAAAAAAD/////////////////1VVVVVAARAAF//////////////////gAAAAAAAAAD//////////////////9VVVVVAAAAF///////////////////4AAAAAAAAD////////////////////1VRVVQAAX/////////////////////gAAAAAA///////////////////////VQQAQF////////////////////////+AAAv//////////////////////////X///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8=");
