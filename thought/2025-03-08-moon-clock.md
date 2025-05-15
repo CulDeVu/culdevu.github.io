@@ -174,6 +174,8 @@ There's also of course the effects of proper motion, which is just a fancy way o
 
 Along a similar vein, there's the effects of relativity. Aberration is the big one, which is where stars will appear in slightly different positions at different times of the year due to different relativistic length contactions when Earth's velocity changes. This affects all stars, by upwards of ~0.005 degrees.
 
+Also there's the fact that light takes a while to get to places in space, so where an object is now will be different from where you see it in the sky.
+
 Also of course is light deflection of gravity. This one, I have no idea. I'm very slowly working through link(https://www.amazon.com/Course-Differential-Geometry-Readings-Mathematics/dp/8185931674)[A Course in Differential Geometry and Lie Groups], so maybe one day I'll understand this stuff.
 
 ... Yeah. I think that's about everything. At least the lower order terms.
@@ -339,7 +341,474 @@ var declination_sun = asind(sind(apparent_obliquity_ecliptic) * sind(sun_apparen
 var right_ascension_sun = atan2d(cosd(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude), cosd(sun_apparent_longitude));
 ```
 
-# Cometary
+## Cometary
+
+# The position of the moon
+
+The book explicitly states that this formula takes into account the angular delay caused by the speed of light.
+
+```
+var moon_mean_longitude =
+  218.3164477 +
+  481267.88123421 * T +
+  -0.0015786*T*T +
+  T*T*T / 538841 +
+  -T*T*T*T / 65194000;
+var moon_mean_anomaly =
+  134.9633964 +
+  477198.8675055 * T +
+  0.0087414 * T*T +
+  T*T*T / 69699 +
+  -T*T*T*T / 14712000;
+```
+
+We haven't talked about elongation. Mean elongation here is the measurement of the moon-earth-sun angle, if both the earth and moon were orbiting with their mean (circular) orbits.
+
+```
+var moon_mean_elongation = 
+  297.8501921 +
+  445267.1114034 * T +
+  -0.0018819 * T * T +
+  T*T*T / 545868 +
+  -T*T*T*T / 113065000;
+```
+
+I'll be honest, I don't know what this one is for.
+
+```
+var F = // argument_latitude_moon
+  93.2720950 +
+  483202.0175233 * T +
+  -0.0036539*T*T +
+  -T*T*T / 3526000 +
+  T*T*T*T / 863310000;
+```
+
+
+
+```
+var table_47_A = [
+  [0, 0, 1, 0, 6288774, -20905355],
+  [2, 0, -1, 0, 1274027, -3699111],
+  [2, 0, 0, 0, 658314, -2955968],
+  [0, 0, 2, 0, 213618, -569925],
+  [0, 1, 0, 0, -185116, 48888],
+  [0, 0, 0, 2, -144332, -3149],
+  [2, 0, -2, 0, 58793, 246158],
+  [2, -1, -1, 0, 57066, -152138],
+  [2, 0, 1, 0, 53322, -170733],
+  [2, -1, 0, 0, 45758, -204586],
+  [0, 1, -1, 0, -40923, -129620],
+  [1, 0, 0, 0, -34720, 108743],
+  [0, 1, 1, 0, -30383, 104755],
+  [2, 0, 0, -2, 15327, 10321],
+  [0, 0, 1, 2, -12528, 0],
+  [0, 0, 1, -2, 10980, 79661],
+  [4, 0, -1, 0, 10675, -34782],
+  [0, 0, 3, 0, 10034, -23210],
+  [4, 0, -2, 0, 8548, -21636],
+  [2, 1, -1, 0, -7888, 24208],
+  [2, 1, 0, 0, -6766, 30824],
+  [1, 0, -1, 0, -5163, -8379],
+  [1, 1, 0, 0, 4987, -16675],
+  [2, -1, 1, 0, 4036, -12831],
+  [2, 0, 2, 0, 3994, -10445],
+  [4, 0, 0, 0, 3861, -11650],
+  [2, 0, -3, 0, 3665, 14403],
+  [0, 1, -2, 0, -2689, -7003],
+  [2, 0, -1, 2, -2602, 0],
+  [2, -1, -2, 0, 2390, 10056],
+  [1, 0, 1, 0, -2348, 6322],
+  [2, -2, 0, 0, 2236, -9884],
+  
+  [0, 1, 2, 0, -2120, 5751],
+  [0, 2, 0, 0, -2069, 0],
+  [2, -2, -1, 0, 2048, -4950],
+  [2, 0, 1, -2, -1773, 4130],
+  [2, 0, 0, 2, -1595, 0],
+  [4, -1, -1, 0, 1215, -3958],
+  [0, 0, 2, 2, -1110, 0],
+  [3, 0, -1, 0, -892, 3258],
+  [2, 1, 1, 0, -810, 2616],
+  [4, -1, -2, 0, 759, -1897],
+  [0, 2, -1, 0, -713, -2117],
+  [2, 2, -1, 0, -700, 2354],
+  [2, 1, -2, 0, 691, 0],
+  [2, -1, 0, -2, 596, 0],
+  [4, 0, 1, 0, 549, -1423],
+  [0, 0, 4, 0, 537, -1117],
+  [4, -1, 0, 0, 520, -1571],
+  [1, 0, -2, 0, -487, -1739],
+  [2, 1, 0, -2, -399, 0],
+  [0, 0, 2, -2, -381, -4421],
+  [1, 1, 1, 0, 351, 0],
+  [3, 0, -2, 0, -340, 0],
+  [4, 0, -3, 0, 330, 0],
+  [2, -1, 2, 0, 327, 0],
+  [0, 2, 1, 0, -323, 1165],
+  [1, 1, -1, 0, 299, 0],
+  [2, 0, 3, 0, 294, 0],
+  [2, 0, -1, -2, 0, 8752]
+  ];
+
+var El = 0, Er = 0;
+for (var i = 0; i < table_47_A.length; ++i) {
+  var a = 1;
+  if (table_47_A[i][1] == 1 || table_47_A[i][1] == -1) {
+    a = E;
+  }
+  if (table_47_A[i][1] == 2 || table_47_A[i][1] == -2) {
+    a = E*E;
+  }
+  El += table_47_A[i][4] * a * sind(
+    table_47_A[i][0] * D +
+    table_47_A[i][1] * M +
+    table_47_A[i][2] * M_ +
+    table_47_A[i][3] * F);
+  Er += table_47_A[i][5] * a * cosd(
+    table_47_A[i][0] * D +
+    table_47_A[i][1] * M +
+    table_47_A[i][2] * M_ +
+    table_47_A[i][3] * F);
+}
+```
+
+```
+var table_47_B_1 = [
+  [0, 0, 0, 1, 5128122],
+  [0, 0, 1, 1, 280602],
+  [0, 0, 1, -1, 277693],
+  [2, 0, 0, -1, 173237],
+  [2, 0, -1, 1, 55413],
+  [2, 0, -1, -1, 46271],
+  [2, 0, 0, 1, 32573],
+  [0, 0, 2, 1, 17198],
+  [2, 0, 1, -1, 9266],
+  [0, 0, 2, -1, 8822],
+  [2, -1, 0, -1, 8216],
+  [2, 0, -2, -1, 4324],
+  [2, 0, 1, 1, 4200],
+  [2, 1, 0, -1, -3359],
+  [2, -1, -1, 1, 2463],
+  [2, -1, 0, 1, 2211],
+  [2, -1, -1, -1, 2065],
+  [0, 1, -1, -1, -1870],
+  [4, 0, -1, -1, 1828],
+  [0, 1, 0, 1, -1794],
+  [0, 0, 0, 3, -1749],
+  [0, 1, -1, 1, -1565],
+  [1, 0, 0, 1, -1491],
+  [0, 1, 1, 1, -1475],
+  [0, 1, 1, -1, -1410],
+  [0, 1, 0, -1, -1344],
+  [1, 0, 0, -1, -1335],
+  [0, 0, 3, 1, 1107],
+  [4, 0, 0, -1, 1021],
+  [4, 0, -1, 1, 833]
+  ];
+var table_47_B_2 = [
+  [0, 0, 1, -3, 777],
+  [3, 0, -2, 1, 671],
+  [2, 0, 0, -3, 607],
+  [2, 0, 2, -1, 596],
+  [2, -1, 1, -1, 491],
+  [2, 0, -2, 1, -451],
+  [0, 0, 3, -1, 439],
+  [2, 0, 2, 1, 422],
+  [2, 0, -3, -1, 421],
+  [2, 1, -1, 1, -366],
+  [2, 1, 0, 1, -351],
+  [4, 0, 0, 1, 331],
+  [2, -1, 1, 1, 315],
+  [2, -2, 0, -1, 302],
+  [0, 0, 1, 3, -283],
+  [2, 1, 1, -1, -229],
+  [1, 1, 0, -1, 223],
+  [1, 1, 0, 1, 223],
+  [0, 1, -2, -1, -220],
+  [2, 1, -1, -1, -220],
+  [1, 0, 1, 1, -185],
+  [2, -1, -2, -1, 181],
+  [0, 1, 2, 1, -177],
+  [4, 0, -2, -1, 176],
+  [4, -1, -1, -1, 166],
+  [1, 0, 1, -1, -164],
+  [4, 0, 1, -1, 132],
+  [1, 0, -1, -1, -119],
+  [4, -1, 0, -1, 115],
+  [2, -2, 0, 1, 107]
+  ];
+
+var Eb = 0;
+for (var i = 0; i < table_47_B_1.length; ++i) {
+  var a = 1;
+  if (table_47_B_1[i][1] == 1 || table_47_B_1[i][1] == -1) {
+    a = E;
+  }
+  if (table_47_B_1[i][1] == 2 || table_47_B_1[i][1] == -2) {
+    a = E*E;
+  }
+  Eb += table_47_B_1[i][4] * a * sind(
+    table_47_B_1[i][0] * D +
+    table_47_B_1[i][1] * M +
+    table_47_B_1[i][2] * M_ +
+    table_47_B_1[i][3] * F);
+}
+for (var i = 0; i < table_47_B_2.length; ++i) {
+  var a = 1;
+  if (table_47_B_2[i][1] == 1 || table_47_B_2[i][1] == -1) {
+    a = E;
+  }
+  if (table_47_B_2[i][1] == 2 || table_47_B_2[i][1] == -2) {
+    a = E*E;
+  }
+  Eb += table_47_B_2[i][4] * a * cosd(
+    table_47_B_2[i][0] * D +
+    table_47_B_2[i][1] * M +
+    table_47_B_2[i][2] * M_ +
+    table_47_B_2[i][3] * F);
+}
+```
+
+```
+// Terms involving A1 due to Venus, A2 involving Jupiter, L_ from earth flattening.
+var A1 = 119.75 + 131.849 * T;
+var A2 = 53.09 + 479264.290 * T;
+var A3 = 313.45 + 481266.484 * T;
+
+El +=
+  3958 * sind(A1) +
+  1962 * sind(L_ - F) +
+  318 * sind(A2);
+Eb +=
+  -2235 * sind(L_) +
+  382 * sind(A3) +
+  175 * sind(A1 - F) +
+  175 * sind(A1 - F) +
+  127 * sind(L_ - M_) -
+  115 * sind(L_ + M_);
+```
+
+```
+var ecliptic_lon_moon = L_ + El / 1000000;
+var ecliptic_lat_moon = Eb / 1000000;
+var dist_moon = 385000.56 + Er / 1000;
+print("geocentric_lon: " + degree_norm(ecliptic_lon_moon));
+print("geocentric_lat: " + degree_norm(ecliptic_lat_moon));
+print("dist_moon: " + dist_moon);
+```
+
+```
+var right_ascension_moon = atan2d(sind(geocentric_lon_moon) * cosd(obliquity_ecliptic) - tand(geocentric_lat_moon) * sind(obliquity_ecliptic), cosd(geocentric_lon_moon));
+var declination_moon = asind(sind(geocentric_lat_moon)*cosd(obliquity_ecliptic) + cosd(geocentric_lat_moon)*sind(obliquity_ecliptic)*sind(geocentric_lon_moon));
+```
+
+## Cometary
+
+The full lunar theory that Astronomical Algorithms usese to build its version is called ELP (ELP-2000/82).
+
+Accurate within 0.003 degrees.
+
+```
+var moon_pos = (date) => {
+  var T = dynamical_time(date);
+
+  //print(mean_elongation_of_moon % 360);
+  //print(mean_elongation_of_moon - 360*Math.floor(mean_elongation_of_moon/360));
+  print("mean anomaly of sun: " + degree_norm(mean_anomaly_sun));
+  print("mean elongation: " + degree_norm(mean_elongation_of_moon));
+  
+  var D = mean_elongation_of_moon;
+  var M = mean_anomaly_sun;
+  var M_ = mean_anomaly_moon;
+  var E = 1 - 0.002516*T + 0.0000074*T*T;
+  print("A1: " + degree_norm(A1));
+  print("A2: " + degree_norm(A2));
+  print("A3: " + degree_norm(A3));
+  print("E: " + E);
+  print("D: " + degree_norm(D));
+  //print("M: " + degree_norm(M));
+  print("M_: " + degree_norm(M_));
+  print("F: " + degree_norm(F));
+  
+  var table_47_A = [
+    [0, 0, 1, 0, 6288774, -20905355],
+    [2, 0, -1, 0, 1274027, -3699111],
+    [2, 0, 0, 0, 658314, -2955968],
+    [0, 0, 2, 0, 213618, -569925],
+    [0, 1, 0, 0, -185116, 48888],
+    [0, 0, 0, 2, -144332, -3149],
+    [2, 0, -2, 0, 58793, 246158],
+    [2, -1, -1, 0, 57066, -152138],
+    [2, 0, 1, 0, 53322, -170733],
+    [2, -1, 0, 0, 45758, -204586],
+    [0, 1, -1, 0, -40923, -129620],
+    [1, 0, 0, 0, -34720, 108743],
+    [0, 1, 1, 0, -30383, 104755],
+    [2, 0, 0, -2, 15327, 10321],
+    [0, 0, 1, 2, -12528, 0],
+    [0, 0, 1, -2, 10980, 79661],
+    [4, 0, -1, 0, 10675, -34782],
+    [0, 0, 3, 0, 10034, -23210],
+    [4, 0, -2, 0, 8548, -21636],
+    [2, 1, -1, 0, -7888, 24208],
+    [2, 1, 0, 0, -6766, 30824],
+    [1, 0, -1, 0, -5163, -8379],
+    [1, 1, 0, 0, 4987, -16675],
+    [2, -1, 1, 0, 4036, -12831],
+    [2, 0, 2, 0, 3994, -10445],
+    [4, 0, 0, 0, 3861, -11650],
+    [2, 0, -3, 0, 3665, 14403],
+    [0, 1, -2, 0, -2689, -7003],
+    [2, 0, -1, 2, -2602, 0],
+    [2, -1, -2, 0, 2390, 10056],
+    [1, 0, 1, 0, -2348, 6322],
+    [2, -2, 0, 0, 2236, -9884],
+    // TODO: more terms
+    ];
+  
+  var table_47_B_1 = [
+    [0, 0, 0, 1, 5128122],
+    [0, 0, 1, 1, 280602],
+    [0, 0, 1, -1, 277693],
+    [2, 0, 0, -1, 173237],
+    [2, 0, -1, 1, 55413],
+    [2, 0, -1, -1, 46271],
+    [2, 0, 0, 1, 32573],
+    [0, 0, 2, 1, 17198],
+    [2, 0, 1, -1, 9266],
+    [0, 0, 2, -1, 8822],
+    [2, -1, 0, -1, 8216],
+    [2, 0, -2, -1, 4324],
+    [2, 0, 1, 1, 4200],
+    [2, 1, 0, -1, -3359],
+    [2, -1, -1, 1, 2463],
+    [2, -1, 0, 1, 2211],
+    [2, -1, -1, -1, 2065],
+    // TODO: more terms
+    ];
+  var table_47_B_2 = [
+    [0, 0, 1, -3, 777],
+    [3, 0, -2, 1, 671],
+    [2, 0, 0, -3, 607],
+    [2, 0, 2, -1, 596],
+    [2, -1, 1, -1, 491],
+    [2, 0, -2, 1, -451],
+    [0, 0, 3, -1, 439],
+    [2, 0, 2, 1, 422],
+    [2, 0, -3, -1, 421],
+    [2, 1, -1, 1, -366],
+    [2, 1, 0, 1, -351],
+    [4, 0, 0, 1, 331],
+    [2, -1, 1, 1, 315],
+    [2, -2, 0, -1, 302],
+    [0, 0, 1, 3, -283],
+    [2, 1, 1, -1, -229],
+    [1, 1, 0, -1, 223],
+    // TODO: more terms
+    ];
+  
+  /*var El =
+      6288774 * sind(0*D + 0*M + 1*M_ + 0*F) +
+      1274027 * sind(2*D + 0*M - 1*M_ + 0*F);
+  var Er =
+      -20905355 * sind(0*D + 0*M + 1*M_ + 0*F) +
+      -3699111  * sind(2*D + 0*M - 1*M_ + 0*F);*/
+  var El = 0, Er = 0;
+  for (var i = 0; i < table_47_A.length; ++i) {
+    var a = 1;
+    if (table_47_A[i][1] == 1 || table_47_A[i][1] == -1) {
+      a = E;
+    }
+    if (table_47_A[i][1] == 2 || table_47_A[i][1] == -2) {
+      a = E*E;
+    }
+    El += table_47_A[i][4] * a * sind(
+      table_47_A[i][0] * D +
+      table_47_A[i][1] * M +
+      table_47_A[i][2] * M_ +
+      table_47_A[i][3] * F);
+    Er += table_47_A[i][5] * a * cosd(
+      table_47_A[i][0] * D +
+      table_47_A[i][1] * M +
+      table_47_A[i][2] * M_ +
+      table_47_A[i][3] * F);
+  }
+  
+  var Eb = 0;
+  for (var i = 0; i < table_47_B_1.length; ++i) {
+    var a = 1;
+    if (table_47_B_1[i][1] == 1 || table_47_B_1[i][1] == -1) {
+      a = E;
+    }
+    if (table_47_B_1[i][1] == 2 || table_47_B_1[i][1] == -2) {
+      a = E*E;
+    }
+    Eb += table_47_B_1[i][4] * a * sind(
+      table_47_B_1[i][0] * D +
+      table_47_B_1[i][1] * M +
+      table_47_B_1[i][2] * M_ +
+      table_47_B_1[i][3] * F);
+  }
+  for (var i = 0; i < table_47_B_2.length; ++i) {
+    var a = 1;
+    if (table_47_B_2[i][1] == 1 || table_47_B_2[i][1] == -1) {
+      a = E;
+    }
+    if (table_47_B_2[i][1] == 2 || table_47_B_2[i][1] == -2) {
+      a = E*E;
+    }
+    Eb += table_47_B_2[i][4] * a * cosd(
+      table_47_B_2[i][0] * D +
+      table_47_B_2[i][1] * M +
+      table_47_B_2[i][2] * M_ +
+      table_47_B_2[i][3] * F);
+  }
+  
+  var ecliptic_lon_moon = L_ + El / 1000000;
+  var ecliptic_lat_moon = Eb / 1000000;
+  var dist_moon = 385000.56 + Er / 1000;
+  print("geocentric_lon: " + degree_norm(ecliptic_lon_moon));
+  print("geocentric_lat: " + degree_norm(ecliptic_lat_moon));
+  print("dist_moon: " + dist_moon);
+  
+  /*var right_ascension_moon = atan2d(sind(geocentric_lon_moon) * cosd(obliquity_ecliptic) - tand(geocentric_lat_moon) * sind(obliquity_ecliptic), cosd(geocentric_lon_moon));
+  var declination_moon = asind(sind(geocentric_lat_moon)*cosd(obliquity_ecliptic) + cosd(geocentric_lat_moon)*sind(obliquity_ecliptic)*sind(geocentric_lon_moon));
+  print("right_ascension_moon: " + right_ascension_moon);
+  print("declination_moon: " + declination_moon);
+  
+  var geocentric_lat_moon = declination_moon;
+  var geocentric_lon_moon = right_ascension_moon + sidereal_time;
+  
+  var x = dist_moon * cosd(geocentric_lon_moon) * cosd(geocentric_lat_moon);
+  var y = dist_moon * sind(geocentric_lon_moon) * cosd(geocentric_lat_moon);
+  var z = dist_moon * sind(geocentric_lat_moon);
+  // return [x, y, z];
+  moon = [x, y, z];*/
+  
+  var x = dist_moon * cosd(ecliptic_lon_moon) * cosd(ecliptic_lat_moon);
+  var y = dist_moon * sind(ecliptic_lon_moon) * cosd(ecliptic_lat_moon);
+  var z = dist_moon * sind(ecliptic_lat_moon);
+  moon = [x, y, z];
+  
+  var ecliptic_inv = ecliptic_inv_transform(date);
+  moon = mv3_mul(ecliptic_inv, moon);
+  
+  {
+    var moon2 = mv3_mul(m3_inv(equatorial_inv_transform(date)), moon);
+    var moon3 = GPS_2_spherical(moon2);
+    print("aa: " + degree_norm(atan2d(moon2[1], moon2[0])));
+    print("bb: " + degree_norm(asind(moon2[2] / dist_moon)));
+    print("cc: " + moon3);
+  }
+  
+  return moon;
+};
+```
+
+
+
+
 
 
 ```
