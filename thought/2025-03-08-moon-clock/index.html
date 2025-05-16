@@ -156,24 +156,28 @@ var julian_day = (date) => {
 </code></pre><h3 class="section_heading">Position</h3><p>Position is hard.</p><p>The basic problem is that everything is moving.</p><p>The sun and moon are moving. The earth's axis is moving relative to them. The stars are moving, as is their places in the sky. These can't just be averaged away either.</p><p>If you were to teleport 10000 years into the future, all of the constellations would be in all the wrong places in the sky, and some of the constellations would look weird because their individual stars moved in different directions. The sun's track through the sky would be off, as would the moon. When you teleport in, it wouldn't be the same season, even if it was exactly 10000 years to the day. You might not even appear on land. Not because of sea levels rising, but because the continents have physically moved out from under you. Earth's axis of rotation would be at a different spot. If you teleport holding a magnetic compass, it would point in a different direction.</p><p>Before getting into the actual position of the sun and moon, I should first go over all the stuff that has to be accounted for separately.</p><h4>Stuff that influences position</h3><p>Also as I understand it, the book gives formulas for computing the <i>actual</i> positions of the various bodies, not apparent positions, so a delay should be applied to account for time it takes light to travel and how fast it's moving. [calculate the time dialation of jupiter and compare it to its moving speed].</p><p>When it comes to computing where a body is visually in the sky, there's also the effect of parallax. Depending on which side of the earth you're on, or when in the year you are, you will see different bodies at slightly different angles in the sky. These effect the sun and moon and planets greatly. For stars, not so much. Astronomical Algorithms says that there are only 13 stars brighter than magnitude 9.0 whose parallax exceeds 0.00007 degrees.</p><p>There's also the parallactic angle, the angle that the body appears to be rotated, which changes throughout the day and the body moves across the sky. [TODO: image]</p><p>Conceptually, Earth spins on an axis at a rate of one revolution per "day" (solar, sidereal, etc). However, as mentioned above, the Earth's axis actually wobbles a bit due to the pull of various stellar bodies. This wobbling gets decomposed into several types:</p><p>First is nutation. The Earth's axis of rotation wobbles around a "mean" axis, like pictured below. The largest term has a period of ~18.6 years. [todo: by how much?]</p><p>[animation of nutation, exagerated?]</p><pre class="codeblock"><code>nutation = (date) => {
 }
 </code></pre><p>Second is precession. The Earth's axis rotates around the normal vector of the ecliptic very slowly, with a period of about 26000 years. Currently, our axis is pointed very close to Polaris. In 13000 years our axis will point as far away as [todo] before heading back to Polaris.</p><p>[image of precession]</p><p>[image of what stars and constellations the north pole will be at at what time.]</p><p>In addition to precession, the ecliptic plane also rotates slowly. [todo more explanation of this]. This has a period of roughly 2.7 million years.</p><p>Fourth is unpredictable rotation. The Earth's rotation can speed up or slow down slightly for many reasons. [todo: between 0 and 2 seconds/decade recently]. We talked about this already.</p><p>[todo: polar motion relative to crust]</p><p>There's also of course the effects of proper motion, which is just a fancy way of saying that objects in the universe are moving.</p><p>Along a similar vein, there's the effects of relativity. Aberration is the big one, which is where stars will appear in slightly different positions at different times of the year due to different relativistic length contactions when Earth's velocity changes. This affects all stars, by upwards of ~0.005 degrees.</p><p>Also there's the fact that light takes a while to get to places in space, so where an object is now will be different from where you see it in the sky.</p><p>Also of course is light deflection of gravity. This one, I have no idea. I'm very slowly working through <a href="https://www.amazon.com/Course-Differential-Geometry-Readings-Mathematics/dp/8185931674">A Course in Differential Geometry and Lie Groups</a>, so maybe one day I'll understand this stuff.</p><p>... Yeah. I think that's about everything. At least the lower order terms.</p><h4>Coordinate systems</h3><p>As we've talked about, everything is moving. To construct a coordinate system we need, at the very least, an origin point and two non-colinear vectors.</p><p>So it's hard to establish a good coordinate system based on observable things. At least, that's the case if you want to be able to predict where things in the sky are hundreds or thousands of years in the future or past. There are a couple things you can do though:</p><ul><li>Construct a coordinate system based on distant stars, the old classic. [TODO: how far away? Can they be in the same galaxy?]</li><li>Construct a reference frame based on something that is conserved. For example, the average longitudinal movement of the all of the Earth's tectonic plates must be 0. Any value other than 0 would be indistinguishable from irregular rotation around earth's axis. This is how the IERS Reference Prime Meridian is maintained.</li><li>Construct a coordinate system based on something that changes, but whose higher-order terms are fairly small. You recalibrate every so often, and just deal with it.</li></ul><p>The book takes the third approach.</p><p>There are so many coordinate systems used in the book.</p><ul><li>Equatorial: "horizontal" angles measured from the sun's ascending node, "vertical" angles measured how you think. Angles measured relative to the center of the Earth. This one is basically your normal lat/lon, but where the horizontal angle is measured [0, 360) and not [-180, 180), and are measured from the ascending node instead of the equator/prime meridian intersection. The "horizontal" angle is called the "right ascension", and the "vertical" angle is called the "declination". These angles are measured geocentrically, not geodetically.</li><li>Ecliptic: "horizontal" and "vertical" angles are measured the same way, but relative to the ecliptic plane (the plane of the sun's orbit) instead of the equator. These are called "longitude" and "latitude", respectively. Yes, I know this is confusing.</li><li>Other: For the moon calculation, we won't be working in the above coordinate systems, because the moon's orbit lies in a slightly different plane, something around 1 degree off. [todo]</li><li>An ecliptic coordinate system, but centered on the solar system's barycenter, used to calculate the "mean distance" to planets.</li></ul><p>We're mostly going to be working with equatorial and ecliptic coordinate systems.</p><p>But how would they work? They're both based on the intersection of the equatorial and ecliptic planes. But as we've seen, those planes move relative to each other, and relative to distant stars</p><p>For the field of astronomy, the answer is "it's too complicated, so fuck it." In the above list of complications that influence the angles and positions of these planes, only two of them work on human timescales: nutation and polar motion.</p><p>Nutation is a large enough effect, and happens with a short enough period that it has to be taken into account in the coordinate system. Otherwise, every 10 years all of the starts and planets in the sky will be whole arcseconds off (gasp!) [todo: check].</p><p>[todo: more]</p><p>The solution to this craziness is:</p><ul><li>Fix the ecliptic plane.</li><li>Find the "mean equator," the average equatorial plane over short timescales. So that would be nutation and polar motion.</li><li>Describe the locations of all modies in the sky in terms of these planes, and backsolve to the "apparent" coordinate, the coordinate that you would actually observe in the sky, taking into account the theoretical nutation and polar motion.</li></ul><p>These planes, the ecliptic and mean equator, do change, just not on human timescales. You want to enable ultra precise calculations, or to enable people to do calculations for the very distant past. So you associate these planes, and all of the measurements you make with them, relative to a moment in time. The current "epoch" in use is J2000, January 1 2000 at 12:00 noon TT. The next epoch will be J2050.</p><p>This way, measurements of things in the sky can stay relatively stable over the years, can remain precise, and can also be "about right" even if you don't account for nutation and the rest.</p><p>[todo: some code]</p><h4>Cometary</h3><h3 class="section_heading">Objects in orbit</h3><p>Ellipses are hard...</p><p>In order to cope, a number of concepts are introduced. Similar to what happened in the coordinate system chapter, we're first going to take care of the happy case, circular orbits, and then start adding terms to get to elliptical orbits.</p><p>The eccentricity of the earth's orbit around the sun is roughly 0.0167 at the moment. This means that the ratio of the semi-minor axis to the semi-major axis is $\sqrt{1 - 0.0167^2}$, which is about 0.9998. Meaning, earth's orbit around the sun is extremely close to a perfect circle. The moon is similar, with an eccentricity of around 0.05.</p><p>Circular orbits have the property that their velocity (and thus their period) are determined by the masses of both bodies and the radius. Which means if we know about the masses and period of an eliptical orbit, we can find a unique "matching" circular orbit of the same period.</p><p>In an eliptical orbit velocities vary over time, fastest near the pericenter and slowest near the apocenter. But in a circular orbit, (angular) velocity is constant. In Astronomical Algorithms, there are higher order terms, but this doesn't affect the analysis.</p><p>If we mark the pericenter as a "starting point" in the orbit, we can ask "in the orbital plane, how far has the orbiting body traveled past the starting point, expressed as an angle?" This is called the body's "true anomaly."</p><p>We can also ask "how far would the body have traveled past its starting point if it had a circular orbit of the same period, expressed as an angle?" This is called the body's "mean anomaly."</p><p>If we do the same thing, but this time mark the ascending node as the "starting point", we'd get the "true longitude" and "mean longitude" instead.</p><p>The last one to introduce is the "argument of periapsis," which is the angle between the ascending node and the pericenter. So in other words, "true longitude = true anomaly + argument of periapsis", and likewise "mean longitude = mean anomaly + argument of periapsis"".</p><p>[image]</p><p>The thing that connects the "true" values with the "mean" values is the "equation of center". The equation of center is the true anomaly minus the mean anomaly. There's no closed-form expression for the equation of center, but for low eccentricities (like the sun-earth and earth-moon orbits) there's a good series expansion:</p><p>For mean anomaly $M$ and eccentricity $e$, Astronomical Algorithms expands the equation of center out to $\sin{3M}$:</p><p>$$\begin{aligned}EOC \approx & \left( 2e - \frac{1}{4}e^3 + \frac{5}{96}e^5 + \frac{107}{4608}e^7 \right) \sin{M} + \\      & \left( \frac{5}{4}e^2 - \frac{11}{24}e^4 + \frac{17}{192}e^6 \right) \sin{2M} + \\      & \left( \frac{13}{12}e^3 + \frac{43}{64}e^5 + \frac{95}{512}e^7 \right) \sin{3M} .\end{aligned}$$</p><p>Here, EOC is expressed in radians because $e$ is unitless.</p><p>So yeah. You can get the true longitude from the mean longitude by adding the equation of center:</p><p>$$\begin{aligned}& \text{mean longitude} + EOC \\&= (\text{argument of periapsis} + \text{mean anomaly}) + (\text{true anomaly} - \text{mean anomaly}) \\&= \text{argument of periapsis} + \text{true anomaly} \\&= \text{true longitude} .\end{aligned}$$</p><h4>Cometary</h3><p>So all of this is clearly antiquated. Elliptical orbits were obviously very difficult to work with before calculators and computers. Hence you do most of your calcs in terms of circular orbits, and correct them at the end.</p><p>In a 2-body system, this analysis applies equally well to both objects. However, Astronomical Algorithms never touches on this. The book just assumes that, for the sun-earth and the earth-moon systems, the big object stays fixed at the focus of the smaller body's orbit. Which seems like a large omission for such a book.</p><h3 class="section_heading">The position of the sun</h3><p>We now have everything we need to compute the position of the sun in the sky! All angles from here on are going to be in degrees. The book guarentees accuracy within 0.01 degrees for some unknown amount of time around J2000.</p><p>We're going to be using [todo] time for these.</p><pre class="codeblock"><code>var T = dynamical_time(date);
-</code></pre><p>We imagine the sun rotating around the earth instead of the other way around. It makes the same ellipse. As detailed in the last section, we calculate the mean longitude and the equation of center.</p><pre class="codeblock"><code>var sun_mean_longitude =
-  280.46646 +
-  36000.76983 * T +
-  0.0003032 * T * T;
-var EOC =
-  (1.914602 - 0.004817*T - 0.000014*T*T) * sind(M) +
-  (0.019993 - 0.000101*T) * sind(2*M) +
-  0.000289 * sind(3*M);
-var sun_true_longitude = sun_mean_longitude + EOC;
-</code></pre><p>The <code class="codeinline">EOC</code> here is calculated by substituting <code class="codeinline">sun_eccentricity</code> (see below) into the expression in the previous section.</p><p>Astronomical Algorithms just sets the sun's latitude to be equal to 0. The sun does wobble above and below the ecliptic plane, but never more than 0.0004 degrees.</p><p>For my use case, I also need the distance to the sun. This is a standard formula for ellipses, but </p><pre class="codeblock"><code>var sun_eccentricity = 0.016708634 - 0.000042037 * T - 0.0000001267*T*T
+</code></pre><p>We imagine the sun rotating around the earth instead of the other way around. It makes the same ellipse. As detailed in the last section, we calculate the mean longitude and the equation of center.</p><pre class="codeblock"><code>var sun_mean_anomaly =
+    357.5291092 +
+    35999.0502909 * T +
+    -0.0001536 * T*T +
+    T*T*T / 24490000;
 var sun_argument_of_periapsis =
   -77.0627 +
   1.71954 * T +
   0.0004569 * T * T;
+
+var EOC =
+  (1.914602 - 0.004817*T - 0.000014*T*T) * sind(sun_mean_anomaly) +
+  (0.019993 - 0.000101*T) * sind(2*sun_mean_anomaly) +
+  0.000289 * sind(3*sun_mean_anomaly);
+
+var sun_mean_longitude = sun_mean_anomaly + sun_argument_of_periapsis;
+var sun_true_longitude = sun_mean_longitude + EOC;
+</code></pre><p>The <code class="codeinline">EOC</code> here is calculated by substituting <code class="codeinline">sun_eccentricity</code> (see below) into the expression in the previous section.</p><p>Astronomical Algorithms just sets the sun's latitude to be equal to 0. The sun does wobble above and below the ecliptic plane, but never more than 0.0004 degrees.</p><p>For my use case, I also need the distance to the sun. This is a standard formula for ellipses, but </p><pre class="codeblock"><code>var sun_eccentricity = 0.016708634 - 0.000042037 * T - 0.0000001267*T*T
 var sun_true_anomaly = sun_true_longitude - sun_argument_of_periapsis;
 var sun_sun = 149597870.700 * 1.000001018 * (1 - sun_eccentricity*sun_eccentricity) / (1 + sun_eccentricity * cosd(sun_true_anomaly));
 </code></pre><p>Before we convert to right ascension/declination, we want to find the "apparent" longitude and obliquity. Actually, Astronomical Algorithms calls the apparent obliquity "true obliquity" because I swear to fucking god the terminology in this field is a dumpster fire. It's presumably called this because the book has another name for the sun's longitude: the "mean equinox of the date", and the apparent sun's longitude is also called the "true equinox of the date." But I'm not going to use any of those names because they're confusing.</p><p>Astronomical Algorithms calculates the apparent longitude using ONLY nutation. Presumably because the other terms are unnecessary to hit the 0.01 degree precision goal.</p><pre class="codeblock"><code>var delta_longitude = [todo]
-var delta_equator_obliquity = [todo]
+var delta_obliquity = [todo]
 
 var sun_apparent_longitude = sun_true_longitude + delta_longitude;
 </code></pre><p>Now the equatorial plane. This is just trig.</p><pre class="codeblock"><code>var obliquity_ecliptic = 
@@ -183,8 +187,8 @@ var sun_apparent_longitude = sun_true_longitude + delta_longitude;
   0.00000050361 * T * T * T;
 var apparent_obliquity_ecliptic = obliquity_ecliptic + delta_obliquity;
 
-var declination_sun = asind(sind(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude));
-var right_ascension_sun = atan2d(cosd(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude), cosd(sun_apparent_longitude));
+var sun_declination = asind(sind(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude));
+var sun_right_ascension = atan2d(cosd(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude), cosd(sun_apparent_longitude));
 </code></pre><h4>Cometary</h3><h3 class="section_heading">The position of the moon</h3><p>The book explicitly states that this formula takes into account the angular delay caused by the speed of light.</p><pre class="codeblock"><code>var moon_mean_longitude =
   218.3164477 +
   481267.88123421 * T +
@@ -203,12 +207,14 @@ var moon_mean_anomaly =
   -0.0018819 * T * T +
   T*T*T / 545868 +
   -T*T*T*T / 113065000;
-</code></pre><p>I'll be honest, I don't know what this one is for.</p><pre class="codeblock"><code>var F = // argument_latitude_moon
+</code></pre><p>I'll be honest, I don't know what this one is for.</p><pre class="codeblock"><code>var moon_argument_of_latitude =
   93.2720950 +
   483202.0175233 * T +
   -0.0036539*T*T +
   -T*T*T / 3526000 +
   T*T*T*T / 863310000;
+
+var E = 1 - 0.002516*T + 0.0000074*T*T;
 </code></pre><pre class="codeblock"><code>var table_47_A = [
   [0, 0, 1, 0, 6288774, -20905355],
   [2, 0, -1, 0, 1274027, -3699111],
@@ -283,15 +289,15 @@ for (var i = 0; i < table_47_A.length; ++i) {
     a = E*E;
   }
   El += table_47_A[i][4] * a * sind(
-    table_47_A[i][0] * D +
-    table_47_A[i][1] * M +
-    table_47_A[i][2] * M_ +
-    table_47_A[i][3] * F);
+    table_47_A[i][0] * moon_mean_elongation +
+    table_47_A[i][1] * sun_mean_anomaly +
+    table_47_A[i][2] * moon_mean_anomaly +
+    table_47_A[i][3] * moon_argument_of_latitude);
   Er += table_47_A[i][5] * a * cosd(
-    table_47_A[i][0] * D +
-    table_47_A[i][1] * M +
-    table_47_A[i][2] * M_ +
-    table_47_A[i][3] * F);
+    table_47_A[i][0] * moon_mean_elongation +
+    table_47_A[i][1] * sun_mean_anomaly +
+    table_47_A[i][2] * moon_mean_anomaly +
+    table_47_A[i][3] * moon_argument_of_latitude);
 }
 </code></pre><pre class="codeblock"><code>var table_47_B_1 = [
   [0, 0, 0, 1, 5128122],
@@ -368,10 +374,10 @@ for (var i = 0; i < table_47_B_1.length; ++i) {
     a = E*E;
   }
   Eb += table_47_B_1[i][4] * a * sind(
-    table_47_B_1[i][0] * D +
-    table_47_B_1[i][1] * M +
-    table_47_B_1[i][2] * M_ +
-    table_47_B_1[i][3] * F);
+    table_47_B_1[i][0] * moon_mean_elongation +
+    table_47_B_1[i][1] * sun_mean_anomaly +
+    table_47_B_1[i][2] * moon_mean_anomaly +
+    table_47_B_1[i][3] * moon_argument_of_latitude);
 }
 for (var i = 0; i < table_47_B_2.length; ++i) {
   var a = 1;
@@ -382,10 +388,10 @@ for (var i = 0; i < table_47_B_2.length; ++i) {
     a = E*E;
   }
   Eb += table_47_B_2[i][4] * a * cosd(
-    table_47_B_2[i][0] * D +
-    table_47_B_2[i][1] * M +
-    table_47_B_2[i][2] * M_ +
-    table_47_B_2[i][3] * F);
+    table_47_B_2[i][0] * moon_mean_elongation +
+    table_47_B_2[i][1] * sun_mean_anomaly +
+    table_47_B_2[i][2] * moon_mean_anomaly +
+    table_47_B_2[i][3] * moon_argument_of_latitude);
 }
 </code></pre><pre class="codeblock"><code>// Terms involving A1 due to Venus, A2 involving Jupiter, L_ from earth flattening.
 var A1 = 119.75 + 131.849 * T;
@@ -394,26 +400,21 @@ var A3 = 313.45 + 481266.484 * T;
 
 El +=
   3958 * sind(A1) +
-  1962 * sind(L_ - F) +
+  1962 * sind(moon_mean_longitude - moon_argument_of_latitude) +
   318 * sind(A2);
 Eb +=
-  -2235 * sind(L_) +
+  -2235 * sind(moon_mean_longitude) +
   382 * sind(A3) +
-  175 * sind(A1 - F) +
-  175 * sind(A1 - F) +
-  127 * sind(L_ - M_) -
-  115 * sind(L_ + M_);
-</code></pre><pre class="codeblock"><code>var ecliptic_lon_moon = L_ + El / 1000000;
-var ecliptic_lat_moon = Eb / 1000000;
-var dist_moon = 385000.56 + Er / 1000;
-print("geocentric_lon: " + degree_norm(ecliptic_lon_moon));
-print("geocentric_lat: " + degree_norm(ecliptic_lat_moon));
-print("dist_moon: " + dist_moon);
-</code></pre><pre class="codeblock"><code>var right_ascension_moon = atan2d(sind(geocentric_lon_moon) * cosd(obliquity_ecliptic) - tand(geocentric_lat_moon) * sind(obliquity_ecliptic), cosd(geocentric_lon_moon));
-var declination_moon = asind(sind(geocentric_lat_moon)*cosd(obliquity_ecliptic) + cosd(geocentric_lat_moon)*sind(obliquity_ecliptic)*sind(geocentric_lon_moon));
-</code></pre><h4>Cometary</h3><p>The full lunar theory that Astronomical Algorithms usese to build its version is called ELP (ELP-2000/82).</p><p>Accurate within 0.003 degrees.</p><pre class="codeblock"><code>var moon_pos = (date) => {
-  var T = dynamical_time(date);
-
+  175 * sind(A1 - moon_argument_of_latitude) +
+  175 * sind(A1 - moon_argument_of_latitude) +
+  127 * sind(moon_mean_longitude - moon_mean_anomaly) -
+  115 * sind(moon_mean_longitude + moon_mean_anomaly);
+</code></pre><pre class="codeblock"><code>var moon_true_longitude = moon_mean_longitude + El / 1000000;
+var moon_true_latitude = Eb / 1000000;
+var moon_dist = 385000.56 + Er / 1000;
+</code></pre><pre class="codeblock"><code>var moon_right_ascension = atan2d(sind(moon_true_longitude) * cosd(obliquity_ecliptic) - tand(moon_true_latitude) * sind(obliquity_ecliptic), cosd(moon_true_longitude));
+var moon_declination = asind(sind(moon_true_latitude)*cosd(obliquity_ecliptic) + cosd(moon_true_latitude)*sind(obliquity_ecliptic)*sind(moon_true_longitude));
+</code></pre><h4>Cometary</h3><p>The full lunar theory that Astronomical Algorithms usese to build its version is called ELP (ELP-2000/82).</p><p>Accurate within 0.003 degrees.</p><h3 class="section_heading">View from earth</h3><p>Remember how I'm making a moon phase clock face for my watch? All the background took a while, but we're getting close.</p><p>I want to display on the watch what the moon looks like in the sky right now. The phase doesn't really change depending on where you are on earth. But the parallactic angle does. So you need to know the position of the wearer on earth.</p><p>The Bangle.JS has a GPS module, but from my experience it's kinda jank and it consumes a lot of battery. Maybe it's normal actually and mobile phones and stuff just pull a bunch of tricks to make it not seem jank and a drain of battery. In any event, that's just how it is on the Bangle.js, imo.</p><p>So instead, if I ever travel and I want to see the watch face updated, I just manually input my position into the watch face program. Which brings me to my next point: GPS or equatorial coordinates?</p><p>GPS is the natural coordinate system to use to enter in my coordinates, of course. Everything around me can tell me my position in GPS coordinates. Nothing tells me my current position in right ascension/declination.</p><p>The rest of the calculations are going to be linear algebra based, so it makes more sense to convert them to a rectangular coordinate system like ECEF. This coordinate system is centered is the earth's center of mass, x points to the intersection of the equator and prime meridian, z points towards the north pole, and y = z X x.</p><p>Also, an advantage of ECEF is that it's easier to wrap my head around, especially while debugging. I'll be honest, until writing this post I didn't even know if the (ascending node, longitude of june solstice, north pole) coordinate system is right handed or left handed.</p><p>As mentioned previously, longitudes (ecliptic) and right ascensions (equatorial) are both measured positive going west in this book, which is opposite of how we normally think of them.</p><pre class="codeblock"><code>var moon_pos = (date) => {
   //print(mean_elongation_of_moon % 360);
   //print(mean_elongation_of_moon - 360*Math.floor(mean_elongation_of_moon/360));
   print("mean anomaly of sun: " + degree_norm(mean_anomaly_sun));

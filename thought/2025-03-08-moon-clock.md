@@ -289,14 +289,22 @@ var T = dynamical_time(date);
 We imagine the sun rotating around the earth instead of the other way around. It makes the same ellipse. As detailed in the last section, we calculate the mean longitude and the equation of center.
 
 ```
-var sun_mean_longitude =
-  280.46646 +
-  36000.76983 * T +
-  0.0003032 * T * T;
+var sun_mean_anomaly =
+    357.5291092 +
+    35999.0502909 * T +
+    -0.0001536 * T*T +
+    T*T*T / 24490000;
+var sun_argument_of_periapsis =
+  -77.0627 +
+  1.71954 * T +
+  0.0004569 * T * T;
+
 var EOC =
-  (1.914602 - 0.004817*T - 0.000014*T*T) * sind(M) +
-  (0.019993 - 0.000101*T) * sind(2*M) +
-  0.000289 * sind(3*M);
+  (1.914602 - 0.004817*T - 0.000014*T*T) * sind(sun_mean_anomaly) +
+  (0.019993 - 0.000101*T) * sind(2*sun_mean_anomaly) +
+  0.000289 * sind(3*sun_mean_anomaly);
+
+var sun_mean_longitude = sun_mean_anomaly + sun_argument_of_periapsis;
 var sun_true_longitude = sun_mean_longitude + EOC;
 ```
 
@@ -308,10 +316,6 @@ For my use case, I also need the distance to the sun. This is a standard formula
 
 ```
 var sun_eccentricity = 0.016708634 - 0.000042037 * T - 0.0000001267*T*T
-var sun_argument_of_periapsis =
-  -77.0627 +
-  1.71954 * T +
-  0.0004569 * T * T;
 var sun_true_anomaly = sun_true_longitude - sun_argument_of_periapsis;
 var sun_sun = 149597870.700 * 1.000001018 * (1 - sun_eccentricity*sun_eccentricity) / (1 + sun_eccentricity * cosd(sun_true_anomaly));
 ```
@@ -322,7 +326,7 @@ Astronomical Algorithms calculates the apparent longitude using ONLY nutation. P
 
 ```
 var delta_longitude = [todo]
-var delta_equator_obliquity = [todo]
+var delta_obliquity = [todo]
 
 var sun_apparent_longitude = sun_true_longitude + delta_longitude;
 ```
@@ -337,8 +341,8 @@ var obliquity_ecliptic =
   0.00000050361 * T * T * T;
 var apparent_obliquity_ecliptic = obliquity_ecliptic + delta_obliquity;
 
-var declination_sun = asind(sind(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude));
-var right_ascension_sun = atan2d(cosd(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude), cosd(sun_apparent_longitude));
+var sun_declination = asind(sind(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude));
+var sun_right_ascension = atan2d(cosd(apparent_obliquity_ecliptic) * sind(sun_apparent_longitude), cosd(sun_apparent_longitude));
 ```
 
 ## Cometary
@@ -376,12 +380,14 @@ var moon_mean_elongation =
 I'll be honest, I don't know what this one is for.
 
 ```
-var F = // argument_latitude_moon
+var moon_argument_of_latitude =
   93.2720950 +
   483202.0175233 * T +
   -0.0036539*T*T +
   -T*T*T / 3526000 +
   T*T*T*T / 863310000;
+
+var E = 1 - 0.002516*T + 0.0000074*T*T;
 ```
 
 
@@ -461,15 +467,15 @@ for (var i = 0; i < table_47_A.length; ++i) {
     a = E*E;
   }
   El += table_47_A[i][4] * a * sind(
-    table_47_A[i][0] * D +
-    table_47_A[i][1] * M +
-    table_47_A[i][2] * M_ +
-    table_47_A[i][3] * F);
+    table_47_A[i][0] * moon_mean_elongation +
+    table_47_A[i][1] * sun_mean_anomaly +
+    table_47_A[i][2] * moon_mean_anomaly +
+    table_47_A[i][3] * moon_argument_of_latitude);
   Er += table_47_A[i][5] * a * cosd(
-    table_47_A[i][0] * D +
-    table_47_A[i][1] * M +
-    table_47_A[i][2] * M_ +
-    table_47_A[i][3] * F);
+    table_47_A[i][0] * moon_mean_elongation +
+    table_47_A[i][1] * sun_mean_anomaly +
+    table_47_A[i][2] * moon_mean_anomaly +
+    table_47_A[i][3] * moon_argument_of_latitude);
 }
 ```
 
@@ -549,10 +555,10 @@ for (var i = 0; i < table_47_B_1.length; ++i) {
     a = E*E;
   }
   Eb += table_47_B_1[i][4] * a * sind(
-    table_47_B_1[i][0] * D +
-    table_47_B_1[i][1] * M +
-    table_47_B_1[i][2] * M_ +
-    table_47_B_1[i][3] * F);
+    table_47_B_1[i][0] * moon_mean_elongation +
+    table_47_B_1[i][1] * sun_mean_anomaly +
+    table_47_B_1[i][2] * moon_mean_anomaly +
+    table_47_B_1[i][3] * moon_argument_of_latitude);
 }
 for (var i = 0; i < table_47_B_2.length; ++i) {
   var a = 1;
@@ -563,10 +569,10 @@ for (var i = 0; i < table_47_B_2.length; ++i) {
     a = E*E;
   }
   Eb += table_47_B_2[i][4] * a * cosd(
-    table_47_B_2[i][0] * D +
-    table_47_B_2[i][1] * M +
-    table_47_B_2[i][2] * M_ +
-    table_47_B_2[i][3] * F);
+    table_47_B_2[i][0] * moon_mean_elongation +
+    table_47_B_2[i][1] * sun_mean_anomaly +
+    table_47_B_2[i][2] * moon_mean_anomaly +
+    table_47_B_2[i][3] * moon_argument_of_latitude);
 }
 ```
 
@@ -578,29 +584,26 @@ var A3 = 313.45 + 481266.484 * T;
 
 El +=
   3958 * sind(A1) +
-  1962 * sind(L_ - F) +
+  1962 * sind(moon_mean_longitude - moon_argument_of_latitude) +
   318 * sind(A2);
 Eb +=
-  -2235 * sind(L_) +
+  -2235 * sind(moon_mean_longitude) +
   382 * sind(A3) +
-  175 * sind(A1 - F) +
-  175 * sind(A1 - F) +
-  127 * sind(L_ - M_) -
-  115 * sind(L_ + M_);
+  175 * sind(A1 - moon_argument_of_latitude) +
+  175 * sind(A1 - moon_argument_of_latitude) +
+  127 * sind(moon_mean_longitude - moon_mean_anomaly) -
+  115 * sind(moon_mean_longitude + moon_mean_anomaly);
 ```
 
 ```
-var ecliptic_lon_moon = L_ + El / 1000000;
-var ecliptic_lat_moon = Eb / 1000000;
-var dist_moon = 385000.56 + Er / 1000;
-print("geocentric_lon: " + degree_norm(ecliptic_lon_moon));
-print("geocentric_lat: " + degree_norm(ecliptic_lat_moon));
-print("dist_moon: " + dist_moon);
+var moon_true_longitude = moon_mean_longitude + El / 1000000;
+var moon_true_latitude = Eb / 1000000;
+var moon_dist = 385000.56 + Er / 1000;
 ```
 
 ```
-var right_ascension_moon = atan2d(sind(geocentric_lon_moon) * cosd(obliquity_ecliptic) - tand(geocentric_lat_moon) * sind(obliquity_ecliptic), cosd(geocentric_lon_moon));
-var declination_moon = asind(sind(geocentric_lat_moon)*cosd(obliquity_ecliptic) + cosd(geocentric_lat_moon)*sind(obliquity_ecliptic)*sind(geocentric_lon_moon));
+var moon_right_ascension = atan2d(sind(moon_true_longitude) * cosd(obliquity_ecliptic) - tand(moon_true_latitude) * sind(obliquity_ecliptic), cosd(moon_true_longitude));
+var moon_declination = asind(sind(moon_true_latitude)*cosd(obliquity_ecliptic) + cosd(moon_true_latitude)*sind(obliquity_ecliptic)*sind(moon_true_longitude));
 ```
 
 ## Cometary
@@ -609,10 +612,32 @@ The full lunar theory that Astronomical Algorithms usese to build its version is
 
 Accurate within 0.003 degrees.
 
+# View from earth
+
+Remember how I'm making a moon phase clock face for my watch? All the background took a while, but we're getting close.
+
+I want to display on the watch what the moon looks like in the sky right now. The phase doesn't really change depending on where you are on earth. But the parallactic angle does. So you need to know the position of the wearer on earth.
+
+The Bangle.JS has a GPS module, but from my experience it's kinda jank and it consumes a lot of battery. Maybe it's normal actually and mobile phones and stuff just pull a bunch of tricks to make it not seem jank and a drain of battery. In any event, that's just how it is on the Bangle.js, imo.
+
+So instead, if I ever travel and I want to see the watch face updated, I just manually input my position into the watch face program. Which brings me to my next point: GPS or equatorial coordinates?
+
+GPS is the natural coordinate system to use to enter in my coordinates, of course. Everything around me can tell me my position in GPS coordinates. Nothing tells me my current position in right ascension/declination.
+
+The rest of the calculations are going to be linear algebra based, so it makes more sense to convert them to a rectangular coordinate system like ECEF. This coordinate system is centered is the earth's center of mass, x points to the intersection of the equator and prime meridian, z points towards the north pole, and y = z X x.
+
+Also, an advantage of ECEF is that it's easier to wrap my head around, especially while debugging. I'll be honest, until writing this post I didn't even know if the (ascending node, longitude of june solstice, north pole) coordinate system is right handed or left handed.
+
+As mentioned previously, longitudes (ecliptic) and right ascensions (equatorial) are both measured positive going west in this book, which is opposite of how we normally think of them.
+
+
+
+
+
+
+
 ```
 var moon_pos = (date) => {
-  var T = dynamical_time(date);
-
   //print(mean_elongation_of_moon % 360);
   //print(mean_elongation_of_moon - 360*Math.floor(mean_elongation_of_moon/360));
   print("mean anomaly of sun: " + degree_norm(mean_anomaly_sun));
