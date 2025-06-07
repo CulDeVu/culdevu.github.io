@@ -7,7 +7,7 @@ Since last time:
 
 I wrote another simulator. This will be the 4th one, by my count. Unlike the others, this one is designed to run on an Arduino.
 
-The idea is this: I would write a simulator of the lisp machine on my Arduino, at the level of busses and logical components. I would expose the major busses on the IO pins, and gradually replace parts of the simulation with real circuit boards on those busses. Output (at least at the beginning) is done through an LCD screen.
+The idea is this: I write a simulator of the lisp machine on my Arduino, at the level of busses and logical components. I expose the major busses on the IO pins, and gradually replace parts of the simulation with real circuit boards on those busses. Output (at least at the beginning) is done through an LCD screen.
 
 Some changes had to happen:
 
@@ -15,11 +15,13 @@ I added a `port` instruction for outputting to the LCD screen. Previously, the m
 
 Very simple programs were taking forever. I would write a simple program to multiply two numbers together, and the sim would show that dozens of garbage collections happening. There are a ton of reasons, but I made a big dent in the problem by changing how local variables work. Previously, you would call `(envt)` to get the contents of the environment register, a list type. Then, to get the n'th item in the environment you'd do `(car (cdr ... n-1 of these ... (cdr (envt))))`. This results in a *ton* of function calls, which then generate a ton of garbage on the heap, filling up memory. So I added a feature where you can do `(envt 10)` instead to get the 10th item in the environment. Honestly, I'd be happier with a system that could handle call stack garbage in a more general way. But that's a problem for another day.
 
-Jesus christ, I didn't realize that how deep the arduino rabbit hole goes. There are huge, blatant bugs in the compiler that have been there for years. For example, this compiles:
+Also, jesus christ, I didn't realize that how deep the arduino rabbit hole goes. There are huge, blatant bugs in the compiler that have been there for years. For example, this compiles:
 
 ```
 typedef struct { int a; } A_t;
 int bar(A_t a) { return a.a; }
+
+// Entrypoint, irrelevant to this example
 void setup() {}
 void loop() {}
 ```
@@ -30,17 +32,21 @@ But this doesn't:
 void foo() {}
 typedef struct { int a; } A_t;
 int bar(A_t a) { return a.a; }
+
+// Entrypoint, irrelevant to this example
 void setup() {}
 void loop() {}
 ```
 
-The latter claims that `A_t` on line 3 is not declared. This is because the arduino compiler (in the IDE as well as the `arduino --verify file.ino`) first runs a preprocessor over the file that rewrites shit, adds `#include` s to the top of files, moves shit around. But it doesn't create an AST or anything before it starts rewriting your file, so sometimes it rewrites your perfectly valid C into non-valid C before passing it off to `avr-gcc`.
+The only difference is the definition of `foo()` in the second block.
 
-In the above specifically, it's detecting functions `foo`, `bar`, `setup`, and `loop`, and inserting forward declarations at the top of the file. Presumably to "fix" the error that will show up when someone writes two mutually recursive functions.
+The latter claims that `A_t` on line 3 is not declared. This is because the arduino compiler (in the IDE as well as the `arduino --verify file.ino`) first runs a preprocessor over the file that rewrites shit, adds `#include` s to the top of files, and moves shit around. But it doesn't create an AST or anything before it starts rewriting your file, so sometimes it rewrites your perfectly valid C into non-valid C before passing it off to `avr-gcc`.
 
-link(https://code.google.com/archive/p/arduino/issues/188)[This old issue] may very well be the first person to complain about this problem. By coincidence, I'm posting this just 8 days short of its 15th birthday!
+In the above specifically, it's detecting functions `foo`, `bar`, `setup`, and `loop`, and inserting forward declarations at the top of the file. Presumably to "fix" the error that will show up when someone writes two mutually recursive functions without forward declaring them. It moves the usage of `A_t` above the declaration of `struct A_t`.
 
-Honestly, I find this crazy. Like, why? Someone in their programming journey will learn about function prototypes vs definitions in like the 2nd or 3rd week [citation needed]. In an effort to make programming slightly less confusing for the first 3 weeks, the Arduino devs decided to make programming slightly harder and less predictable for weeks 4 through infinity.
+link(https://code.google.com/archive/p/arduino/issues/188)[This old issue] may very well be the first to complain about this problem. By coincidence, I'm posting this just 8 days short of its 15th birthday!
+
+Honestly, I find this crazy. Like, why? Someone in their programming journey will learn about function prototypes vs definitions in like their 2nd or 3rd week. In an effort to make programming slightly less confusing for weeks 1 through 3, the Arduino devs decided to make programming slightly harder and less predictable for weeks 4 through infinity.
 
 Luckily, you can step around this nonsense: make a `main.h` file that contains everything you would normally put in your `.ino` file, and make your `.ino` file look like this:
 
@@ -48,11 +54,13 @@ Luckily, you can step around this nonsense: make a `main.h` file that contains e
 #include "main.h"
 ```
 
-The arduino compiler only does it's stupid preprocessing on `.ino` files, not on `.c` or `.h` files. So those are safe. *For now*. You could also attach `--verbose` to the `arduino` command, and then ditch the `arduino` command.
+The arduino compiler only does it's stupid preprocessing on `.ino` files, not on `.c` or `.h` files. So those are safe. *For now*.
 
-Also, damn arduinos have a tiny amount of RAM. Luckily, the MEGA has quite a bit of flash. If you have lots of data to stuff into flash memory, the normal `PROGMEM` macro doesn't work. You have to explicitly place the data on the *far* side of the address space, and let the code in the `.text` section have the lower addresses. You have to add `__attribute__((__section__(".fini1")))`, or one of the other `fini`'s defined in the compiler's linker script. Reading can be done with a custom `memcpy` function using `pgm_read_byte_far`.
+You could also just use `avr_gcc` like a big kid.
 
-After all was done, I had a simple hello-world program running in the simulator, on the arduino:
+Also, damn arduinos have a tiny amount of RAM. Luckily, the MEGA has quite a bit of flash. Although, if you have lots of data to stuff into flash memory, the normal `PROGMEM` macro doesn't work. You have to explicitly place the data on the *far* side of the address space, and let the code in the `.text` section have the lower addresses. You have to add `__attribute__((__section__(".fini1")))`, or one of the other `fini`'s defined in the compiler's linker script. Reading can be done with a custom `memcpy` function using `pgm_read_byte_far`.
+
+After all was done, I had a simple hello-world program running in the simulator, running on the arduino:
 
 ```
 (define output-instr
@@ -77,11 +85,11 @@ After all was done, I had a simple hello-world program running in the simulator,
     '()))
 ```
 
-Here, `begin` is a macro that's just built-in to the compiler. Port `0`, output to the LCD, is the only one implemented. I also have some stub microcode for `(port 1)`-style 1-operand instructions, which would take input. The idea is that, instead of interrupts, which would make everything much more complex, each peripheral would just maintain its own ringbuffer, and respond like traditional memory-mapped hardware.
+Here, `begin` is a macro that's just built-in to the compiler. Port `0`, output to the LCD, is the only one implemented. I also have some stub microcode for `(port 1)`, which would take input. The idea is that instead of interrupts, which would make everything much more complex, each peripheral would just maintain its own ringbuffer, and respond to request to read or write to the buffer.
 
 # The build, first steps
 
-I was gifted a link(https://www.adafruit.com/product/5903)[hot plate] for christmas, so no more heat gun for me! As a result, my boards look much better now:
+I was gifted a link(https://www.adafruit.com/product/5903)[hot plate] for christmas, so no more heat gun for me! As a result my boards look much better now:
 
 imgcmp(clean_latches.jpeg)[](clean_transistors.jpeg)[]
 
@@ -94,17 +102,17 @@ Here's a pic and video of the the hello-world program with the first board:
 img(close_up_hello.jpeg)[Sorry for the contrast, it's hard to take a picture of the screen. Also, the weird "hamburger" glyph is the \n character. I include it in the output, because the sim also runs on my computer for testing.]
 <video style="max-width:100%" controls><source src="hello.mp4" type="video/mp4"></video>
 
-Note, in the video, I've deliberately slowed the clock so that you can see it executing each `port` instruction. Also in the video, the blinky lights are wrong. There was a bug in the simulator, where the read-instr-car signal line wasn't getting reset, so it's latching other data on the bus. It's fixed in the later video.
+In this video I've deliberately slowed the clock so that you can see it executing each `port` instruction. Also in the video, the blinky lights are wrong. There was a bug in the simulator, where the `read-instr-car` signal line wasn't getting reset, so it's latching other data on the bus. This gets fixed in a later video down below.
 
 I suppose now is a good time to talk about general structure.
 
-The computer consists of 2 major busses: an output bus and an input bus. These busses are register-sized, so they actually consist of 4 smaller sub-busses: mark, type, car, and cdr. On the write cycle, components in the computer will write to the output bus. Then a dedicated bit of swizzle circuitry will latch, and maybe cause the values in the sub-busses to switch lanes. Like, maybe the value in the type sub-bus needs to be sent to the car sub-bus. Then, on the read cycle, those values get sent down the input bus, where they can be latched by all of the components. 
+The computer consists of 2 major busses: an output bus and an input bus. These busses are register-sized, so they actually consist of 4 smaller sub-busses: `mark`, `type`, `car`, and `cdr`. On the write cycle, components in the computer will write to the output bus. Then a dedicated bit of swizzle circuitry will latch, and maybe cause the values in the sub-busses to switch lanes. Like, maybe the value in the `type` sub-bus needs to be sent to the `car` sub-bus. Then, on the read cycle, those values get sent down the input bus, where they can be latched by the appropriate components. 
 
 So it looks something like this:
 
 img(bitmap2.png)[Data goes round and round in a loop.]
 
-In the real machine, these busses are going to be long ribbon cables, with IDC ports punched in. The "components" above will be stacked circuit boards in a tower.
+In the real machine, these busses are going to be long ribbon cables with IDC ports punched in. The "components" above will be stacked circuit boards in a tower.
 
 A real board looks like this:
 
@@ -114,7 +122,7 @@ The stacking design was inspired by many homebrew cpus, like link(https://incohe
 
 Currently, the machine looks like this:
 
-imgcmp(arduino_tower.jpeg)[By the end of this, all the back row IO pins are taken, and it's still not enough](board_tower.jpeg)[2 boards in a stack. Currently being held up by the stiffness of the ribbon cables.]
+imgcmp(arduino_tower.jpeg)[By the end of this, all the back row IO pins are taken. It's still not enough](board_tower.jpeg)[2 boards in a stack. Currently being held up by the stiffness of the ribbon cables.]
 
 The top board is the `instr` car register, the bottom one is the `state` car register.
 
@@ -175,13 +183,13 @@ I wrote another program to show off the blinkenlights. This one multiplies `(* 1
     '()))
 ```
 
-I don't have a `letrec` macro implemented in the compiler yet, so I'm just doing that job manually, creating an auxiliary function and passing it itself. `print` is implemented by repeatedly dividing and modulo-ing by 10. I currently don't have any right-shift instructions in the computer, so that's why it's doing the O(n) multiply.
+I don't have a `letrec` macro implemented in the compiler yet, so I'm just doing that job manually, creating an auxiliary function and passing it itself. `print` is implemented by repeatedly dividing and modulo-ing by 10. I currently don't have any right-shift instructions in the computer, which is why it's doing the O(n) multiply.
 
 And here it is, in all its blinky glory:
 
 <video style="max-width:100%" controls><source src="math.mp4" type="video/mp4"></video>
 
-In this video, the computer is not being slowed. It's limited by what the arduino can do, but this is its current max rate.
+In this video the computer is not being slowed. It's limited by what the arduino can do, but this is its current max rate.
 
 You can see in the video that, periodically, the `state` changes to 0b00011001 and `instr` seems to be counting down, or `state` equals `0b00011010` and `instr` is counting up. Those are the two GC stages happening. The multiply generates a *ton* of garbage. Currently, the computer needs to GC 5 times (!!) to run this program, which is why the program takes like 40 seconds to finish. That's prety awful, but I plan on working on it.
 
@@ -195,7 +203,7 @@ I'd like some more IO pins. I'd like to find some sort of IO expander kit, if an
 
 I have to say, I'm really happy that things seem to be picking up. I've got some actual boards, and an actual microcontroller running actual cons cells, being controlled by microcode that actually works!
 
-It's probably just me, but I have a weird "thing" with handling leaded solder. I don't mean that I'm squeamish about it. I mean I lay down newspaper on the table before I solder, and change my clothes afterwards. And in the weeks afterwards, I avoid setting things, like my phone, on the table where I solder, because of the contamination from of bits of solder -> table -> phone -> hand -> mouth. So, okay, maybe I *am* a little squeamish about it.
+It's probably just me, but I have a weird "thing" with handling leaded solder. I don't mean that I'm squeamish about it. I mean I lay down newspaper on the table before I solder, and change my clothes afterwards. And in the weeks afterwards I avoid setting things, like my phone, on the table where I solder, because of the contamination from bits of solder -> table -> phone -> hand -> mouth. So, okay, maybe I *am* a little squeamish about it.
 
 I've read online that ~3.5 ug/dL of lead in my blood is cause for concern, even for adults, so for me that comes out to ~150 ug of lead total in my bloodstream.
 
@@ -205,11 +213,17 @@ img(solder_blob.jpg)[A little bit of solder splatter]
 
 This little spec is, I feel, pretty representative of the sorts of tiny little bits of solder that end up flying off sometimes while soldering.
 
-My calipers measure it to be ~0.32mm, from the picture I measure it to be ~0.39mm. Taking the lower measurement, that comes out to a volume of ~0.137mm^3. If this little dot was 63/37 Sn/Pb, then it would contain ~426.2ug of lead, about 3x the 150ug limit!
+My calipers measure it to be ~0.32mm, from the picture I measure it to be ~0.39mm. Taking the lower measurement, that comes out to a volume of ~0.137mm^3, or ~1.37e-4 cm^3
+
+63/37 solder is 63/37 *by weight*. The density of lead is 11.348 g/cm^3, and tin is 7.289 g/cm^3. This means that 63/37 is 109/100 Pb/Sn *by volume*.
+
+From this, that little 0.137mm^3 ball is ~7.15e-5 cm^3 of lead, which comes out to ~8.12e-4 g of lead.
+
+So this little dot is contains ~812ug of lead, over 5x the 150ug limit!
 
 Now I don't know the body's digestive efficiency of lead. Or distribution of sizes of little solderballs, or the propensity of lead solder joint's to shave off little pieces through friction, or how small a spec of lead dust has to be to get picked up and carried through contact, etc etc. This is all very un-scientific. But that's anxiety, right? It's not rational.
 
-People online say that, hey man, don't worry, it's not a problem, just don't eat while soldering, wash your hands afterwards, I've been using 63/37 my whole life, and look at me, I'm fine, and also the rosin fumes are probably worse, and lead-free solder can be toxic too ya know. I don't know, man.
+People online say that, hey man, don't worry, it's not a problem, just don't eat while soldering, wash your hands afterwards, I've been using 63/37 my whole life, and look at me, I'm fine, and also the rosin fumes are probably worse, and lead-free solder can be toxic too ya know. I don't know.
 
 All this is to say, my roll of leaded solder is getting low, and I'm probably going full lead-free after it runs out.
 
