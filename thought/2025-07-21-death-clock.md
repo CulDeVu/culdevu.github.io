@@ -7,15 +7,19 @@ We have here a death clock.
 
 I've mounted in on the wall above my desk. It's simple looking, mounted on wood and perfboard, simple electronics with lightly artful wiring. The brains, located in the center, is an Attiny 85.
 
-The top LEDs display today's date. The bottom LEDs display a death date.
+The bottom LEDs display today's date. The top LEDs display a death date.
 
 Every day at midnight it rolls a new death date. The clock knows my birthdate. It also has inside it a table of mortality statistics by age, provided by the 2025 Social Security Trustees Report. With these, along with the current date, it can sample my probability distribution of dying on a specific date, given that I've already lived to the current date.
 
-I started working on this about 2 months ago. A couple hours here, a couple hours there.
+I started working on this about 2 months ago. A couple hours here, a couple hours there. This picture was taken a couple weeks ago. And yes, I know the year is wrong.
 
 # Prior work
 
-Prior work on the subject of mortality goes back thousands of years. [maybe include stuff about gilgamesh? research on the first example of a hero trying to avoid a profecised death?]
+Writing on the subject of one's own mortality goes back thousands of years.
+
+One of Gilgamesh's adventures involves link(https://web.archive.org/web/20060206220555/http://alexm.here.ru/mirrors/www.enteract.com/jwalz/Eliade/159.html)[becoming afraid of death and seeking immortality]. 
+
+Another popular genre is of heroes attempting to avert prophesied deaths. Oedipus is a classic, but the story of Achilles in The Illiad is probably just as old. I'm interested to know what the oldest example of this genre. There's link(https://origin.web.fordham.edu/halsall/ancient/1100egyptmagic.asp)[this 20th dynasty story] about prince Naneferkaptah getting cursed for stealing a god's book. I'm not sure this one counts though, because although sister-wife and son die seemingly by accident, this happens because of the actively angry Throth and Ra.
 
 In the modern day these questions are dealt with quantitatively. It's hard to make any big life decision without someone talking about average life expectancy.
 
@@ -47,9 +51,11 @@ I wanted some nice wiring, with a bit of an old-school bent. I like browsing hac
 
 Personally I find soldering to be a chore. I have to pull out all the stuff and set up the fans and put on the gloves and clean up afterwards. Pretty much the moment I put everything away is when I notice a problem that needs correcting. And out it all comes again.
 
-So I've been finding myself wire-wrapping more lately. It's nice: I don't have to pull out the soldering supplies if I find an issue on the board. I can unwrap, correct, and then rewrap, all dry.
+For SMD it's not so bad. Reflow is less messy, quicker, and easier to correct mistakes.
 
-It doesn't work for everything, and the boards still needed a good bit of soldering. But if I can wirewrap half the connections, then any problem on the board has a 50% chance of being able to be fixed without the soldering equiptment.
+For THT I've been finding myself wirewrapping more lately. It's nice: I don't have to pull out the soldering supplies if I find an issue on the board. I can unwrap, correct, and then rewrap, all dry.
+
+It doesn't work for everything, and the boards still needed a good bit of soldering. But if I can wirewrap half the connections, then any problem on the board has a 50% chance of being able to be fixed without the soldering equipment.
 
 Idk, it's just nicer.
 
@@ -63,7 +69,7 @@ Also notice that I'm powering the whole thing via the power pins on the arduino.
 
 It turns out that the magic was actually one single linear regular on the verge of melting. So I stopped that.
 
-img(jumpers.jpg)[The two sections, and a middle controll section, mounted on a backboard.]
+img(jumpers.jpg)[The two sections, and a middle control section, mounted on a backboard.]
 
 The middle section has some buttons for setting the date after a power outage, and some ICSP pins for programming. I just use an arduino as the programmer, and `avrdude` to flash.
 
@@ -94,88 +100,136 @@ The ports on the boards are JST-XH. Why not JST-RE? Shrug, I don't know why we h
 
 I ordered some 22 AWG jumper terminals without realizing they weren't the right size for the JST female ports. But after just plugging the wires in directly, I think they look cool without them.
 
-# Justification
+# Discussion
 
-I have a strange relationship with emotions, like many of my bretheren on the internet. [todo]
+These visualizations and clocks and stuff that people make, they aren't being made just for shits. It's not "just art," there's some intention behind it. People have some anxiety about spending their time "right," and they make tools to help put things into perspective. These clocks are tools.
 
-I have a strange relationship with stuff. [todo]
+I feel that way too. Part of the idea for the clock is that it might be helpful for making decisions.
 
-These visualizations and clocks and stuff that people make, they aren't being made just for shits. It's not "just art," there's some intention behind it. People have some anxiety about spending their time "right," and they make tools to help put things into perpective. These clocks are tools.
-
-I feel it too. Part of the idea for the clock is that it might help me make decisions. The idea is that 
-
-There are things that you can spend your time doing. Some of them you do or don't have to do, some of them you do or don't want to do.
+There are things that you can spend your time doing. Some of them you do or don't *have* to do, some of them you do or don't *want* to do.
 
 Things come in four kinds:
 
-- things you have to do and want to do
-- things you have to do but don't want to do
-- things you don't have to do but want to do
-- things you don't have to do and don't want to do.
+- things you *have* to do and *want* to do
+- things you *have* to do but *don't want* to do
+- things you *don't have* to do but *want* to do
+- things you *don't have* to do and *don't want* to do.
 
 Hopefully you're already doing the first, and not doing the fourth. Which leaves the middle two.
 
-[todo]
+We're going to look at a simple toy model. Every day you choose between option 2, called work, or option 3, called fun. A day of work increases your money by 1. A day of fun decreases your money by 8 but increases your happiness by 1. You get a 4% interest rate on your money, accrued daily. The goal is to maximize happiness.
 
-In this toy model there are two important strategies.
+As it is said, all models are wrong. But some models are specifically chosen, with carefully tuned parameters, to back up my shitty point.
 
-## The smelly teen spirit
+In this toy model there are three important strategies.
 
-The teen spirit will work for the requisite 8 days, and then have fun for 1 day. Rinse and repeat.
+## The analog nomad
 
-The teen spirit will never save up. They'll never reap the benefits of that sweet 4% interest.
+Back in the day, people would travel around Europe by train and bus, from city to city. They would take on odd jobs in each city to pay for experience. Apparently these people didn't even work remote programming jobs at Stripe.
 
-To say that they spend money as fast as they make it isn't untrue, but it's not the goal. The goal is to try to, at any given moment, rack up as much happiness as possible as soon as possible. Tomorrow may never come, life is not guarenteed.
+In our model, the analog nomad will work for the requisite 8 days, and then have fun for 1 day. Rinse and repeat.
 
-This strategy is least optimal strategy in terms of expected happiness, at least among the strategies that are even trying.
+The analog nomad will never save up. They'll never reap the benefits of that sweet 4% interest.
 
-[todo: proof?]
+To say that they spend money as fast as they make it isn't untrue, but it's not the goal. The goal is to try to, at any given moment, rack up as much happiness as possible as soon as possible. Tomorrow may never come, life is not guaranteed.
 
-However, this strategy also minimizes variance.
+According to our model, this strategy has an expected happiness of 2202, and a variance of 672^2.
 
-## The high school guidance councelor
+If the interest rule were taken away, this strategy would be optimal: if $X$ is a random variable representing age at death, then any other strategy $F(x)$ would obey $F(x) \leq \frac{x}{8}$. This of course mean that $E[F(X)] \leq \frac{E[X]}{8} = E[\text{happiness of analog nomad}]$.
 
-The high school guidance councelor will advise you to stay in school, go to college, get a job, put your head down and work hard, save as much money as possible, and retire no earlier than 65.
+With interest, this strategy is the least optimal strategy in terms of expected happiness, at least among the strategies that are even trying. 1 fun day per 8 work days is the minimum.
 
-It's safe, and it's what they themselves are planning on doing. "Just another couple years of these zoomers calling me a wagie, and I'll be able to take that vacation I've been planning!"
+On the other hand, this strategy minimizes variance.
 
-In the model, these people take no fun days until the "retirement" cutoff, and then only take fun days (until the money runs out).
+## The public school guidance counselor
 
-They reap the full, maximum benefit from the 4% interest. Empirically, the optimal retirement age is [todo]. This cutoff results in an expected happiness of [todo].
+The public school guidance counselor will advise all children you to stay in school, go to college, get a job in a stable job sector, put your head down and work hard, save as much money as possible, and retire no earlier than 60.
 
-This strategy is optimal, in that no other strategy results in a higher happiness. (That's not actually true, the actual optimal smooths the hard cutoff out by a couple years. The higher the interest rate the sharper the optimal cutoff is. By 4%, it's practically indistinguishable from the high school guidence councelor strategy).
+It's safe, and it's what they themselves are planning on doing. "Just another couple years of these gen a's saying I sound like a wagie, and I'll be able to take that vacation I've been planning!"
 
-This strategy also unfortunately has one of the least optimal variances among all strategies. It deliberately pushes happiness as far into the future as possible. Roughly 25% of men die before age 65, so they would all get a score of 0. It lets the unfortunate who die young take a score of 0 happiness to boost the expected happiness of the whole.
+In this model, people take no fun days until the "retirement" cutoff, and then only take fun days (until the money runs out).
 
-## The wojak
+They reap the full, maximum benefit from the 4% interest. Empirically, the optimal retirement age is 62.8 years according to this model. This cutoff results in an expected happiness of 4534 and variance 3120^2.
 
-The wojak is the everyman. The normal person. They hold down a steady job like a normal person, and maybe take a vacation of every year or two. Yeah it's not optimal, but so what? Wojak deserves it.
+This strategy is optimal, in that no other strategy results in a higher happiness. (That's not actually true, the actual optimal smooths the hard cutoff out by a couple years. The higher the interest rate the sharper the optimal cutoff is. By 4%, it's practically indistinguishable from the public school guidance counselor strategy).
 
-It's hard to come up with a definite score for this strategy. [todo]
+This strategy also unfortunately has one of the least optimal variances among all strategies. It deliberately pushes happiness as far into the future as possible. Over 20% of men die before age 62, so they would all get a score of 0. The graph is bimodal, driving up the variance.
 
-None of these feel compelling. The extremes are too extreme, and the middle ground is too lame.
+## The desk jockey
+
+The desk jockey is the everyman. The normal person. They hold down a steady job like a normal person, and maybe take a vacation of every year or two. Yeah it's not optimal, but so what? The desk jockey deserves it.
+
+So the strategy is: take N number of days of fun each year until "retirement", which is going to be different for every value of N.
+
+img(everyman_plot.svg)[plot]
+
+Here's a graph different values of N. The bottom left corner is equivalent to the analog nomad and the top right is equivalent to the guidance counselor.
+
+The graph is amazingly linear! Each day additional day off the desk jockey takes per year subtracts 50-60 expected happiness, subtracts 60-80 stddev, and adds 0.01-0.1 years to your retirement age (not shown).
+
+None of these feel strategies feel compelling. The extremes are too extreme. The middle ground offers a tradeoff between the extremes, but doesn't feel like it improves the situation.
 
 ## The death clock
 
-I can't match the smelly teen spirit for variance, and I can't match the guidance councelor for expected value. But maybe I can take a small hit to expected value while keeping variance low.
+I can't match the analog nomad for consistency, and I can't match the guidance counselor for expected results. I'm okay with taking a hit to my expected score for a bit of consistancy, but I don't want to trade them 1-to-1. I want a completely different strategy.
 
 My intuition says that you should do work days at the same rate that you live to see the results.
 
-So every day you would pick a random death date proportional to [todo]. Assuming that sample death day, calculate whether you could spend it all on fun before you die. If yes, work today. If no, take a fun day. Repeat tomorrow.
+So every day you would pick a random death date proportional to your probability distribution of death dates, given that you've already lived this long ($P(X=x | X \geq \text{today's date})$). Assuming that sample death day, calculate whether you could spend it all on fun before you die. If yes, work today. If no, take a fun day. Repeat tomorrow.
+
+The formula used for "if you can spend it all before you die" is what you'd expect. If $\Delta d$ is the current sampled hypothetical death date - today's date, it is:
+
+$$
+\text{money} \cdot \text{interest}^{\Delta d} - 8 \frac{\text{interest}^{\Delta d + 1} - 1}{\text{interest} - 1} \ge 0
+$$
 
 This will weight fun days more towards your elder years, but some will still happen when you're young. You still reap a lot of the benefit of the interest rate, but those who die young don't go out with a happiness of 0.
 
-The expected happiness for this strategy is [todo], and the variance is [todo].
+The expected happiness for this strategy is 3850, and the variance is 2648^2.
+
+Let's see where this falls on the plot. Remember, we want to be to the right and below the purple line.
+
+img(death_clock_plot.svg)[]
+
+... well damn. So much for that intuition.
+
+Luckily we can fix this. If we plan on bottoming out our cash stack a bit before the end date, we can jump to the other side of the line.
+
+$$
+1.3 \cdot \text{money} \cdot \text{interest}^{\Delta d} - 8 \frac{\text{interest}^{\Delta d + 1} - 1}{\text{interest} - 1} \ge 0
+$$
+
+img(overspend_plot.svg)[]
+
+Of course all of this is silly. Life doesn't work anything like the model described here. The point is that a real life death clock is a potentially useful tool. Asking the death clock to roll a new hypothetical death date, and then taking that date seriously, is NOT an obviously stupid thing to do.
+
+Also, "money" and "work" here is a stand-in for all sorts of things that give returns over time, but that don't make you happy.
+
+This may be extrapolating too much, but I see this strategy as being helpful even beyond that. Say you hate your job but the pay is decent. When do you quit? Well, you ask your death clock every day.
+
+For me, most days it will tell give me a date 40 years from now, and I'll say "if that's my real death date, I can stomach my job for one more day."
+
+Every once in a while it'll give me a date within the next few years, to which I'll say "yikes, I better solidify those plans to go visit with those friends I haven't seen in a while, but ultimately one more day at this job won't kill me."
+
+Any date much sooner and I'd probably give notice that I'm leaving, or at least take the opportunity to start looking around.
+
+But there will be a couple times in my life that it will give me a date within the week, and that's when I text my boss and tell him I'm not showing back up.
 
 # Conclusion
 
 I see 20-somethings online opine about death all the time. It's always so melodramatic. Hopefully this wasn't that. Hopefully this was cool and fun.
 
+I have a strange relationship with emotions, like many of my brethren on the internet.
+
+I also have a strange relationship with stuff. I don't like having tons of possessions. I pack light and I like to live light. My bed frame is an upgrade from the mattress that laid on the floor for so many years, but god damn is it a pain to move.
+
+This clock is different though. It's something I think I want to keep for a long time.
+
 There are many future directions from here.
 
 Power outages are annoying. Setting the right date involves pressing those two buttons in the middle a bunch. Setting the default date involves reprogramming the Attiny. It'd be nice if I integrated a backup battery.
 
-In the event of my death, it'd be cool if the death date on the bottom froze. It would turn into a decoration saying "this art piece was made by me, in memoriam me, passed away on <date>". How I'd accomplish that I don't know. I'm not totally sold on this idea. I also like the idea that it would keep ticking, predicting my life span were I still alive.
+In the event of my death, it'd be cool if the death date on the bottom froze. It would turn into a decoration saying "this art piece was made by me, in memoriam me, passed away on xxx". How I'd accomplish that I don't know. I'm not totally sold on this idea. I also like the idea that it would keep ticking, predicting my life span were I still alive.
 
 It didn't include a real time clock. I could have, just didn't want to deal with the hassle. From my tests, the Attiny keeps time relatively well. And if it drifts a bit, it's not that big of a deal. Despite calling it a clock, it's more of a calendar.
 
