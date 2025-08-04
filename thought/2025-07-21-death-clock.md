@@ -11,7 +11,7 @@ The bottom LEDs display today's date. The top LEDs display a death date.
 
 Every day at midnight it rolls a new death date. The clock knows my birthdate. It also has inside it a table of mortality statistics by age, provided by the 2025 Social Security Trustees Report. With these, along with the current date, it can sample my probability distribution of dying on a specific date, given that I've already lived to the current date.
 
-I started working on this about 2 months ago. A couple hours here, a couple hours there. This picture was taken a couple weeks ago. And yes, I know the year is wrong.
+I started working on this about 2 months ago. A couple hours here, a couple hours there. This picture was taken a couple weeks ago. And yes, I know the year in the photo is wrong.
 
 # Prior work
 
@@ -19,21 +19,21 @@ Writing on the subject of one's own mortality goes back thousands of years.
 
 One of Gilgamesh's adventures involves link(https://web.archive.org/web/20060206220555/http://alexm.here.ru/mirrors/www.enteract.com/jwalz/Eliade/159.html)[becoming afraid of death and seeking immortality]. 
 
-Another popular genre is of heroes attempting to avert prophesied deaths. Oedipus is a classic, but the story of Achilles in The Illiad is probably just as old. I'm interested to know what the oldest example of this genre. There's link(https://origin.web.fordham.edu/halsall/ancient/1100egyptmagic.asp)[this 20th dynasty story] about prince Naneferkaptah getting cursed for stealing a god's book. I'm not sure this one counts though, because although sister-wife and son die seemingly by accident, this happens because of the actively angry Throth and Ra.
+A popular sub-genre is of heroes attempting to avert prophesied deaths. Oedipus is a classic, but the story of Achilles in The Illiad is probably just as old. I'm interested to know what the oldest example of this genre is. There's link(https://origin.web.fordham.edu/halsall/ancient/1100egyptmagic.asp)[this 20th dynasty story] about prince Naneferkaptah getting cursed for stealing a god's book. I'm not sure this one counts though, because although his sister-wife and son die seemingly by fate, this happens because of the actively angry Throth and Ra.
 
-In the modern day these questions are dealt with quantitatively. It's hard to make any big life decision without someone talking about average life expectancy.
+Since the scientific revolution, these questions have been dealt with dealt with quantitatively.
 
-I suspect that visualizations of life expectancy is likewise very old, though I don't know of any examples. There's link(https://en.wikipedia.org/wiki/File:Nightingale-mortality.jpg)[this famous diagram] of army fatalities by month between 1854 and 1856 (published in 1858), which doesn't quite fit but is interesting nonetheless.
+I suspect that visualizations of life expectancy are likewise very old, though I don't know of any examples. There's link(https://en.wikipedia.org/wiki/File:Nightingale-mortality.jpg)[this famous diagram] of army fatalities by month between 1854 and 1856 (published in 1858), which doesn't quite fit but is interesting nonetheless.
 
-Visualizations of life and death are pretty common on the internet, especially on social media. I remember sharing this link(https://lifeboxes.neocities.org)["your life where one box equals one month"] link on facebook back in 2012. There are tons of these sorts of visualizations, where your life gets "shaded in" as it happens.
+Visualizations of life and death are pretty common on the internet, especially on social media. I remember sharing this link(https://lifeboxes.neocities.org)["your life where one box equals one month"] link on facebook back in 2012. There are tons of these sorts of things, where your life gets "shaded in" as it happens.
 
-In the realm of electronic clocks, there are products out there that predict or help visualize your death. By coincidence link(https://inqfactory.com/pages/death-clock)[this clock] was released as part of a viral video just a couple days ago.
+In the realm of electronic clocks, there are products out there that help visualize your lifespan. By coincidence link(https://inqfactory.com/pages/death-clock)[this clock] was released as part of a viral video just a couple weeks ago.
 
 Even in the realm of bespoke hobby electronics art pieces there are examples. link(https://learn.adafruit.com/mindfulness-clock-of-doom/)[Here's one by Adafruit], and link(https://github.com/adamtait/ArduinoDeathClock)[here's one of the many, many examples on github].
 
-In these last 3 examples, your supposed death date is fixed. They give you a sense of averages, but not of the whole probability distribution. In reality the mortality standard variation is huge: 18 years for males according to the data I'm using.
+In these last 3 examples, your supposed death date is fixed. They give you a sense of averages, but not of the whole probability distribution. In reality the mortality standard devation is huge: 18 years for males according to the data I'm using.
 
-This last one doesn't really fit, but I can't leave it out. I listened to link(https://sphinx.acast.com/themagnusarchives/mag70-bookofthedead/media.mp3)[this episode] of the horror podcast The Magnus Archives years ago. There's probably some amount of inspiration taken from this story.
+This last one doesn't really fit, but I can't leave it out. I listened to link(https://sphinx.acast.com/themagnusarchives/mag70-bookofthedead/media.mp3)[this episode] of the horror podcast The Magnus Archives years ago. I just liked it, and it fits with this project thematically.
 
 # The build
 
@@ -65,7 +65,7 @@ The two display boards are daisy chained together, which ended up causing signal
 
 In this picture the two boards are in the same orientation. I ended up flipping the orientation of the bottom board later.
 
-Also notice that I'm powering the whole thing via the power pins on the arduino. After a while I started wondering how that worked. I've been slowly working through a link(https://www.youtube.com/playlist?list=PLUl4u3cNGP62UTc77mJoubhDELSC8lfR0)[lecture series on power electronics], and I wanted to see some of that magic in action.
+Also notice that I was powering the whole thing via the power pins on the arduino. After a while I started wondering how that worked. I've been slowly working through a link(https://www.youtube.com/playlist?list=PLUl4u3cNGP62UTc77mJoubhDELSC8lfR0)[lecture series on power electronics], and I wanted to see some of that magic in action.
 
 It turns out that the magic was actually one single linear regular on the verge of melting. So I stopped that.
 
@@ -135,7 +135,7 @@ To say that they spend money as fast as they make it isn't untrue, but it's not 
 
 According to our model, this strategy has an expected happiness of 2202, and a variance of 672^2.
 
-If the interest rule were taken away, this strategy would be optimal: if $X$ is a random variable representing age at death, then any other strategy $F(x)$ would obey $F(x) \leq \frac{x}{8}$. This of course mean that $E[F(X)] \leq \frac{E[X]}{8} = E[\text{happiness of analog nomad}]$.
+If the interest rule were taken away, this strategy would be optimal: if $X$ is a random variable representing age at death, then any other strategy $H(x)$ would obey $H(x) \leq \frac{x}{9}$. This of course mean that $E[F(X)] \leq \frac{E[X]}{8} = E[\text{happiness of analog nomad}]$.
 
 With interest, this strategy is the least optimal strategy in terms of expected happiness, at least among the strategies that are even trying. 1 fun day per 8 work days is the minimum.
 
@@ -143,7 +143,7 @@ On the other hand, this strategy minimizes variance.
 
 ## The public school guidance counselor
 
-The public school guidance counselor will advise all children you to stay in school, go to college, get a job in a stable job sector, put your head down and work hard, save as much money as possible, and retire no earlier than 60.
+The public school guidance counselor will advise all children to stay in school, go to college, get a job in a stable job sector, put your head down and work hard, save as much money as possible, and retire no earlier than 60.
 
 It's safe, and it's what they themselves are planning on doing. "Just another couple years of these gen a's saying I sound like a wagie, and I'll be able to take that vacation I've been planning!"
 
@@ -151,7 +151,7 @@ In this model, people take no fun days until the "retirement" cutoff, and then o
 
 They reap the full, maximum benefit from the 4% interest. Empirically, the optimal retirement age is 62.8 years according to this model. This cutoff results in an expected happiness of 4534 and variance 3120^2.
 
-This strategy is optimal, in that no other strategy results in a higher happiness. (That's not actually true, the actual optimal smooths the hard cutoff out by a couple years. The higher the interest rate the sharper the optimal cutoff is. By 4%, it's practically indistinguishable from the public school guidance counselor strategy).
+This strategy is optimal in expectation. (That's not actually true, the actual optimal smooths the hard cutoff out by a couple years. The higher the interest rate the sharper the optimal cutoff is. By 4%, it's practically indistinguishable from the public school guidance counselor strategy).
 
 This strategy also unfortunately has one of the least optimal variances among all strategies. It deliberately pushes happiness as far into the future as possible. Over 20% of men die before age 62, so they would all get a score of 0. The graph is bimodal, driving up the variance.
 
@@ -165,7 +165,7 @@ img(everyman_plot.svg)[plot]
 
 Here's a graph different values of N. The bottom left corner is equivalent to the analog nomad and the top right is equivalent to the guidance counselor.
 
-The graph is amazingly linear! Each day additional day off the desk jockey takes per year subtracts 50-60 expected happiness, subtracts 60-80 stddev, and adds 0.01-0.1 years to your retirement age (not shown).
+The graph is amazingly linear! Each additional day off the desk jockey takes per year subtracts 50-60 expected happiness, subtracts 60-80 stddev, and adds 0.01-0.1 years to your retirement age (not shown).
 
 None of these feel strategies feel compelling. The extremes are too extreme. The middle ground offers a tradeoff between the extremes, but doesn't feel like it improves the situation.
 
@@ -173,9 +173,9 @@ None of these feel strategies feel compelling. The extremes are too extreme. The
 
 I can't match the analog nomad for consistency, and I can't match the guidance counselor for expected results. I'm okay with taking a hit to my expected score for a bit of consistancy, but I don't want to trade them 1-to-1. I want a completely different strategy.
 
-My intuition says that you should do work days at the same rate that you live to see the results.
+My intuition says that you should work at the same rate that you live to see the results.
 
-So every day you would pick a random death date proportional to your probability distribution of death dates, given that you've already lived this long ($P(X=x | X \geq \text{today's date})$). Assuming that sample death day, calculate whether you could spend it all on fun before you die. If yes, work today. If no, take a fun day. Repeat tomorrow.
+So every day you would pick a random death date proportional to your probability distribution of death dates, given that you've already lived this long ($P(X=x | X \geq \text{today's date})$). Assuming that sample death day, calculate whether you could spend all your moneyon fun before you die. If yes, work today. If no, take a fun day. Repeat tomorrow.
 
 The formula used for "if you can spend it all before you die" is what you'd expect. If $\Delta d$ is the current sampled hypothetical death date - today's date, it is:
 
@@ -207,9 +207,9 @@ Also, "money" and "work" here is a stand-in for all sorts of things that give re
 
 This may be extrapolating too much, but I see this strategy as being helpful even beyond that. Say you hate your job but the pay is decent. When do you quit? Well, you ask your death clock every day.
 
-For me, most days it will tell give me a date 40 years from now, and I'll say "if that's my real death date, I can stomach my job for one more day."
+For me, most days it will give me a date 40 years from now, and I'll say "if that's my real death date, I can stomach my job for one more day."
 
-Every once in a while it'll give me a date within the next few years, to which I'll say "yikes, I better solidify those plans to go visit with those friends I haven't seen in a while, but ultimately one more day at this job won't kill me."
+Every once in a while it will give me a date within the next few years, to which I'll say "yikes, I better make plans to go visit with those friends I haven't seen in a while, but ultimately one more day at this job won't kill me."
 
 Any date much sooner and I'd probably give notice that I'm leaving, or at least take the opportunity to start looking around.
 
