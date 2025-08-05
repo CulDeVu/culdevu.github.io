@@ -1,11 +1,11 @@
 == Death clock
-=== wip
+=== An electronics art project.
 
 img(final.jpg)[]
 
 We have here a death clock.
 
-I've mounted in on the wall above my desk. It's simple looking, mounted on wood and perfboard, simple electronics with lightly artful wiring. The brains, located in the center, is an Attiny 85.
+I've mounted in on the wall above my desk. It's simple looking, mounted on wood and perfboard, simple electronics with nice wiring. The brains, located in the center, is an Attiny 85.
 
 The bottom LEDs display today's date. The top LEDs display a death date.
 
@@ -215,7 +215,7 @@ Any date much sooner and I'd probably give notice that I'm leaving, or at least 
 
 But there will be a couple times in my life that it will give me a date within the week, and that's when I text my boss and tell him I'm not showing back up.
 
-# Conclusion
+# End
 
 I see 20-somethings online opine about death all the time. It's always so melodramatic. Hopefully this wasn't that. Hopefully this was cool and fun.
 
