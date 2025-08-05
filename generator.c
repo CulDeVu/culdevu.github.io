@@ -479,7 +479,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
-    process_thought("2025-07-21-death-clock");
+    process_thought("2025-08-05-death-clock");
     process_thought("2025-03-30-lisp-machine-4");
     process_thought("2025-03-08-moon-clock");
     process_thought("2025-01-11-lisp-machine-3");
