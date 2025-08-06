@@ -5,7 +5,7 @@ img(final.jpg)[]
 
 We have here a death clock.
 
-I've mounted in on the wall above my desk. It's simple looking, mounted on wood and perfboard, simple electronics with nice wiring. The brains, located in the center, is an Attiny 85.
+I've mounted it on the wall above my desk. It's simple looking, mounted on wood and perfboard, simple electronics with nice wiring. The brains, located in the center, is an Attiny 85.
 
 The bottom LEDs display today's date. The top LEDs display a death date.
 
