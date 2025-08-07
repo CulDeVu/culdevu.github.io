@@ -1,0 +1,224 @@
+<html>
+<body>
+
+<p>Volume <input id="input_volume"/> <span id="output_volume" /></p>
+<p>Suspension mass <input id="input_mass"/> <span id="output_mass" /></p>
+<p>Concentration <input id="input_concentration"/> <span id="output_concentration" /></p>
+
+<p>Fluid rate <input id="input_fluid_rate"/> <span id="output_fluid_rate" /></p>
+<p>Mass rate <input id="input_mass_rate"/> <span id="output_mass_rate" /></p>
+
+<p>Time till empty <input id="input_empty"/> <span id="output_empty" /></p>
+
+<script>
+parse = function(str) {
+  str = str.trim();
+  if (str.endsWith(",")) return parse(str.slice(0, -1));
+  if (str.startsWith(",")) return parse(str.slice(1));
+  
+  if (str == "") {
+    return [];
+  } else if (str.startsWith("[")) {
+    let end_index = str.indexOf("]");
+    let comma_index = str.indexOf(",");
+    
+    if (end_index == -1 || comma_index == -1 || end_index <= comma_index) {
+      // TODO: error message?
+      return [[0, Infinity]];
+    }
+    // assert(comma_index < end_index)
+    let m = Number(str.slice(1, comma_index).trim());
+    let M = Number(str.slice(comma_index+1, end_index).trim());
+    
+    let vs = parse(str.slice(end_index + 1));
+    
+    return [[m, M], ...vs];
+  } else {
+    comma_index = str.indexOf(",");
+    if (comma_index == -1) {
+      let v = Number(str);
+      return [v];
+    } else {
+      let first = str.slice(0, comma_index);
+      let v = Number(first);
+      let vs = parse(str.slice(comma_index));
+      
+      return [v, ...vs];
+    }
+  }
+};
+
+serialize_one = function(v) {
+  if (Array.isArray(v)) {
+    return "[" + v[0].toFixed(2) + ", " + v[1].toFixed(2) + "]";
+  } else {
+    return v.toFixed(2);
+  }
+}
+serialize = function(v) {
+  return v.map((x) => serialize_one(x)).join(", ");
+};
+
+compact = function(xs) {
+  for (let i = 0; i < xs.length; ++i) {
+    for (let j = i+1; j < xs.length; ++j) {
+      let a = xs[i];
+      let b = xs[j];
+      if (Array.isArray(a) && Array.isArray(b)) {
+        if (a[0] <= b[1] && b[0] <= a[1]) {
+          return compact([[Math.min(a[0],b[0]), Math.max(a[1],b[1])], ...xs.slice(0, i), ...xs.slice(i+1, j), ...xs.slice(j+1)]);
+        }
+      } else if (Array.isArray(a)) {
+        if (a[0] <= b && b <= a[1]) {
+          return compact([...xs.slice(0, j), ...xs.slice(j+1)]);
+        }
+      } else if (Array.isArray(b)) {
+        if (b[0] <= a && a <= b[1]) {
+          return compact([...xs.slice(0, i), ...xs.slice(i+1)]);
+        }
+      } else {
+        if (a == b) {
+          return compact([...xs.slice(0, i), ...xs.slice(i+1)]);
+        }
+      }
+    }
+  }
+  return xs;
+};
+
+merge = function(as, bs) {
+  let out = [];
+  for (let i = 0; i < as.length; ++i) {
+    for (let j = 0; j < bs.length; ++j) {
+      let a = as[i];
+      let b = bs[j];
+      if (Array.isArray(a) && Array.isArray(b)) {
+        if (a[0] <= b[1] && b[0] <= a[1]) out.push([Math.max(a[0],b[0]), Math.min(a[1],b[1])]);
+      } else if (Array.isArray(a)) {
+        if (a[0] <= b && b <= a[1]) out.push(b);
+      } else if (Array.isArray(b)) {
+        if (b[0] <= a && a <= b[1]) out.push(a);
+      } else {
+        if (a == b) out.push(a);
+      }
+    }
+  }
+  // console.log(out);
+  return compact(out);
+  //return {m: Math.max(a.m, b.m), M: Math.min(a.M, b.M)};
+};
+
+p = function(as, bs) {
+  let out = [];
+  for (let i = 0; i < as.length; ++i) {
+    for (let j = 0; j < bs.length; ++j) {
+      // console.log(as[i], bs[i], Array.isArray(as[i]), Array.isArray(bs[i]))
+      let a = as[i];
+      let b = bs[j];
+      if (Array.isArray(a) && Array.isArray(b)) {
+        out.push([a[0] * b[0], a[1] * b[1]]);
+      } else if (Array.isArray(a)) {
+        out.push([a[0] * b, a[1] * b]);
+      } else if (Array.isArray(b)) {
+        out.push([a * b[0], a * b[1]]);
+      } else {
+        out.push(a * b);
+      }
+    }
+  }
+  return compact(out);
+}
+safe_d = function(a, b) {
+  if (b == 0) {
+    return Infinity;
+  } else if (b == Infinity) {
+    return 0;
+  } else {
+    return a / b;
+  }
+};
+d = function(as, bs) {
+  let out = [];
+  for (let i = 0; i < as.length; ++i) {
+    for (let j = 0; j < bs.length; ++j) {
+      // console.log(as[i], bs[i], Array.isArray(as[i]), Array.isArray(bs[i]))
+      let a = as[i];
+      let b = bs[j];
+      if (Array.isArray(a) && Array.isArray(b)) {
+        out.push([safe_d(a[0], b[1]), safe_d(a[1], b[0])]);
+      } else if (Array.isArray(a)) {
+        out.push([safe_d(a[0], b), safe_d(a[1], b)]);
+      } else if (Array.isArray(b)) {
+        out.push([safe_d(a, b[1]), safe_d(a, b[0])]);
+      } else {
+        out.push(a / b);
+      }
+    }
+  }
+  return compact(out);
+  // return {m: a.m / b.M, M: a.M / b.m};
+}
+
+// console.log(p(parse("5, [10, 20]"), parse("1, 2, 3")));
+// console.log(d(parse("5, [10, 20]"), parse("1, 2, 3")));
+
+update = function() {
+  volume = parse(document.getElementById("input_volume").value || "[0, Infinity]");
+  mass = parse(document.getElementById("input_mass").value || "[0, Infinity]");
+  concentration = parse(document.getElementById("input_concentration").value || "[0, Infinity]");
+  fluid_rate = parse(document.getElementById("input_fluid_rate").value || "[0, Infinity]");
+  mass_rate = parse(document.getElementById("input_mass_rate").value || "[0, Infinity]");
+  empty = parse(document.getElementById("input_empty").value || "[0, Infinity]");
+  
+  for (let i = 0; i < 1; ++i) {
+    // m & v
+    concentration = merge(concentration, d(mass, volume));
+    // m & t
+    mass_rate = merge(mass_rate, d(mass, empty));
+    // v & t
+    fluid_rate = merge(fluid_rate, d(volume, empty));
+    
+    // m/v & v
+    mass = merge(mass, p(concentration, volume));
+    // m/v & m
+    volume = merge(volume, d(mass, concentration));
+    
+    // m/t & t
+    mass = merge(mass, p(mass_rate, empty));
+    // m/t & m
+    // empty = merge(empty, d(mass, mass_rate));
+    
+    // v/t & t
+    volume = merge(volume, p(fluid_rate, empty));
+    // v/t & v
+    empty = merge(empty, d(volume, fluid_rate));
+    
+    // m/v & m/t
+    fluid_rate = merge(fluid_rate, d(mass_rate, concentration));
+    // m/v & v/t
+    mass_rate = merge(mass_rate, p(concentration, fluid_rate));
+    // m/t & v/t
+    concentration = merge(concentration, d(mass_rate, fluid_rate));
+    console.log(empty);
+  }
+  
+  console.log(volume);
+  document.getElementById("output_volume").innerHTML = serialize(volume);
+  document.getElementById("output_mass").innerHTML = serialize(mass);
+  document.getElementById("output_concentration").innerHTML = serialize(concentration);
+  document.getElementById("output_fluid_rate").innerHTML = serialize(fluid_rate);
+  document.getElementById("output_mass_rate").innerHTML = serialize(mass_rate);
+  document.getElementById("output_empty").innerHTML = serialize(empty);
+};
+
+var all_inputs = document.getElementsByTagName("input");
+for (var i = 0; i < all_inputs.length; ++i) {
+  all_inputs[i].oninput = function() {
+    console.log("a");
+    update();
+  }
+}
+</script>
+
+</body>
+</html>
