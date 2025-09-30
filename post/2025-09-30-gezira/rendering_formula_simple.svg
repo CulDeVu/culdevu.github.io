@@ -1,0 +1,21 @@
+<svg width="560" height="560" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(160 160) scale(240 240)">
+    <path d="M 0.3 0.8 L 0.6 0.3 L 1 0.3 L 1 0.8 Z" stroke="black" stroke-width="0.01" fill="cyan" />
+    
+    <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.015" />
+    <path d="M 0.3 0.8 L 0.6 0.3" stroke="red" stroke-width="0.025" />
+    
+    <g transform="translate(0.3 0.8)">
+      <circle r="0.04" fill="red" />
+      <text x="-0.05" font-size="0.2" text-anchor="end">A</text>
+    </g>
+    
+    <g transform="translate(0.6 0.3)">
+      <circle r="0.04" fill="red" />
+      <text y="-0.05" font-size="0.2">B</text>
+    </g>
+    
+    <text x="0.45" y="0.7" font-size="0.0675">trapezoid(A, B)</text>
+  </g>
+</svg>
+

@@ -1,0 +1,53 @@
+<svg width="600" height="170" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="grid">
+      <path d="M -1.1 -1 L 2.1 -1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -1.1 0 L 2.1 0" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -1.1 1 L 2.1 1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -1.1 2 L 2.1 2" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -1 -1.1 L -1 2.1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -0 -1.1 L 0 2.1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M 1 -1.1 L 1 2.1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M 2 -1.1 L 2 2.1" stroke="blue" fill="none" stroke-width="0.02" />
+    </g>
+  </defs>
+  
+  <g transform="translate(50 50) scale(40 40)">
+    <use href="#grid" />
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="green" fill="none" stroke-width="0.1" />
+      <path d="M 0.3 0.3 L 0.8 0.8" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="2.9" font-size="1" fill="green">✓</text>
+  </g>
+  
+  <g transform="translate(200 50) scale(40 40)">
+    <use href="#grid" />
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M -1 0 L 0 0 L 0 1 L -1 1 Z" stroke="green" fill="none" stroke-width="0.1" />
+      <path d="M -0.3 0.3 L 0.8 0.8" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="2.9" font-size="1" fill="red">✗</text>
+  </g>
+  
+  <g transform="translate(350 50) scale(40 40)">
+    <use href="#grid" />
+    
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M -1 0 L 1 0 L 1 1 L -1 1 Z" stroke="green" fill="none" stroke-width="0.1" />
+      <path d="M 0 0.3 L 0.8 0.8" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="2.9" font-size="1" fill="green">✓</text>
+  </g>
+  
+  <g transform="translate(500 50) scale(40 40)">
+    <use href="#grid" />
+    
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M -1 -1 L 1 -1 L 1 1 L -1 1 Z" stroke="green" fill="none" stroke-width="0.1" />
+      <path d="M 0 0 L 0.8 0.8" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="2.9" font-size="1" fill="green">✓</text>
+  </g>
+</svg>
+

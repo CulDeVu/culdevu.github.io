@@ -1,0 +1,93 @@
+<svg width="700" height="170" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(20 20) scale(60 60)">
+    <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.05" />
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M 0.3 0.3 L 0.8 0.8" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="1.25" font-size="0.2">⌊A.x⌋ = ⌊C.x⌋</text>
+    <text y="1.50" font-size="0.2">⌈A.x⌉ = ⌈C.x⌉</text>
+    <text y="1.75" font-size="0.2">⌊A.y⌋ = ⌊C.y⌋</text>
+    <text y="2.00" font-size="0.2">⌈A.y⌉ = ⌈C.y⌉</text>
+    <text x="0.4" y="2.5" font-size="0.4" fill="green">✓</text>
+    <text x="0.4" y="-0.1" font-size="0.2">1</text>
+  </g>
+  
+  <g transform="translate(120 20) scale(60 60)">
+    <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.05" />
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M -0.2 0.4 L 0.8 0.8" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="1.25" font-size="0.2">⌊A.x⌋ ≠ ⌊C.x⌋</text>
+    <text y="1.50" font-size="0.2">⌈A.x⌉ ≠ ⌈C.x⌉</text>
+    <text y="1.75" font-size="0.2">⌊A.y⌋ = ⌊C.y⌋</text>
+    <text y="2.00" font-size="0.2">⌈A.y⌉ = ⌈C.y⌉</text>
+    <text x="0.4" y="2.5" font-size="0.4" fill="red">✗</text>
+    <text x="0.4" y="-0.1" font-size="0.2">2</text>
+  </g>
+  
+  <g transform="translate(220 20) scale(60 60)">
+    <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.05" />
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M -0.2 0.4 L 0.8 1.2" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="1.25" font-size="0.2">⌊A.x⌋ ≠ ⌊C.x⌋</text>
+    <text y="1.50" font-size="0.2">⌈A.x⌉ ≠ ⌈C.x⌉</text>
+    <text y="1.75" font-size="0.2">⌊A.y⌋ ≠ ⌊C.y⌋</text>
+    <text y="2.00" font-size="0.2">⌈A.y⌉ ≠ ⌈C.y⌉</text>
+    <text x="0.4" y="2.5" font-size="0.4" fill="red">✗</text>
+    <text x="0.4" y="-0.1" font-size="0.2">3</text>
+  </g>
+  
+  <g transform="translate(320 20) scale(60 60)">
+    <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.05" />
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M 0.2 -0.2 L 0.8 1.2" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="1.25" font-size="0.2">⌊A.x⌋ = ⌊C.x⌋</text>
+    <text y="1.50" font-size="0.2">⌈A.x⌉ = ⌈C.x⌉</text>
+    <text y="1.75" font-size="0.2">⌊A.y⌋ ≠ ⌊C.y⌋</text>
+    <text y="2.00" font-size="0.2">⌈A.y⌉ ≠ ⌈C.y⌉</text>
+    <text x="0.4" y="2.5" font-size="0.4" fill="red">✗</text>
+    <text x="0.4" y="-0.1" font-size="0.2">4</text>
+  </g>
+  
+  <g transform="translate(420 20) scale(60 60)">
+    <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.05" />
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M 0 0.8 L 0.6 0.3" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="1.25" font-size="0.2">⌊A.x⌋ = ⌊C.x⌋</text>
+    <text y="1.50" font-size="0.2">⌈A.x⌉ ≠ ⌈C.x⌉</text>
+    <text y="1.75" font-size="0.2">⌊A.y⌋ = ⌊C.y⌋</text>
+    <text y="2.00" font-size="0.2">⌈A.y⌉ = ⌈C.y⌉</text>
+    <text x="0.4" y="2.5" font-size="0.4" fill="green">✓</text>
+    <text x="0.4" y="-0.1" font-size="0.2">5</text>
+  </g>
+  
+  <g transform="translate(520 20) scale(60 60)">
+    <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.05" />
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M 1 0.2 L 1.2 0.8" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="1.25" font-size="0.2">⌊A.x⌋ = ⌊C.x⌋</text>
+    <text y="1.50" font-size="0.2">⌈A.x⌉ ≠ ⌈C.x⌉</text>
+    <text y="1.75" font-size="0.2">⌊A.y⌋ = ⌊C.y⌋</text>
+    <text y="2.00" font-size="0.2">⌈A.y⌉ = ⌈C.y⌉</text>
+    <text x="0.4" y="2.5" font-size="0.4" fill="green">✓</text>
+    <text x="0.4" y="-0.1" font-size="0.2">6</text>
+  </g>
+  
+  <g transform="translate(620 20) scale(60 60)">
+    <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.05" />
+    <g transform="translate(0 1) scale(1 -1)">
+      <path d="M 0 0.8 L 1 0.3" stroke="red" stroke-width="0.08" />
+    </g>
+    <text y="1.25" font-size="0.2">⌊A.x⌋ ≠ ⌊C.x⌋</text>
+    <text y="1.50" font-size="0.2">⌈A.x⌉ ≠ ⌈C.x⌉</text>
+    <text y="1.75" font-size="0.2">⌊A.y⌋ = ⌊C.y⌋</text>
+    <text y="2.00" font-size="0.2">⌈A.y⌉ = ⌈C.y⌉</text>
+    <text x="0.4" y="2.5" font-size="0.4" fill="red">✗</text>
+    <text x="0.4" y="-0.1" font-size="0.2">7</text>
+  </g>
+</svg>
+

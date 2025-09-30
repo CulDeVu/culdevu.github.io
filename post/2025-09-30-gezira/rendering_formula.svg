@@ -1,0 +1,45 @@
+<svg width="800" height="560" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(160 160) scale(240 240)">
+    <path d="M 0 0.5 L 0.5 0 L 1 0 L 1 0.5 Z" stroke="black" stroke-width="0.01" fill="cyan" />
+    <path d="M 0 0.5 L 1 0.5 L 1 0.75 L 0 0.75 Z" stroke="black" stroke-width="0.01" fill="cyan" />
+    <!--<path d="M 0 0.75 L 1 0.75 L 1 0 L 0.5 0 L 0 0.5 Z" stroke="none" fill="cyan" />-->
+    
+    <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.015" />
+    <path d="M -0.25 0.75 L 0.75 -0.25" stroke="red" stroke-width="0.025" />
+    
+    <g transform="translate(-0.25 0.75)">
+      <circle r="0.04" fill="red" />
+      <text x="-0.05" font-size="0.2" text-anchor="end">A</text>
+    </g>
+    
+    <g transform="translate(0.75 -0.25)">
+      <circle r="0.04" fill="red" />
+      <text y="-0.05" font-size="0.2">B</text>
+    </g>
+    
+    <g transform="translate(0.75 0)">
+      <circle r="0.04" fill="red" />
+      <text x="0.05" y="-0.05" font-size="0.125">snap(B)</text>
+    </g>
+    
+    <g transform="translate(0.5 0)">
+      <circle r="0.04" fill="red" />
+      <text x="-0.05" y="-0.05" font-size="0.125" text-anchor="end">clip(B)</text>
+    </g>
+    
+    <g transform="translate(0 0.75)">
+      <circle r="0.04" fill="red" />
+      <text x="0.05" y="0.05" font-size="0.125" dominant-baseline="hanging">snap(A)</text>
+    </g>
+    
+    <g transform="translate(0 0.5)">
+      <circle r="0.04" fill="red" />
+      <text x="-0.05" y="-0.05" font-size="0.125" text-anchor="end">clip(A)</text>
+    </g>
+    
+    <text x="1.05" y="0" font-size="0.0675" dominant-baseline="hanging">trapezoid(clip(B), snap(B)) = 0</text>
+    <text x="0.5" y="0.25" font-size="0.0675">trapezoid(clip(A), clip(B))</text>
+    <text x="0.05" y="0.625" font-size="0.0675">trapezoid(snap(A), clip(A))</text>
+  </g>
+</svg>
+

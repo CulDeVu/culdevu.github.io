@@ -1,0 +1,23 @@
+<svg width="500" height="500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <g id="grid">
+      <path d="M -1.1 -1 L 2.1 -1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -1.1 0 L 2.1 0" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -1.1 1 L 2.1 1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -1.1 2 L 2.1 2" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -1 -1.1 L -1 2.1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M -0 -1.1 L 0 2.1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M 1 -1.1 L 1 2.1" stroke="blue" fill="none" stroke-width="0.02" />
+      <path d="M 2 -1.1 L 2 2.1" stroke="blue" fill="none" stroke-width="0.02" />
+    </g>
+  </defs>
+  
+  <g transform="translate(150 150) scale(100 100)">
+    <use href="#grid" />
+    <g transform="translate(0 1) scale(1 -1)">
+
+      <path d="M 0.1 0.1 Q 0.5 3, 0.9 0.1" stroke="red" fill="none" stroke-width="0.08" />
+    </g>
+  </g>
+</svg>
+
