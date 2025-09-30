@@ -473,6 +473,7 @@ void process_thought(char *name)
 
 int main()
 {
+	process_post("2025-09-30-gezira");
 	process_post("2022-07-08-nopelepsy-04");
 	process_post("2022-05-20-mcci");
 	process_post("2018-08-12-nopelepsy-03");
@@ -507,18 +508,23 @@ int main()
 	process_thought("2020-06-06-jvm-sucks");
 
 	char *post_header = "<h2 style=\"margin-bottom:0.5rem\"><a href=\"%s\" class=\"primary_link\">%s</a></h2><i>Pub. %s</i>";
+    
+    FILE *fout_wip = fopen("../thought/wip.html", "w");
+	write_header(fout_wip);
+	fprintf(fout_wip, "<p>This is where I put unfinished posts and notes about things to write about later.</p>");
 
 	{
 		FILE *fout = fopen("../index.html", "w");
 		write_header(fout);
-		fprintf(fout, "<p>This is where longer pieces go where I talk about things I've been playing with in my spare time. I constantly have side projects, but I don't always feel like writing long pieces about them. These are posted very very rarely.</p><hr>");
+		fprintf(fout, "<p>This is where longer pieces go where I talk about things I've been playing with in my spare time. I constantly have side projects, but I don't always feel like writing long pieces about them. These are posted very very rarely.</p>");
 		for (int i = 0; i < post_num; ++i)
 		{
-			fprintf(fout, post_header, post_href[i], post_names[i], post_date[i]);
-			fprintf(fout, "<p style=\"margin-top: 0.5rem\">%s</p>", post_descr[i]);
-
-			if (i != post_num - 1)
-				fprintf(fout, "<hr>");
+            FILE *fout_dest = (strcmp(post_descr[i], "wip") == 0) ? fout_wip : fout;
+            
+            fprintf(fout_dest, "<hr>");
+			
+            fprintf(fout_dest, post_header, post_href[i], post_names[i], post_date[i]);
+			fprintf(fout_dest, "<p style=\"margin-top: 0.5rem\">%s</p>", post_descr[i]);
 		}
 		write_footer(fout);
 	}
@@ -527,10 +533,6 @@ int main()
 		FILE *fout_finished = fopen("../thought/index.html", "w");
 		write_header(fout_finished);
 		fprintf(fout_finished, "<p>This is where I put much shorter pieces that are less informative and opinionated/inflamatory enough for me to not put on my front page. Unfinished posts are located <a href=\"/thought/wip.html\">here</a></p>");
-
-		FILE *fout_wip = fopen("../thought/wip.html", "w");
-		write_header(fout_wip);
-		fprintf(fout_wip, "<p>This is where I put unfinished posts and notes about things to write about later.</p>");
 
 		for (int i = 0; i < thought_num; ++i)
 		{
@@ -572,7 +574,10 @@ int main()
 
 		for (int i = 0; i < post_num; ++i)
 		{
-			fprintf(fout, "<item><title>%s</title><link>%s</link><pubDate>%s</pubDate><description>%s</description></item>", post_names[i], post_href[i], post_rss_date[i], post_descr[i]);
+            if (strcmp(post_descr[i], "wip") != 0)
+            {
+			    fprintf(fout, "<item><title>%s</title><link>%s</link><pubDate>%s</pubDate><description>%s</description></item>", post_names[i], post_href[i], post_rss_date[i], post_descr[i]);
+            }
 		}
 
 		for (int i = 0; i < thought_num; ++i)
