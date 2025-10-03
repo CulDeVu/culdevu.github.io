@@ -1,5 +1,5 @@
-<svg width="560" height="560" xmlns="http://www.w3.org/2000/svg">
-  <g transform="translate(160 160) scale(240 240)">
+<svg width="800" height="560" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(220 100) scale(360 360)">
     <path d="M 0.3 0.8 L 0.6 0.3 L 1 0.3 L 1 0.8 Z" stroke="black" stroke-width="0.01" fill="cyan" />
     
     <path d="M 0 0 L 1 0 L 1 1 L 0 1 Z" stroke="blue" fill="none" stroke-width="0.015" />
