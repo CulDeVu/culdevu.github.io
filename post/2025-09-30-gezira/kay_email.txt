@@ -1,0 +1,21 @@
+Hello Dr. Alan Kay.
+
+I'm writing a small piece on my blog about Gezira, the rendering system at that was developed at VPRI. I wanted to talk about the source code: my thoughts and what parts I thought were interesting.
+
+As part of it I'm writing a short little section on the history of the project. 
+
+Now I've seen you online critisizing people for half-assing their research and getting things wrong about the projects you  were involved in. I don't want to make that mistake, so I'd like to ask a few questions. These are things that I haven't been able to find online anywhere. They may not all make it in, but more to round out my research.
+
+1. An old version of the VPRI website says that you co-founded VPRI with Dan Ingalls "and others". Who are those others?
+
+2. When exactly did you meet Dan Amelang? How did you meet? From one of your talks you give the imporession that you met him because of his work on Cairo. But from the Cairo git repo, Dan was a contributor to Cairo for about 4 months total. Did you meet in that time window?
+
+3. The VPRI's public tax forms show that Dan Amelang was working 40 hours a week for many years, from 2013 to 2018. Changes to gezira stopped in 2012. The only other thing I know he worked on was Shadama, which he demoed in 2017. What was he working on for VPRI during those intervening years?
+
+I'm not looking to overly pry. It's just that Dan Amelang is the main character of Gezira, and I'd like to know what else he's worked on.
+
+4. What happened to HARC? Why did it disband?
+
+5. I've seen people online talking about struggling to get Frank working. I for one have never found any Frank source code or binaries anywhere (with the exception of this iPad build [todo: link]). Was Frank ever released?
+
+6. Possibly the most important question the set: what happened to the mustache? 
