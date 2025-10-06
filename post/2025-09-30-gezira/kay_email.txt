@@ -1,21 +1,102 @@
-Hello Dr. Alan Kay.
 
-I'm writing a small piece on my blog about Gezira, the rendering system at that was developed at VPRI. I wanted to talk about the source code: my thoughts and what parts I thought were interesting.
+On 10/5/25 15:23, Alan Kay <snip> wrote:
 
-As part of it I'm writing a short little section on the history of the project. 
+ Hi David
 
-Now I've seen you online critisizing people for half-assing their research and getting things wrong about the projects you  were involved in. I don't want to make that mistake, so I'd like to ask a few questions. These are things that I haven't been able to find online anywhere. They may not all make it in, but more to round out my research.
+I read your blog, and wondered what your goal might be.
 
-1. An old version of the VPRI website says that you co-founded VPRI with Dan Ingalls "and others". Who are those others?
+STEPS was a project that didn't get done as originally planned (I was one of
+the main culprits), but some very good work was done on parts of it, including
+that by Dan Amelang. Overall, I consider it an unsuccessful project (close, but
+no cigar).
 
-2. When exactly did you meet Dan Amelang? How did you meet? From one of your talks you give the imporession that you met him because of his work on Cairo. But from the Cairo git repo, Dan was a contributor to Cairo for about 4 months total. Did you meet in that time window?
+One thing that I perhaps didn't make clear enough in the early STEPS writings
+was that the heart of the project was to capture the *semantics* of "vanilla
+personal computing of the day" in as compact a form as possible (the pragmatics
+might require a supercomputer to run it, but that wasn't the point).
 
-3. The VPRI's public tax forms show that Dan Amelang was working 40 hours a week for many years, from 2013 to 2018. Changes to gezira stopped in 2012. The only other thing I know he worked on was Shadama, which he demoed in 2017. What was he working on for VPRI during those intervening years?
+One big part was 2.5 D graphics -- but I worked with John Warnock at Utah and
+later at Parc -- and everyone on that plane of thinking already used a
+pseudo-compositional high level math for expressing the meanings -- and current
+day languages and HW required lots of code to run it fast enough for practical
+use.
 
-I'm not looking to overly pry. It's just that Dan Amelang is the main character of Gezira, and I'd like to know what else he's worked on.
+I was interested in the much more compact expression of the semantics, and
+looked around for people of similar interest. We luckily found Dan Amelang (and
+his brother helped with some major parts on a summer project as well).
 
-4. What happened to HARC? Why did it disband?
+The initial versions of Gezeira ran surprisingly well, and this tempted me away
+from the original goal, towards wanting to give demos and talks using it.
+Similarly, with Frank. Things would have been better if I'd stayed true to my
+original plan. However, I did give many talks using just Frank, and quite a few
+of these are on YouTube.
 
-5. I've seen people online talking about struggling to get Frank working. I for one have never found any Frank source code or binaries anywhere (with the exception of this iPad build [todo: link]). Was Frank ever released?
+Funding got more and more difficult to obtain and I also got older and older.
+I'm now 85 and have had a stage 4 cancer for the last 4 years which science has
+been holding back (and am living in London). I occasionally give talks,but
+prefer to play music in my remaining time on the planet.
 
-6. Possibly the most important question the set: what happened to the mustache? 
+Very best wishes
+Alan
+
+
+
+    On Sunday, October 5, 2025 at 08:25:33 PM GMT+1, Daniel Taylor <snip>
+wrote: 
+
+ Hello Dr. Alan Kay.
+
+I'm writing a small piece on my blog about Gezira, the rendering system
+at that was developed at VPRI. I wanted to talk about the source code:
+my thoughts and what parts I thought were interesting.
+
+Here it is, if you're interested:
+https://djtaylor.me/post/2025-09-30-gezira/ . It's still a work in
+progress though.
+
+As part of it I'm writing a short little section on the history of the
+project.
+
+Now I've seen you online criticizing people for half-assing their
+research and getting things wrong about the projects you
+were involved in. I don't want to make that mistake, so I'd like to ask a few
+questions. These are things that I haven't been able to find online
+anywhere. They may not all make it in; it's more for rounding out my
+research.
+
+1. An old version of the VPRI website says that you co-founded VPRI with
+Dan Ingalls "and others". Who are those others?
+
+2. Also, there were some big names on your board of directors! Were they
+all actually participating in governing the nonprofit? Or were they
+board members more in name only? Were you really reporting your UI
+progress to Douglas Engelbart? Your Gezira progress to Ken Perlin?
+Your... er... programming language translation work to Douglas Adams?
+
+3. When exactly did you meet Dan Amelang? How did you meet? From your
+talks you give the impression that you met him because of his work on
+Cairo. But from the Cairo git repo, Dan was a contributor to Cairo for
+about 4 months total. Did you meet in that time window?
+
+4. The VPRI's public tax forms show that Dan Amelang was working 40
+hours a week for many years, from 2013 to 2018. Changes to Gezira
+stopped in 2012. The only other thing I know he worked on was Shadama,
+which he demoed in 2017. What was he working on for VPRI during those
+intervening years?
+
+I'm not looking to overly pry. It's just that Dan Amelang is the main
+character of Gezira, and I'd like to know what else he worked on at VPRI.
+
+5. What happened to HARC? Why did it disband?
+
+6. I've seen people online talking about struggling to get Frank
+running. I for one have never found any Frank source code or binaries
+anywhere (with the exception of this iPad build
+https://tinlizzie.org/~bert/frank4ipad/). Was Frank ever released?
+
+7. Possibly the most important question the set: what happened to the
+mustache? When did you start rocking the mustache, and when did you
+decide to start growing out your beard?
+
+Thanks for taking the time to respond!
+- Daniel
