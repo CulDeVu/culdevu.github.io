@@ -473,7 +473,7 @@ void process_thought(char *name)
 
 int main()
 {
-	process_post("2025-09-30-gezira");
+	process_post("2025-10-11-gezira");
 	process_post("2022-07-08-nopelepsy-04");
 	process_post("2022-05-20-mcci");
 	process_post("2018-08-12-nopelepsy-03");
