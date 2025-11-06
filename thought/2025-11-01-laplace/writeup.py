@@ -1,7 +1,7 @@
 # == Recursive monte carlo greens functions
 # === wip
 
-# What follows is 
+# What follows is some experiments with using greens functions for solving some differential equations, particularly laplace equations.
 
 # First I need to set things up.
 
@@ -17,9 +17,8 @@ x01 = [x/100 for x in range(100)]
 x13 = [x/100 for x in range(100, 300)]
 x19 = [x/100 for x in range(100, 900)]
 x03 = [x/100 for x in range(300)]
-x02 = [x/100 for x in range(200)]
-x26 = [x/100 for x in range(200, 600)]
-# x120 = [x/100 for x in range(100, 2000)]
+x02 = [x/20 for x in range(2*20)]
+x26 = [x/20 for x in range(2*20, 6*20)]
 
 def plot(filename, xs, *data):
   plt.clf()
@@ -48,7 +47,7 @@ def Hv(x):
 # \end{aligned}
 # $$
 
-# Using this to solve $\frac{d^2}{dx^2}u(x) = 2$:
+# Using this to solve $\frac{d^2}{dx^2}u(x) = 2$, $u(0)=0, u(1)=1$:
 
 def sample_quadratic(x):
   def G(x, s):
@@ -66,6 +65,8 @@ plot('quadratic.svg',
 
 # img(quadratic.svg)[]
 
+# $\frac{d^2}{dx^2}u(x) = 48x - 24, u(0)=0, u(1)=1$:
+
 def sample_cubic(x):
   def G(x, s):
     return (x - s)*Hv(x - s) + (s - 1)*x
@@ -79,6 +80,8 @@ plot('cubic.svg',
   [mean([sample_cubic(x) for _ in range(100)]) for x in x01])
 
 # img(cubic.svg)[]
+
+# $\frac{d^2}{dx^2}u(x) = -4 u(x), u(0)=0, u(1)=1$:
 
 def sample_laplace1_v1(p, x):
   if x < 0.01:
@@ -332,6 +335,8 @@ plot('no_endpoints.svg',
 # TODO: walk-on-stars
 
 # ## s orbital
+
+# $\frac{d^2}{dx^2}u(x) = -2 (\frac{1}{x} - \frac{1}{2}) u(x), u(0)=0, u(\inf)=1$:
 
 def s_orbital_01(r):
   def one_sample(x):

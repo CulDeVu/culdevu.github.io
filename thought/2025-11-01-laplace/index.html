@@ -124,7 +124,7 @@
 			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a><a href="/physics/" class="navitem">Physics</a>
 		</div>
 
-		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Recursive monte carlo greens functions</h2><i>Pub. 2025 Nov 1</i><p>What follows is </p><p>First I need to set things up.</p><pre class="codeblock"><code>import random
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Recursive monte carlo greens functions</h2><i>Pub. 2025 Nov 1</i><p>What follows is some experiments with using greens functions for solving some differential equations, particularly laplace equations.</p><p>First I need to set things up.</p><pre class="codeblock"><code>import random
 from math import sin, exp, sqrt, pi
 from statistics import mean, stdev
 import matplotlib.pyplot as plt
@@ -134,9 +134,12 @@ def xrange():
     yield xi / 100
 x01 = [x/100 for x in range(100)]
 x13 = [x/100 for x in range(100, 300)]
-x16 = [x/100 for x in range(100, 600)]
 x19 = [x/100 for x in range(100, 900)]
-</code></pre><p>x120 = [x/100 for x in range(100, 2000)]</p><pre class="codeblock"><code>def plot(filename, xs, *data):
+x03 = [x/100 for x in range(300)]
+x02 = [x/20 for x in range(2*20)]
+x26 = [x/20 for x in range(2*20, 6*20)]
+
+def plot(filename, xs, *data):
   plt.clf()
   axis = plt.gca()
   
@@ -156,7 +159,7 @@ def Hv(x):
     return 1
   else:
     return 0
-</code></pre><p>$$\begin{aligned}\int_0^1 f(s) G(x, s) ds & = A\end{aligned}$$</p><p>Using this to solve $\frac{d^2}{dx^2}u(x) = 2$:</p><pre class="codeblock"><code>def sample_quadratic(x):
+</code></pre><p>$$\begin{aligned}\int_0^1 f(s) G(x, s) ds & = A\end{aligned}$$</p><p>Using this to solve $\frac{d^2}{dx^2}u(x) = 2$, $u(0)=0, u(1)=1$:</p><pre class="codeblock"><code>def sample_quadratic(x):
   def G(x, s):
     return (x - s)*Hv(x - s) + (s - 1)*x
   
@@ -166,7 +169,7 @@ def Hv(x):
   x01,
   [x*x for x in x01],
   [mean([sample_quadratic(x) for _ in range(100)]) for x in x01])
-</code></pre><p><figure><img src="quadratic.svg" style="align-self: center; max-width:100%"></figure></p><pre class="codeblock"><code>def sample_cubic(x):
+</code></pre><p><figure><img src="quadratic.svg" style="align-self: center; max-width:100%"></figure></p><p>$\frac{d^2}{dx^2}u(x) = 48x - 24, u(0)=0, u(1)=1$:</p><pre class="codeblock"><code>def sample_cubic(x):
   def G(x, s):
     return (x - s)*Hv(x - s) + (s - 1)*x
   
@@ -177,7 +180,7 @@ plot('cubic.svg',
   x01,
   [x*(8*x*x - 12*x + 5) for x in x01],
   [mean([sample_cubic(x) for _ in range(100)]) for x in x01])
-</code></pre><p><figure><img src="cubic.svg" style="align-self: center; max-width:100%"></figure></p><pre class="codeblock"><code>def sample_laplace1_v1(p, x):
+</code></pre><p><figure><img src="cubic.svg" style="align-self: center; max-width:100%"></figure></p><p>$\frac{d^2}{dx^2}u(x) = -4 u(x), u(0)=0, u(1)=1$:</p><pre class="codeblock"><code>def sample_laplace1_v1(p, x):
   if x < 0.01:
     return 0
   if 0.99 < x:
@@ -287,10 +290,10 @@ poly = reduce(add_poly, polys, [0])
 poly = mul_poly([1/10], poly)
 </code></pre><p>Now mine. Left are my computed values, right are the Taylor series coefficients.</p><pre class="codeblock"><code>(poly[0] * factorial(0), 0.3)
 </code></pre><blockquote>(0.3, 0.3)</blockquote><pre class="codeblock"><code>(poly[1] * factorial(1), -0.0455)
-</code></pre><blockquote>(-0.0531234707420423, -0.0455)</blockquote><pre class="codeblock"><code>(poly[2] * factorial(2), 0.0102072)
-</code></pre><blockquote>(0.009342148713005673, 0.0102072)</blockquote><pre class="codeblock"><code>(poly[3] * factorial(3), -0.00318547)
-</code></pre><blockquote>(-0.0036301001957742794, -0.00318547)</blockquote><pre class="codeblock"><code>(poly[4] * factorial(4), 0.00129975)
-</code></pre><blockquote>(0.0012629861607769736, 0.00129975)</blockquote><p>That looks right. So apparently <code class="codeinline">sample_laplace1_v1</code> is computing the Taylor series of the solution of the differential equation somehow.</p><p>I was floored when I saw this.</p><p>TODO: why does this work?</p><h4>No endpoints</h3><p>What would happen if I just messed up the two base cases? Like if I put the wrong values in them.</p><pre class="codeblock"><code>def G_laplace_01(x, s):
+</code></pre><blockquote>(-0.053964937941266757, -0.0455)</blockquote><pre class="codeblock"><code>(poly[2] * factorial(2), 0.0102072)
+</code></pre><blockquote>(0.009447869393405637, 0.0102072)</blockquote><pre class="codeblock"><code>(poly[3] * factorial(3), -0.00318547)
+</code></pre><blockquote>(-0.0032433947669587154, -0.00318547)</blockquote><pre class="codeblock"><code>(poly[4] * factorial(4), 0.00129975)
+</code></pre><blockquote>(0.0009182964886332954, 0.00129975)</blockquote><p>That looks right. So apparently <code class="codeinline">sample_laplace1_v1</code> is computing the Taylor series of the solution of the differential equation somehow.</p><p>I was floored when I saw this.</p><p>TODO: why does this work?</p><h4>No endpoints</h3><p>What would happen if I just messed up the two base cases? Like if I put the wrong values in them.</p><pre class="codeblock"><code>def G_laplace_01(x, s):
   return (x - s)*Hv(x - s) + (s - 1)*x
 
 def sample_laplace1_wrong_endpoints(p, x):
@@ -322,7 +325,7 @@ plot('no_endpoints.svg',
   x01,
   [sin(2 * x) / sin(2) for x in x01],
   [mean([sample_laplace1_no_endpoints(-4, x) for _ in range(100)]) for x in x01])
-</code></pre><p><figure><img src="no_endpoints.svg" style="align-self: center; max-width:100%"></figure></p><p>There's a bit more variance, but that's to be expected.</p><p>TODO: re-anchor</p><p>TODO: walk-on-stars</p><h4>s orbital</h3><pre class="codeblock"><code>def s_orbital_01(r):
+</code></pre><p><figure><img src="no_endpoints.svg" style="align-self: center; max-width:100%"></figure></p><p>There's a bit more variance, but that's to be expected.</p><p>TODO: re-anchor</p><p>TODO: walk-on-stars</p><h4>s orbital</h3><p>$\frac{d^2}{dx^2}u(x) = -2 (\frac{1}{x} - \frac{1}{2}) u(x), u(0)=0, u(\inf)=1$:</p><pre class="codeblock"><code>def s_orbital_01(r):
   def one_sample(x):
     cutoff = 0.95
     if cutoff < random.random():
@@ -332,21 +335,6 @@ plot('no_endpoints.svg',
     return (x + G_laplace_01(x, s) * -2 * (1/s - 0.5) * one_sample(s)) / cutoff
   
   return one_sample(r)
-
-def G_laplace_16(x, s):
-  return (x - s)*Hv(x - s) + (s - 6)/5*x - (s-6)/5
-def s_orbital_16(r, m=6):
-  def one_sample(x, accum):
-    # cutoff = min(1, abs(accum))
-    cutoff = 0.98
-    if cutoff < random.random():
-      return 0
-    
-    s = 1 + random.random() * 5
-    weight = G_laplace_16(x, s) * -2 * (1/s - 0.5) * m
-    return (6/5 - x/5 + weight * one_sample(s, accum * weight)) / cutoff
-  
-  return one_sample(r, 1)
 
 def G_laplace_19(x, s):
   return (x - s)*Hv(x - s) + (s - 9)/8*x - (s-9)/8
@@ -371,12 +359,43 @@ plot('s_orbital_09.svg',
 </code></pre><p>print([stdev([s_orbital_09(r) for _ in range(100)]) for r in x19])</p><p><figure><img src="s_orbital_09.svg" style="align-self: center; max-width:100%"></figure></p><pre class="codeblock"><code>plot('param_19.svg',
   [m/10 for m in range(30)],
   [mean([s_orbital_19(2, m/10) for _ in range(100)]) for m in range(30)])
-</code></pre><p><figure><img src="param_19.svg" style="align-self: center; max-width:100%"></figure></p><pre class="codeblock"><code>plot('s_orbital_06.svg',
-  x01 + x16,
-  [exp(-x)*x*exp(1) for x in x01 + x16],
-  [mean([s_orbital_01(r) for _ in range(100)]) for r in x01] +
-  [mean([s_orbital_16(r) for _ in range(100)]) for r in x16])
-</code></pre><p>print([stdev([s_orbital_09(r) for _ in range(100)]) for r in x19])</p><p><figure><img src="s_orbital_06.svg" style="align-self: center; max-width:100%"></figure></p><pre class="codeblock"><code>plot('param_16.svg',
-  [m/10 for m in range(60)],
-  [mean([s_orbital_16(2, m/10) for _ in range(100)]) for m in range(60)])
-</code></pre><p><figure><img src="param_16.svg" style="align-self: center; max-width:100%"></figure></p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2024 by Daniel Taylor</span></div><script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
+</code></pre><p><figure><img src="param_19.svg" style="align-self: center; max-width:100%"></figure></p><pre class="codeblock"><code>def G_laplace_generator(a, b):
+  def G(x, s):
+    return (x - s)*Hv(x - s) + (s - b)/(b - a)*x - a * (s - b)/(b - a)
+  return G
+
+G_laplace_02 = G_laplace_generator(0, 2)
+def s_orbital_02(r):
+  def one_sample(x, accum):
+    cutoff = min(1, abs(accum))
+    # cutoff = 0.98
+    if cutoff < random.random():
+      return 0
+    
+    s = random.random() * 2
+    weight = G_laplace_02(x, s) * -2 * (1/s - 0.5) * 2
+    return (x/2 + weight * one_sample(s, accum * weight)) / cutoff
+  
+  return one_sample(r, 1)
+
+G_laplace_26 = G_laplace_generator(2, 6)
+def s_orbital_26(r):
+  def one_sample(x, accum):
+    cutoff = min(1, abs(accum))
+    # cutoff = 0.98
+    if cutoff < random.random():
+      return 0
+    
+    s = 2 + random.random() * 4
+    weight = G_laplace_26(x, s) * -2 * (1/s - 0.5) * 4
+    return (-0.25*(x-2)+1 + weight * one_sample(s, accum * weight)) / cutoff
+  
+  return one_sample(r, 1)
+
+plot('s_orbital_06.svg',
+  x02 + x26,
+  [exp(-x)*x*exp(2)/2 for x in x02 + x26],
+  [mean([s_orbital_02(r) for _ in range(100)]) for r in x02] +
+  [mean([s_orbital_26(r) for _ in range(100)]) for r in x26]
+  )
+</code></pre><p>print([stdev([s_orbital_09(r) for _ in range(100)]) for r in x19])</p><p><figure><img src="s_orbital_06.svg" style="align-self: center; max-width:100%"></figure></p><p>plot('param_16.svg', # [m/10 for m in range(60)], # [mean([s_orbital_16(2, m/10) for _ in range(100)]) for m in range(60)])</p><h3 class="section_heading">img(param_16.svg)[]</h3></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2024 by Daniel Taylor</span></div><script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
