@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="180mm"
+   height="180mm"
+   viewBox="0 0 180 180"
+   version="1.1"
+   id="svg135463"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="forward_2.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview135465"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.66368547"
+     inkscape:cx="451.26798"
+     inkscape:cy="238.06458"
+     inkscape:window-width="1680"
+     inkscape:window-height="978"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-text-baseline="true">
+    <sodipodi:guide
+       position="-34.132524,170"
+       orientation="0,1"
+       id="guide177742"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="-31.896115,140"
+       orientation="0,1"
+       id="guide177744"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="-39.801912,90.000003"
+       orientation="0,1"
+       id="guide177746"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="-42.688524,79.999999"
+       orientation="0,1"
+       id="guide177748"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+    <sodipodi:guide
+       position="-44.832593,49.999999"
+       orientation="0,1"
+       id="guide177750"
+       inkscape:label=""
+       inkscape:locked="false"
+       inkscape:color="rgb(0,0,255)" />
+  </sodipodi:namedview>
+  <defs
+     id="defs135460" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline"
+     sodipodi:insensitive="true">
+    <rect
+       style="display:inline;fill:#c8c8c8;fill-opacity:1;stroke-width:0.912624"
+       id="rect177627"
+       width="40"
+       height="180"
+       x="140"
+       y="0" />
+    <rect
+       style="display:inline;fill:#c8c8c8;fill-opacity:1;stroke-width:0.858504"
+       id="rect177435"
+       width="50"
+       height="180"
+       x="0"
+       y="0" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="text">
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;display:inline;stroke-width:0.264583"
+       x="20.728251"
+       y="29.999998"
+       id="text139574"><tspan
+         sodipodi:role="line"
+         id="tspan139572"
+         style="stroke-width:0.264583"
+         x="20.728251"
+         y="29.999998">C(n)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;display:inline;stroke-width:0.264583"
+       x="69.615295"
+       y="29.999998"
+       id="text143010"><tspan
+         sodipodi:role="line"
+         id="tspan143008"
+         style="stroke-width:0.264583"
+         x="69.615295"
+         y="29.999998">B(n) = (C(n) | R(n) | F(n))</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;display:inline;stroke-width:0.264583"
+       x="157.76353"
+       y="59.999996"
+       id="text146026"><tspan
+         sodipodi:role="line"
+         id="tspan146024"
+         style="stroke-width:0.264583"
+         x="157.76353"
+         y="59.999996">F(n)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;display:inline;stroke-width:0.264583"
+       x="75.946686"
+       y="59.999996"
+       id="text149960"><tspan
+         sodipodi:role="line"
+         id="tspan149958"
+         style="stroke-width:0.264583"
+         x="75.946686"
+         y="59.999996">U(n) = (C(n) | R(n))</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;display:inline;stroke-width:0.264583"
+       x="57.134415"
+       y="120"
+       id="text156114"><tspan
+         sodipodi:role="line"
+         id="tspan156112"
+         style="stroke-width:0.264583"
+         x="57.134415"
+         y="120">B(n+1) = (C(n+1) | R(n+1) | F(n+1))</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;display:inline;stroke-width:0.264583"
+       x="17.60803"
+       y="150"
+       id="text160972"><tspan
+         sodipodi:role="line"
+         id="tspan160970"
+         style="stroke-width:0.264583"
+         x="17.60803"
+         y="150">C(n+1)</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;display:inline;stroke-width:0.264583"
+       x="20.583557"
+       y="90"
+       id="text169754"><tspan
+         sodipodi:role="line"
+         id="tspan169752"
+         style="stroke-width:0.264583"
+         x="20.583557"
+         y="90">U(n)</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 118.16249,34.069186 43.76517,20.265916"
+       id="path178282"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 90.715072,34.064714 7.042599,20.638265"
+       id="path178317"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 104.55307,34.139057 6.59873,20.254387"
+       id="path178352"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 26.555317,83.201959 37.343344,74.20621 26.393452,34.049112"
+       id="path178500"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 111.4168,64.01859 37.343344,74.20621"
+       id="path178667"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 66.196989,114.81086 80.15009,105.45398 80.032687,63.997855"
+       id="path179330"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 80.15009,105.45398 161.9105,64.220234"
+       id="path179365"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 27.36158,143.99715 37.714565,133.90392 25.940613,94.42466"
+       id="path179593"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 127.21265,124.29616 -89.498085,9.60776"
+       id="path179628"
+       sodipodi:nodetypes="cc" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="arrows" />
+</svg>
