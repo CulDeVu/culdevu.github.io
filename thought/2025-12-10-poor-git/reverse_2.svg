@@ -23,15 +23,15 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.93859299"
-     inkscape:cx="432.02965"
-     inkscape:cy="487.96444"
+     inkscape:zoom="0.66368547"
+     inkscape:cx="371.41087"
+     inkscape:cy="367.64403"
      inkscape:window-width="1680"
      inkscape:window-height="978"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer2"
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:snap-text-baseline="true">
@@ -96,7 +96,8 @@
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     sodipodi:insensitive="true">
     <text
        xml:space="preserve"
        style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;stroke-width:0.264583"
@@ -224,5 +225,99 @@
        d="M 32.023415,63.312732 31.112304,145.18519"
        id="path135378"
        sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;stroke-width:0.264583"
+       x="24.216419"
+       y="10.000005"
+       id="text39802"><tspan
+         id="tspan39800"
+         style="stroke-width:0.264583"
+         x="24.216419"
+         y="10.000005">CODE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;stroke-width:0.264583"
+       x="136.52376"
+       y="10.000005"
+       id="text42290"><tspan
+         id="tspan42288"
+         style="stroke-width:0.264583"
+         x="136.52376"
+         y="10.000005">BACK</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:4.23333px;line-height:1.25;font-family:serif;-inkscape-font-specification:serif;stroke-width:0.264583"
+       x="74.170654"
+       y="10.000005"
+       id="text174591"><tspan
+         id="tspan174589"
+         style="stroke-width:0.264583"
+         x="74.170654"
+         y="10.000005">TEMP</tspan></text>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="plus/minus">
+    <g
+       id="g4014"
+       transform="translate(21.719347,108.47438)">
+      <circle
+         style="fill:#ff6464;fill-opacity:1;stroke-width:1.065"
+         id="path1195"
+         cx="59.638309"
+         cy="-32.08728"
+         r="2.8515606" />
+      <rect
+         style="fill:#000000;fill-opacity:1;stroke-width:0.851644"
+         id="rect2919"
+         width="4.0348225"
+         height="1.1899422"
+         x="57.620899"
+         y="-32.682251" />
+    </g>
+    <g
+       id="g4014-8"
+       transform="translate(57.150594,137.9838)">
+      <circle
+         style="fill:#ff6464;fill-opacity:1;stroke-width:1.065"
+         id="path1195-85"
+         cx="59.638309"
+         cy="-32.08728"
+         r="2.8515606" />
+      <rect
+         style="fill:#000000;fill-opacity:1;stroke-width:0.851644"
+         id="rect2919-0"
+         width="4.0348225"
+         height="1.1899422"
+         x="57.620899"
+         y="-32.682251" />
+    </g>
+    <g
+       id="g4019"
+       transform="translate(-43.657339,72.703395)">
+      <circle
+         style="fill:#6464ff;fill-opacity:1;stroke-width:1.065"
+         id="path1195-8"
+         cx="72.837479"
+         cy="-28.793131"
+         r="2.8515606" />
+      <rect
+         style="fill:#000000;fill-opacity:1;stroke-width:0.831458"
+         id="rect2919-5"
+         width="4.0348225"
+         height="1.1342005"
+         x="70.820068"
+         y="-29.360231" />
+      <rect
+         style="fill:#000000;fill-opacity:1;stroke-width:0.831458"
+         id="rect2919-5-9"
+         width="4.0348225"
+         height="1.1342005"
+         x="-30.810543"
+         y="-73.404579"
+         transform="rotate(90)" />
+    </g>
   </g>
 </svg>
