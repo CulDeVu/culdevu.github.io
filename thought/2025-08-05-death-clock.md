@@ -33,7 +33,7 @@ Even in the realm of bespoke hobby electronics art pieces there are examples. li
 
 In these last 3 examples, your supposed death date is fixed. They give you a sense of averages, but not of the whole probability distribution. In reality the mortality standard devation is huge: 18 years for males according to the data I'm using.
 
-This last one doesn't really fit, but I can't leave it out. I listened to link(https://sphinx.acast.com/themagnusarchives/mag70-bookofthedead/media.mp3)[this episode] of the horror podcast The Magnus Archives years ago. I just liked it, and it fits with this project thematically.
+This last one isn't also doesn't quite fit, but I can't leave it out. I enjoyed link(https://sphinx.acast.com/themagnusarchives/mag70-bookofthedead/media.mp3)[this episode] of the horror podcast The Magnus Archives, which features a book that also gives new predictions on your death every time you open it.
 
 # The build
 
@@ -67,7 +67,7 @@ In this picture the two boards are in the same orientation. I ended up flipping 
 
 Also notice that I was powering the whole thing via the power pins on the arduino. After a while I started wondering how that worked. I've been slowly working through a link(https://www.youtube.com/playlist?list=PLUl4u3cNGP62UTc77mJoubhDELSC8lfR0)[lecture series on power electronics], and I wanted to see some of that magic in action.
 
-It turns out that the magic was actually one single linear regular on the verge of melting. So I stopped that.
+It turns out that the magic was actually one single linear regular on the verge of melting. Sigh.
 
 img(jumpers.jpg)[The two sections, and a middle control section, mounted on a backboard.]
 
@@ -90,7 +90,7 @@ I was originally wanting to mount it on some dark walnut. But the hardwood store
 
 imgcmp(dremel.jpg)[Cutting the plexiglass.](plexiglass.jpg)[The plexiglass cut and it all put together.]
 
-Julie 3d printed this cool dremel table saw thing. We have a quick-connect head that we use with the cutting wheel bits that I thought would be an issue, but it wasn't.
+Julie 3d printed this cool dremel table saw thing.
 
 The study only *sort of* smelled like melted plastic afterwards!
 
@@ -135,7 +135,7 @@ To say that they spend money as fast as they make it isn't untrue, but it's not 
 
 According to our model, this strategy has an expected happiness of 2202, and a variance of 672^2.
 
-If the interest rule were taken away, this strategy would be optimal: if $X$ is a random variable representing age at death, then any other strategy $H(x)$ would obey $H(x) \leq \frac{x}{9}$. This of course mean that $E[F(X)] \leq \frac{E[X]}{8} = E[\text{happiness of analog nomad}]$.
+If the interest rule were taken away, this strategy would be optimal: if $X$ is a random variable representing age at death, then any other strategy $H(x)$ would obey $H(x) \leq \frac{x}{9}$. This of course mean that $E[H(X)] \leq \frac{E[X]}{9} = E[\text{happiness of analog nomad}]$.
 
 With interest, this strategy is the least optimal strategy in terms of expected happiness, at least among the strategies that are even trying. 1 fun day per 8 work days is the minimum.
 
@@ -175,7 +175,7 @@ I can't match the analog nomad for consistency, and I can't match the guidance c
 
 My intuition says that you should work at the same rate that you live to see the results.
 
-So every day you would pick a random death date proportional to your probability distribution of death dates, given that you've already lived this long ($P(X=x | X \geq \text{today's date})$). Assuming that sample death day, calculate whether you could spend all your moneyon fun before you die. If yes, work today. If no, take a fun day. Repeat tomorrow.
+So every day you would pick a random death date proportional to your probability distribution of death dates, given that you've already lived this long ($P(X=x | X \geq \text{today's date})$). Assuming that sample death day, calculate whether you could spend all your money on fun before you die. If yes, work today. If no, take a fun day. Repeat tomorrow.
 
 The formula used for "if you can spend it all before you die" is what you'd expect. If $\Delta d$ is the current sampled hypothetical death date - today's date, it is:
 
@@ -233,5 +233,5 @@ In the event of my death, it'd be cool if the death date on the bottom froze. It
 
 It didn't include a real time clock. I could have, just didn't want to deal with the hassle. From my tests, the Attiny keeps time relatively well. And if it drifts a bit, it's not that big of a deal. Despite calling it a clock, it's more of a calendar.
 
-It's very sensitive to electrical noise in the air. I'm still not sure why. It's up on the wall away from people and clothes, but sometimes when I get close one of the latches will trigger and turn the display all garbled. I wake the chip up every hour to refresh the display for this reason. I would like to fix it though.
+It was very sensitive to electrical noise in the air while it was being built. But now that all of the long jumpers have been replaced with little jumpers I haven't had any issues. In any event, I wake the chip up every hour to refresh the display in case the latches trigger for no reason. I would like to fix this properly at some point.
 
