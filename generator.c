@@ -480,6 +480,7 @@ int main()
 	process_post("2018-01-02-nopelepsy-02");
 	process_post("2016-02-02-microfacet-dummies");
 
+    process_thought("2026-04-20-carnot");
     process_thought("2026-03-25-flatland");
     process_thought("2026-01-05-poor-git");
     process_thought("2025-11-01-laplace");

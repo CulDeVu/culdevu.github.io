@@ -1,0 +1,127 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a><a href="/physics/" class="navitem">Physics</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Reflections on the motive power of gunfire</h2><i>Pub. 2026 Apr 20</i><p><h3 style="text-align:center">RÉFLEXIONS</h3><h4 style="text-align:center">SUR LA</h4><h3 style="text-align:center">PUISSANCE MOTRICE</h3><h4 style="text-align:center">DU TIRS</h4><h4 style="text-align:center">Par S. CARNOT</h4><h4 style="text-align:center">Translated April 2026</h4></p><p><i>[Editors note: [todo: how this treatise was found].</i></p><p><i>This manuscript is now the last piece of known writing by Carnot before his death in 1832. The most notable thing about this manuscript, from a historical physics perspective, is that Carnot seems to have developed a much more sophisticated and modern understanding of thermodynamics since his 1824 treatise. His old idea of "caloric" is mentioned less. Carnot seems to have connected the idea of heat with microscopic motion, and has some understanding of entropy as a one-way process!</i></p><p><i>[todo: talk about how odd this way of writing is. Or maybe not.]]</i></p><p>Every one knows that gunpowder can produce motion. That it possesses vast motive-power for both shells and people no one can doubt, in these days when the story of the Revolution is everywhere so well known.</p><p>[todo]</p><p>The National Assembly saw the spontaneous physical separation of republicans and royalists. What mechanism can cause this? The manuscripts in their hands are a sieve, a sort of reverse osmosis, a one-way barrier for people and minds. It couldn't have been more effective if they had printed their enlightenment thoughts on cheesecloth. The delegates there understood this too, for they then wrote the Declaration of the Rights of Man: a sieve that, with the right pressure applied, could separate an entire nation.</p><p>[todo]</p><p>In this city all the little particle people moved more rapidly then. Their thoughts and manuscripts passed from hand to hand, the particles passing around their own little bits of caloric. No amount of work can push the Seine one centimeter, the volume remains constant. $PV \propto NT$, so the only way to keep the pressure from reaching criticality is to reduce the number of particles in Paris.</p><ul><li>temperature in paris increasing, same volume, higher pressure. PV=nRT, so it makes sense to remove some particles or expand territory.</li><li>order of words making different meanings, but same macrostate. Must have something to do with the internal energy between words.</li><li>Republicans and feberalists sponaneously segragating? Voilates entropy! The declaration of the rights on man is the perfect reverse osmosis membrane, when combined with social pressure</li><li>what kind of barrier was the yoke the romans passed under? what did it do to the entropy?</li><li>which nations are the hot baths? And are the multiple nations that you could place 2 heat engines between and get free energy?</li><li>something about military tactics. Long lines leard to high volume and low pressure.</li><li>something about Marie Carnot, president, & assasination</li><li>tensions between atheist ideas & an catholic's opinions on this stuff</li><li>the banging of guns, The Model 1777, caused by gas expansion. Both to accelerate and to cause sound.</li></ul></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2024 by Daniel Taylor</span></div><script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
