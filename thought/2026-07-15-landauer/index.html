@@ -1,0 +1,127 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+		
+		<style>
+			body {
+				-webkit-text-size-adjust: none;
+				-moz-text-size-adjust: none;
+				-ms-text-size-adjust: none;
+
+				word-wrap: break-word;
+				font-family: sans-serif;
+				line-height: 1.2rem;
+			}
+
+			.nav {
+				display: inline-block;
+			}
+
+			.navitem {
+				display: inline-block;
+
+				padding: 10px;
+				min-width: 100px;
+				text-align: center;
+
+				color: #fff;
+				text-decoration: none;
+
+				transition: background 0.25s ease;
+			}
+
+			.navitem:hover {
+				background: #b50;
+				/*color: #fa0;*/
+				transition: background 0.125s ease;
+				color: #fff;
+			}
+
+			/* 4*(navitem-width + 2*navitem-padding) + 2*body-padding = 4*(100px + 10px) + 2*(10px) = 500px */
+			@media (max-width: 500px) { 
+				.navitem {
+					width: calc(50% - 20px);
+				}
+			}
+
+			.codeblock {
+				border: 1px solid;
+				padding: 1em;
+				overflow: auto;
+			}
+
+			.codeinline {
+				border: 1px solid #aaa;
+				border-radius: 3px;
+				background-color: #e6e6e6;
+
+				/* Not very good. Will probably depend on the metrics of the font used. Oh well. */
+				padding-left: 0.1em;
+				padding-right: 0.1em;
+			}
+
+			.primary_link {
+				color: #000;
+				text-decoration: none;
+			}
+			.primary_link:hover {
+				color: #b50;
+				text-decoration: none;
+			}
+
+			/* For dealing with img()[] elements */
+			figure {
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+
+				margin: 0;
+				padding: 1ch;
+
+				display: inline-flex;
+				flex-flow: column;
+			}
+			figcaption {
+				margin-top: 0.5rem;
+				align-self: center;
+			}
+			img {
+				align-self: center;
+				max-width:100%%
+			}
+
+			blockquote {
+				margin: 0;
+				padding-left: 2ch;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				padding-right: 2ch;
+				border: 1px solid #888;
+				background-color: #e6e6e6;
+				border-radius: 3px;
+
+				font-style: italic;
+			}
+
+			h2 {
+				font-size: 1.25rem;
+			}
+
+			.section_heading {
+				border-top: 1px dotted;
+				padding-top: 1rem;
+			}
+
+		</style>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body style="max-width:980px; padding: 10px; margin:auto; background: #e6e6e6">
+		<div style="background: #fafafa; padding: 20px">
+			<div><h1 style="margin-top: 0.5em; margin-bottom: 0.3em">djtaylor.me</h1></div>
+			<div><i>Insert tagline here</i></div>
+		</div>
+		<div style="background: #222; color: #fafafa">
+			<a href="/" class="navitem">Blog</a><a href="/thought/" class="navitem">Thoughts</a><a href="/portfolio/" class="navitem">Projects</a><a href="/resume/" class="navitem">Resume</a><a href="/physics/" class="navitem">Physics</a>
+		</div>
+
+		<div style="background: #fafafa; padding: 20px"><h2 style="margin-bottom:0.5rem">Landauer machine</h2><i>Pub. 2026 Jul 15</i><p>In 1961 Roger Landauer argued that any logically irreversible computation must produce a minimum amount of heat. The argument at its most basic: consider a particle in one of two equivalent but distinct states called "0" and "1". If that particle is then forced to be in just the "0" state, effectively "erasing" or "zeroing" the particle, that operation reduces the particle's number of states by half, decreasing its entropy by $ln(2)$. The entropy of the universe must have increased by at least $ln(2)$ in kind, and this is envisioned by Landauer as a transfer of at least $k T ln(2)$ joules of heat into the universe.</p><p>Let's put aside whether this is true or not in the general case. I want to make a model of a machine that does operate at this limit, what I'm calling a "Landauer machine".</p><p>There are many models out there of reversable computers: ones that generate no heat at all. There are fewer models of Landauer machines, but they do exist. [todo: examples? Maybe talk about Landauer's own model?]</p><p>The model described here goes back to our thermodynamic roots. It does computation on gas particles in containers by compressing and expanding them in various ways.</p><p>Some papers I've read hand-wave away some details of how a computer like this would work. You have to be careful though. You can't just attach any old "sensor" to the boxes and decide what operations to perform, because that implies a form of computation, and you'd have to argue that process is itself reversible.</p><p>So I'm deliberate in my choice of primitives:</p><ul><li>Boxes can have removable/insertable dividers.</li><li>Boxes can be separated and rejoined.</li><li>The walls of the boxes can be rigid or moveable as need be.</li><li>Different parts of the computation can take place in different heat baths at different pressures as the situation demands. Boxes are transfered between computations with different heat bath requirements by physically moving them out of one and into another, which takes zero work.</li><li>We can perform isothermal compression/expansion to a box in finite time. Or close enough to finite.</li><li>Boxes can be connected by tubes. These tubes are assumed to have essentially zero volume, and so gass moves through them essentially instantly.</li><li>We can have pistons that travel a pre-specified distance.</li><li>If those pistons have to do work on its load to travel its distance, it can. If the load does work on the piston instead, that's also allowed. They're allowed to dynamimcally supply or receive however much is necessary to more its distance. However, they aren't able to dynamically choose whether to give or receive work, or to receive work in two different directions.</li></ul><p>Probably the simplest example of a reversible operation is <code class="codeinline">NOT</code>:</p><p>[image]</p><p>[todo: explain]</p><p>The simplest example of an irreversible operation is <code class="codeinline">RST</code>:</p><p>[image]</p><p>This is a classic thermodynamics example. The dividing wall is removed between the two halves, doing a free expansion on the gass. Pressure is halved, volume doubled, temperature remains the same. Then a piston isothermally compresses into the correct half, leaving behind a vaccum in the other. This compression performs $k T ln(2)$ joules of work on the gass. But since we're keeping a constant temperature, the energy of our monoatomic gass is also contant, and so that $k T ln(2)$ joules radiates off as heat, exactly as the Landauer limit predicts.</p><p>The next simplest reversible opeation if the <code class="codeinline">CNOT</code> or <code class="codeinline">Toffoli gate</code>:</p><p>[image]</p><p>https://worrydream.com/refs/Landauer_1961_-_Irreversibility_and_Heat_Generation_in_the_Computing_Process.pdf</p><p>https://www.feynmanlectures.caltech.edu/I_46.html</p></div><div style="background-color: #222; padding: 1em; color: #fafafa">Written by Daniel Taylor.<br>Email: contact@djtaylor.me<br><br><span style="color: #aaa">© 2024 by Daniel Taylor</span></div><script id="MathJax-script" async src="/3rd-party/mathjax/tex-mml-chtml.js"></script><script>window.MathJax = { tex: { inlineMath: [['$', '$']] } };</script></body></html>
