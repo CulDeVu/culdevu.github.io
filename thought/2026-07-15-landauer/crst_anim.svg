@@ -1,0 +1,46 @@
+
+<svg version="1.1" width="400" height="800" xmlns="http://www.w3.org/2000/svg">
+<g transform="scale(10 10)">
+
+<rect x="10" width="10">
+  <animate attributeName="y" values="10;10;20;20" keyTimes="0;.3;.6;1" dur="5s" repeatCount="indefinite" />
+  <animate attributeName="height" values="10;10;0;0" keyTimes="0;.3;.6;1" dur="5s" repeatCount="indefinite" />
+  <animate attributeName="fill" values="lightblue;lightblue;plum;lightpink;lightpink" keyTimes="0;.3;.301;.6;1" dur="5s" repeatCount="indefinite" />
+</rect>
+<rect x="20" width="10">
+  <animate attributeName="y" values="10;10;20;20" keyTimes="0;.3;.6;1" dur="5s" repeatCount="indefinite" />
+  <animate attributeName="height" values="10;10;0;0" keyTimes="0;.3;.6;1" dur="5s" repeatCount="indefinite" />
+  <animate attributeName="fill" values="lightpink;lightpink;plum;lightpink;lightpink" keyTimes="0;.3;.301;.6;1" dur="5s" repeatCount="indefinite" />
+</rect>
+
+<!-- wires -->
+<path d="M15,20 c0,5 4,5 4,10" stroke="black" fill="none" />
+<path d="M25,20 c0,5 -4,5 -4,10" stroke="black" fill="none" />
+
+<path d="M10,10 l0,10 l20,0 l0,-10 m-10,0 l0,10" stroke="black" fill="none" stroke-linecap="square" />
+
+<path d="M10,10 l20,0 m-15,0 l0,-5 m10,5 l0,-5 M10,60 l10,0 m-5,0 l0,5" stroke="black" fill="none" stroke-linecap="square">
+  <animateTransform attributeName="transform" type="translate" values="0,0;0,0;0,10;0,10;" keyTimes="0;.3;.6;1" dur="5s" repeatCount="indefinite" />
+</path>
+
+<!-- middle -->
+<rect x="7" y="30" width="10" height="10" stroke="black" fill="lightblue" />
+<rect x="23" y="30" width="10" height="10" stroke="black" fill="lightpink" />
+<path d="M19,30 l0,10 m2,-10 l0,10" stroke="black" fill="none" />
+
+<path d="M17,44 l6,0 m-6,2 l6,0 m-6,2 l6,0 m-6,2 l6,0" stroke="black" fill="none" stroke-linecap="square" />
+
+<!-- last box -->
+<path d="M12.5,60 c0,-5 6.5,-5 6.5,-10" stroke="black" fill="none" />
+<path d="M17.5,60 c0,-5 3.5,-5 3.5,-10" stroke="black" fill="none" />
+
+<rect x="10" y="60" width="10">
+  <animate attributeName="height" values="0;0;10;10" keyTimes="0;.3;.6;1" dur="5s" repeatCount="indefinite" />
+  <animate attributeName="fill" values="plum;plum;lightpink;lightpink" keyTimes="0;.3;.6;1" dur="5s" repeatCount="indefinite" />
+</rect>
+<rect x="20" y="60" width="10" height="10" fill="lightblue" />
+
+<path d="M10,70 l0,-10 l20,0 l0,10 l-10,0 l0,-10" stroke="black" fill="none" stroke-linecap="square" />
+
+</g>
+</svg>

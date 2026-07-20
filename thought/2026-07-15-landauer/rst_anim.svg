@@ -1,0 +1,23 @@
+
+<svg version="1.1" width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+<g transform="scale(10 10)">
+
+<rect x="10" y="10" width="10" height="10">
+<animate attributeName="fill" values="lightblue;lightblue;plum;lightpink;lightpink" keyTimes="0; 0.16; 0.161; 0.48; 1" dur="5s" repeatCount="indefinite" />
+</rect>
+<rect x="20" y="10" width="10" height="10" fill="lightpink">
+<animate attributeName="fill" values="lightpink;lightpink;plum;lightpink;lightblue;lightblue" keyTimes="0;0.16;0.161;0.48;0.64;1" dur="5s" repeatCount="indefinite" />
+<animate attributeName="width" values="10;10;0;0;10;10" keyTimes="0;0.32;0.48;0.64;0.8;1" dur="5s" repeatCount="indefinite" />
+</rect>
+
+<path d="M30,10 L10,10 L10,20 L30,20" stroke="black" fill="none" stroke-linecap="square" />
+<path d="M20,10 l0,10" stroke="black" stroke-linecap="square">
+<animate attributeName="d" values="M20,10 l0,10; M20,10 l0,10; M20,-2 l0,10; M20,-2 l0,10; M20,10 l0,10; M20,10 l0,10" dur="5s" keyTimes="0;0.16;0.32;0.48;0.64;1" repeatCount="indefinite" />
+</path>
+
+<path d="M30,10 l0,10 m0,-5 l5,0" stroke="black" fill="none" stroke-linecap="square">
+<animateTransform attributeName="transform" type="translate" values="0;0;-10;-10;0;0" keyTimes="0;.32;.48;.64;.8;1" dur="5s" repeatCount="indefinite" />
+</path>
+
+</g>
+</svg>
